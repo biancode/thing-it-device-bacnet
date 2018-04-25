@@ -271,7 +271,7 @@ export class ConfirmedReqPDU {
         const writer = new BACnetWriterUtil();
 
         // Write Service choice
-        writer.writeUInt8(BACnetConfirmedService.ReadProperty);
+        writer.writeUInt8(BACnetConfirmedService.WriteProperty);
 
         // Write Object identifier
         writer.writeTag(0, BACnetTagTypes.context, 4);
