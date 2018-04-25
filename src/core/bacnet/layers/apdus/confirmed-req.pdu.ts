@@ -251,15 +251,16 @@ export class ConfirmedReqPDU {
         writer.writeUInt8(BACnetConfirmedService.ReadProperty);
 
         // Write Object identifier
-        writer.writeTag(0, BACnetTagTypes.context, 4);
-        writer.writeObjectIdentifier(params.unitObjId.getValue());
+        params.unitObjId.writeParam(writer, { num: 0, type: BACnetTagTypes.context });
 
         // Write Property ID
-        writer.writeParam(params.propId, 1);
+        const unitPropId = new BACnetTypes.BACnetEnumerated(params.propId);
+        unitPropId.writeParam(writer, { num: 1, type: BACnetTagTypes.context });
 
         if (_.isNumber(params.propArrayIndex)) {
             // Write Property Array Index
-            writer.writeParam(params.propArrayIndex, 2);
+            const unitPropIndex = new BACnetTypes.BACnetUnsignedInteger(params.propArrayIndex);
+            unitPropIndex.writeParam(writer, { num: 2, type: BACnetTagTypes.context });
         }
 
         return writer;
