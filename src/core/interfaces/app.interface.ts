@@ -15,10 +15,6 @@ export interface IBACnetAddressInfo {
  */
 
 /* Application Config */
-export interface IAppConfig {
-    server: IServerConfig;
-    bacnet?: IBACnetConfig;
-}
 
 /* BACnet config */
 export interface IBACnetConfig {
@@ -26,9 +22,16 @@ export interface IBACnetConfig {
 }
 
 /* Server config */
-export interface IServerConfig {
+import { InputSocket, OutputSocket } from '../sockets';
+
+export interface IServerSocketConfig {
     port: number;
     outputSequence: ISequenceConfig;
+}
+
+export interface IServerSocketResponse {
+    input: InputSocket;
+    output: OutputSocket;
 }
 
 /* Sequence Manager Config */
