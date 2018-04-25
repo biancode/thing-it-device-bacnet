@@ -1,4 +1,3 @@
-
 export abstract class Logger {
     abstract logInfo(message: string): void;
     abstract logDebug(message: string): void;
@@ -36,6 +35,14 @@ export interface IServerSocketConfig {
 export interface IServerSocketResponse {
     message: Buffer;
     output: OutputSocket;
+}
+
+/* BACnet Manager */
+import { ILayer } from '../bacnet/interfaces';
+
+export interface IBACnetResponse {
+    layer: ILayer;
+    server: IServerSocketResponse;
 }
 
 /* Sequence Manager Config */
