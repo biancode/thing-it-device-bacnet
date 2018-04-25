@@ -254,12 +254,12 @@ export class ConfirmedReqPDU {
         params.unitObjId.writeParam(writer, { num: 0, type: BACnetTagTypes.context });
 
         // Write Property ID
-        const unitPropId = new BACnetTypes.BACnetEnumerated(params.propId);
+        const unitPropId = new BACnetTypes.BACnetEnumerated(params.unitProp.id);
         unitPropId.writeParam(writer, { num: 1, type: BACnetTagTypes.context });
 
-        if (_.isNumber(params.propArrayIndex)) {
+        if (_.isNumber(params.unitProp.index)) {
             // Write Property Array Index
-            const unitPropIndex = new BACnetTypes.BACnetUnsignedInteger(params.propArrayIndex);
+            const unitPropIndex = new BACnetTypes.BACnetUnsignedInteger(params.unitProp.index);
             unitPropIndex.writeParam(writer, { num: 2, type: BACnetTagTypes.context });
         }
 
