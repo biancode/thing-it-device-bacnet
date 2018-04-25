@@ -38,6 +38,8 @@ import {
     BACnetTypeBase,
 } from '../../types';
 
+import * as BACnetTypes from '../../types';
+
 export class ConfirmedReqPDU {
     public readonly className: string = 'ConfirmedReqPDU';
 
@@ -276,23 +278,26 @@ export class ConfirmedReqPDU {
         writer.writeUInt8(BACnetConfirmedService.WriteProperty);
 
         // Write Object identifier
-        writer.writeTag(0, BACnetTagTypes.context, 4);
-        writer.writeObjectIdentifier(params.unitObjId.getValue());
+        params.unitObjId.writeParam(writer, { num: 0, type: BACnetTagTypes.context });
 
         // Write Property ID
-        writer.writeParam(params.unitProp.id, 1);
+        const unitPropId = new BACnetTypes.BACnetEnumerated(params.unitProp.id);
+        unitPropId.writeParam(writer, { num: 1, type: BACnetTagTypes.context });
 
         if (_.isNumber(params.unitProp.index)) {
             // Write Property Array Index
-            writer.writeParam(params.unitProp.index, 2);
+            const unitPropIndex = new BACnetTypes.BACnetUnsignedInteger(params.unitProp.index);
+            unitPropIndex.writeParam(writer, { num: 2, type: BACnetTagTypes.context });
         }
 
         // Write Property Value
-        writer.writeValue(3, params.unitProp.payload);
+        const propValue = params.unitProp.payload as BACnetTypes.BACnetTypeBase;
+        propValue.writeParam(writer, { num: 3, type: BACnetTagTypes.context });
 
         if (params.unitProp.commandable) {
             // Write Property Priority
-            writer.writeParam(params.unitProp.priority, 4);
+            const unitPropPriority = new BACnetTypes.BACnetUnsignedInteger(params.unitProp.priority);
+            unitPropPriority.writeParam(writer, { num: 4, type: BACnetTagTypes.context });
         }
 
         return writer;
