@@ -92,7 +92,15 @@ export interface IWriteConfirmedReqUnsubscribeCOVProperty {
 export interface IServiceConfirmedReqReadProperty
     extends IWriteConfirmedReq, IWriteConfirmedReqReadProperty {
 }
-
+export interface IServiceConfirmedReqWriteProperty
+    extends IWriteConfirmedReq, IWriteConfirmedReqWriteProperty {
+}
+export interface IServiceConfirmedReqSubscribeCOV
+    extends IWriteConfirmedReq, IWriteConfirmedReqSubscribeCOVProperty {
+}
+export interface IServiceConfirmedReqUnsubscribeCOV
+    extends IWriteConfirmedReq, IWriteConfirmedReqUnsubscribeCOVProperty {
+}
 
 /**
  * Simple ACK
