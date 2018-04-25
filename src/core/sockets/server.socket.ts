@@ -16,8 +16,6 @@ import { logger } from '../utils';
 
 import { OutputSocket } from './output.socket';
 
-import { ServerSequence } from '../configs';
-
 import { SequenceManager } from '../managers';
 
 export class ServerSocket {
@@ -30,13 +28,13 @@ export class ServerSocket {
 
     private sequenceManager: SequenceManager;
 
-    public initManager (serverConfig: IServerSocketConfig): void {
+    public initServer (serverConfig: IServerSocketConfig): void {
         // Save configuration
         this.serverConfig = serverConfig;
         // Create response flow
         this.respFlow = new Subject();
         // Create sequence manager
-        this.sequenceManager = new SequenceManager(this.serverConfig.outputSequence);
+        this.sequenceManager = new SequenceManager(this.serverConfig.sequence);
     }
 
     /**
