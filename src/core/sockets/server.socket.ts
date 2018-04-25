@@ -22,17 +22,21 @@ export class ServerSocket {
     public readonly className: string = 'Server';
 
     private sock: dgram.Socket;
-    private respFlow: Subject<IServerSocketResponse>;
 
     private serverConfig: IServerSocketConfig;
 
     private sequenceManager: SequenceManager;
 
+    private _respFlow: Subject<IServerSocketResponse>;
+    public get respFlow (): Subject<IServerSocketResponse> {
+        return this._respFlow;
+    }
+
     public initServer (serverConfig: IServerSocketConfig): void {
         // Save configuration
         this.serverConfig = serverConfig;
         // Create response flow
-        this.respFlow = new Subject();
+        this._respFlow = new Subject();
         // Create sequence manager
         this.sequenceManager = new SequenceManager(this.serverConfig.sequence);
     }
@@ -43,8 +47,8 @@ export class ServerSocket {
      * @return {Bluebird<any>}
      */
     public destroy (): Bluebird<any> {
-        this.respFlow.complete();
-        this.respFlow = null;
+        this._respFlow.complete();
+        this._respFlow = null;
 
         return new Bluebird((resolve, reject) => {
             this.sock.close(() => { resolve(); });
@@ -69,7 +73,7 @@ export class ServerSocket {
                 port: rinfo.port, address: rinfo.address,
             });
 
-            this.respFlow.next({ message: msg, output: outputSoc });
+            this._respFlow.next({ message: msg, output: outputSoc });
         });
 
         const startPromise = new Bluebird((resolve, reject) => {
