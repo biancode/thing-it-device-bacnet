@@ -79,6 +79,16 @@ export interface IWriteConfirmedReqWriteProperty {
     unitObjId: BACnetTypes.BACnetObjectId;
     unitProp: IBACnetObjectProperty;
 }
+export interface IWriteConfirmedReqSubscribeCoVProperty {
+    processId: BACnetTypes.BACnetUnsignedInteger;
+    unitObjId: BACnetTypes.BACnetObjectId;
+    issConfNotif: BACnetTypes.BACnetBoolean;
+    lifetime: BACnetTypes.BACnetUnsignedInteger;
+}
+export interface IWriteConfirmedReqUnsubscribeCoVProperty {
+    processId: BACnetTypes.BACnetUnsignedInteger;
+    unitObjId: BACnetTypes.BACnetObjectId;
+}
 
 export interface IServiceConfirmedReqReadProperty
     extends IWriteConfirmedReq, IWriteConfirmedReqReadProperty {
