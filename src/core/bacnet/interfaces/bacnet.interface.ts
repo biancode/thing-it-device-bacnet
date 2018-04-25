@@ -7,7 +7,7 @@ import * as BACnetTypes from '../types';
 
 export interface IBACnetObjectProperty {
     id: BACnetPropertyId;
-    payload: BACnetTypes.BACnetTypeBase | BACnetTypes.BACnetTypeBase[];
+    payload?: BACnetTypes.BACnetTypeBase | BACnetTypes.BACnetTypeBase[];
     writable?: boolean;
     priority?: number;
     index?: number;
