@@ -75,6 +75,10 @@ export interface IWriteConfirmedReqReadProperty {
     propId: number;
     propArrayIndex?: number;
 }
+export interface IWriteConfirmedReqWriteProperty {
+    unitObjId: BACnetTypes.BACnetObjectId;
+    unitProp: IBACnetObjectProperty;
+}
 
 export interface IServiceConfirmedReqReadProperty
     extends IWriteConfirmedReq, IWriteConfirmedReqReadProperty {
