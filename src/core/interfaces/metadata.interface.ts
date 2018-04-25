@@ -3,6 +3,10 @@ export interface IMasterMetadata {
     plugin: string;
     label: string;
     family: string;
+    manufacturer?: string;
+    discoverable?: boolean;
+    tangible?: boolean;
+    additionalSoftware?: any[];
     actorTypes: any[];
     sensorTypes: any[];
     events: IEvent[];
@@ -27,6 +31,7 @@ export interface IState {
     id: string;
     label: string;
     type: IStateType;
+    defaultValue?: any;
 }
 export interface IStateType {
     id: string;
