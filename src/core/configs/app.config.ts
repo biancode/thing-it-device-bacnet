@@ -1,6 +1,11 @@
-import { ISequenceConfig } from '../interfaces';
+import { IAppConfig } from '../interfaces';
 
-export const ServerSequence: ISequenceConfig = {
-    thread: 1,
-    delay: 20,
+export const config: IAppConfig = {
+    server: {
+        port: 47808,
+        sequence: {
+            thread: 1,
+            delay: 20,
+        }
+    }
 };

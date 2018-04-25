@@ -16,6 +16,10 @@ export interface IBACnetAddressInfo {
 
 /* Application Config */
 
+export interface IAppConfig {
+    server: IServerSocketConfig;
+}
+
 /* BACnet config */
 export interface IBACnetConfig {
     edeFilePath: string;
@@ -26,7 +30,7 @@ import { OutputSocket } from '../sockets';
 
 export interface IServerSocketConfig {
     port: number;
-    outputSequence: ISequenceConfig;
+    sequence: ISequenceConfig;
 }
 
 export interface IServerSocketResponse {
