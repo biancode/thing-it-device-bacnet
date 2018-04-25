@@ -22,7 +22,7 @@ export interface IBACnetConfig {
 }
 
 /* Server config */
-import { InputSocket, OutputSocket } from '../sockets';
+import { OutputSocket } from '../sockets';
 
 export interface IServerSocketConfig {
     port: number;
@@ -30,7 +30,7 @@ export interface IServerSocketConfig {
 }
 
 export interface IServerSocketResponse {
-    input: InputSocket;
+    message: Buffer;
     output: OutputSocket;
 }
 

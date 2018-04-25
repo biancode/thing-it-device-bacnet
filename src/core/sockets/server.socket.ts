@@ -14,7 +14,6 @@ import {
 import { ApiError } from '../errors';
 import { logger } from '../utils';
 
-import { InputSocket } from './input.socket';
 import { OutputSocket } from './output.socket';
 
 import { ServerSequence } from '../configs';
@@ -67,14 +66,12 @@ export class ServerSocket {
         });
 
         this.sock.on('message', (msg: Buffer, rinfo: dgram.AddressInfo) => {
-            // Generate Input Socket
-            const inputSoc = new InputSocket(msg);
             // Generate Output Socket
-            const outputSoc = this.genOutputSocket({
+            const outputSoc = this.getOutputSocket({
                 port: rinfo.port, address: rinfo.address,
             });
 
-            this.respFlow.next({ input: inputSoc, output: outputSoc });
+            this.respFlow.next({ message: msg, output: outputSoc });
         });
 
         const startPromise = new Bluebird((resolve, reject) => {
@@ -100,7 +97,7 @@ export class ServerSocket {
      * @param  {IBACnetAddressInfo} rinfo - object with endpoint address and port
      * @return {OutputSocket}
      */
-    public genOutputSocket (rinfo: IBACnetAddressInfo): OutputSocket {
+    public getOutputSocket (rinfo: IBACnetAddressInfo): OutputSocket {
         return new OutputSocket(this.sock, rinfo, this.sequenceManager);
     }
 }
