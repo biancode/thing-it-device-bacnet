@@ -78,13 +78,13 @@ export interface IWriteConfirmedReqWriteProperty {
     unitObjId: BACnetTypes.BACnetObjectId;
     unitProp: IBACnetObjectProperty;
 }
-export interface IWriteConfirmedReqSubscribeCoVProperty {
+export interface IWriteConfirmedReqSubscribeCOVProperty {
     processId: BACnetTypes.BACnetUnsignedInteger;
     unitObjId: BACnetTypes.BACnetObjectId;
     issConfNotif: BACnetTypes.BACnetBoolean;
     lifetime: BACnetTypes.BACnetUnsignedInteger;
 }
-export interface IWriteConfirmedReqUnsubscribeCoVProperty {
+export interface IWriteConfirmedReqUnsubscribeCOVProperty {
     processId: BACnetTypes.BACnetUnsignedInteger;
     unitObjId: BACnetTypes.BACnetObjectId;
 }

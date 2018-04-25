@@ -21,8 +21,8 @@ import {
     IWriteConfirmedReq,
     IWriteConfirmedReqReadProperty,
     IWriteConfirmedReqWriteProperty,
-    IWriteConfirmedReqSubscribeCoVProperty,
-    IWriteConfirmedReqUnsubscribeCoVProperty,
+    IWriteConfirmedReqSubscribeCOVProperty,
+    IWriteConfirmedReqUnsubscribeCOVProperty,
 } from '../../interfaces';
 
 import {
@@ -305,13 +305,13 @@ export class ConfirmedReqPDU {
     }
 
     /**
-     * writeSubscribeCoV - writes the "APDU Confirmed Request Subscribe CoV" message
+     * writeSubscribeCOV - writes the "APDU Confirmed Request Subscribe CoV" message
      * to subscribe or re-subscribe to the CoV events.
      *
-     * @param  {IWriteConfirmedReqSubscribeCoVProperty} params - "APDU Confirmed Request Subscribe CoV" write params
+     * @param  {IWriteConfirmedReqSubscribeCOVProperty} params - "APDU Confirmed Request Subscribe CoV" write params
      * @return {BACnetWriterUtil}
      */
-    public writeSubscribeCoV (params: IWriteConfirmedReqSubscribeCoVProperty): BACnetWriterUtil {
+    public writeSubscribeCOV (params: IWriteConfirmedReqSubscribeCOVProperty): BACnetWriterUtil {
         const writer = new BACnetWriterUtil();
 
         // Write Service choice
@@ -341,14 +341,14 @@ export class ConfirmedReqPDU {
     }
 
     /**
-     * writeUnsubscribeCoV - writes the "APDU Confirmed Request Subscribe CoV" message
+     * writeUnsubscribeCOV - writes the "APDU Confirmed Request Subscribe CoV" message
      * to cancel the CoV subscription.
      *
-     * @param  {IWriteConfirmedReqUnsubscribeCoVProperty} params - "APDU Confirmed Request Subscribe CoV" write params
+     * @param  {IWriteConfirmedReqUnsubscribeCOVProperty} params - "APDU Confirmed Request Subscribe CoV" write params
      * @return {BACnetWriterUtil}
      */
-    public writeUnsubscribeCoV (params: IWriteConfirmedReqUnsubscribeCoVProperty): BACnetWriterUtil {
-        return this.writeSubscribeCoV(params as IWriteConfirmedReqSubscribeCoVProperty);
+    public writeUnsubscribeCOV (params: IWriteConfirmedReqUnsubscribeCOVProperty): BACnetWriterUtil {
+        return this.writeSubscribeCOV(params as IWriteConfirmedReqSubscribeCOVProperty);
     }
 }
 
