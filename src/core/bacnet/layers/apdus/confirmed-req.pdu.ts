@@ -20,6 +20,7 @@ import {
 import {
     IWriteConfirmedReq,
     IWriteConfirmedReqReadProperty,
+    IWriteConfirmedReqWriteProperty,
 } from '../../interfaces';
 
 import {
@@ -255,6 +256,41 @@ export class ConfirmedReqPDU {
         if (_.isNumber(params.propArrayIndex)) {
             // Write Property Array Index
             writer.writeParam(params.propArrayIndex, 2);
+        }
+
+        return writer;
+    }
+
+    /**
+     * writeWriteProperty - writes the "APDU Confirmed Request Write Property" message.
+     *
+     * @param  {IWriteConfirmedReqWriteProperty} params - "APDU Confirmed Request Write Property" write params
+     * @return {BACnetWriterUtil}
+     */
+    public writeWriteProperty (params: IWriteConfirmedReqWriteProperty): BACnetWriterUtil {
+        const writer = new BACnetWriterUtil();
+
+        // Write Service choice
+        writer.writeUInt8(BACnetConfirmedService.ReadProperty);
+
+        // Write Object identifier
+        writer.writeTag(0, BACnetTagTypes.context, 4);
+        writer.writeObjectIdentifier(params.unitObjId.getValue());
+
+        // Write Property ID
+        writer.writeParam(params.unitProp.id, 1);
+
+        if (_.isNumber(params.unitProp.index)) {
+            // Write Property Array Index
+            writer.writeParam(params.unitProp.index, 2);
+        }
+
+        // Write Property Value
+        writer.writeValue(3, params.unitProp.payload);
+
+        if (params.unitProp.commandable) {
+            // Write Property Priority
+            writer.writeParam(params.unitProp.priority, 4);
         }
 
         return writer;
