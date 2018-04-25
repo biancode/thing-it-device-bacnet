@@ -47,6 +47,21 @@ export class BACnetNull extends BACnetTypeBase {
     }
 
     /**
+     * writeParam - writes the BACnet Param as "null" value.
+     *
+     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {IBACnetTag} tag - BACnet tag
+     * @return {void}
+     */
+    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+        const dataSize: number = 1;
+        // Tag Number - Tag Type - Param Length (bytes)
+        writer.writeTag(tag.num, tag.type, dataSize);
+        // Write "null" value
+        writer.writeUIntValue(0);
+    }
+
+    /**
      * setValue - sets the new BACnet "null" value as internal state.
      *
      * @param  {null} newValue - new "null" value

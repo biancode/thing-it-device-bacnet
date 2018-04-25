@@ -4,6 +4,7 @@ import { BACnetTypeBase } from '../type.base';
 
 import {
     BACnetPropTypes,
+    BACnetTagTypes,
 } from '../../enums';
 
 import {
@@ -50,8 +51,24 @@ export class BACnetReal extends BACnetTypeBase {
      * @return {void}
      */
     public writeValue (writer: BACnetWriterUtil): void {
-        writer.writeTag(BACnetPropTypes.real, 0, 4);
+        this.writeParam(writer, {
+            num: BACnetPropTypes.real,
+            type: BACnetTagTypes.application,
+        });
+    }
 
+    /**
+     * writeParam - writes the BACnet Param as "real" value.
+     *
+     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {IBACnetTag} tag - BACnet tag
+     * @return {void}
+     */
+    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+        const dataSize: number = 4;
+        // Tag Number - Tag Type - Param Length (bytes)
+        writer.writeTag(tag.num, tag.type, dataSize);
+        // Write "real" value
         writer.writeFloatBE(this.data)
     }
 

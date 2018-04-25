@@ -4,6 +4,8 @@ import { BACnetTypeBase } from '../type.base';
 
 import {
     BACnetPropTypes,
+    BACnetTagTypes,
+    OpertionMaxValue,
 } from '../../enums';
 
 import {
@@ -62,7 +64,25 @@ export class BACnetUnsignedInteger extends BACnetTypeBase {
      * @return {void}
      */
     public writeValue (writer: BACnetWriterUtil): void {
-        writer.writeParam(this.data, BACnetPropTypes.unsignedInt, 0);
+        this.writeParam(writer, {
+            num: BACnetPropTypes.unsignedInt,
+            type: BACnetTagTypes.application,
+        });
+    }
+
+    /**
+     * writeParam - writes the BACnet Param as "unsigned integer" value.
+     *
+     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {IBACnetTag} tag - BACnet tag
+     * @return {void}
+     */
+    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+        const dataSize = this.getUIntSize(this.data);
+        // Tag Number - Tag Type - Param Length (bytes)
+        writer.writeTag(tag.num, tag.type, dataSize);
+        // Write "unsigned integer" value
+        writer.writeUIntValue(this.data);
     }
 
     /**
@@ -100,6 +120,26 @@ export class BACnetUnsignedInteger extends BACnetTypeBase {
      */
     public get value (): number {
         return this.getValue();
+    }
+
+    /**
+     * HELPERs
+     */
+
+    /**
+     * getUIntSize - returns the size (byte) of the unsigned int value.
+     *
+     * @param  {number} uIntValue - unsigned int value
+     * @return {number}
+     */
+    public getUIntSize (uIntValue: number): number {
+        if (uIntValue <= OpertionMaxValue.uInt8) {
+            return 1;
+        } else if (uIntValue <= OpertionMaxValue.uInt16) {
+            return 2;
+        } else if (uIntValue <= OpertionMaxValue.uInt32) {
+            return 4;
+        }
     }
 
     /**

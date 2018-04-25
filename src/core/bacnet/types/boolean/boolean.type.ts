@@ -4,6 +4,7 @@ import { BACnetTypeBase } from '../type.base';
 
 import {
     BACnetPropTypes,
+    BACnetTagTypes,
 } from '../../enums';
 
 import {
@@ -49,7 +50,22 @@ export class BACnetBoolean extends BACnetTypeBase {
      * @return {void}
      */
     public writeValue (writer: BACnetWriterUtil): void {
-        writer.writeTag(BACnetPropTypes.boolean, 0, +this.data);
+        writer.writeTag(BACnetPropTypes.boolean, BACnetTagTypes.application, +this.data);
+    }
+
+    /**
+     * writeParam - writes the BACnet Param as "boolean" value.
+     *
+     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {IBACnetTag} tag - BACnet tag
+     * @return {void}
+     */
+    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+        const dataSize: number = 1;
+        // Tag Number - Tag Type - Param Length (bytes)
+        writer.writeTag(tag.num, tag.type, dataSize);
+        // Write "boolean" value
+        writer.writeUIntValue(+this.data);
     }
 
     /**

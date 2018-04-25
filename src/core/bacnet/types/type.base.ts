@@ -1,3 +1,4 @@
+import { APIError } from '../errors';
 
 import { BACnetReaderUtil, BACnetWriterUtil } from '../utils';
 
@@ -24,6 +25,10 @@ export abstract class BACnetTypeBase {
      * @return {void}
      */
     abstract writeValue (writer: BACnetWriterUtil): void;
+
+    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+        throw new APIError(`${this.className} - writeParam: Not implemented yet`);
+    }
 
     /**
      * setValue - sets the new internal state.
