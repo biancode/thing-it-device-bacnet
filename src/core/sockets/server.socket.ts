@@ -5,32 +5,38 @@ import * as _ from 'lodash';
 
 import { Subject } from 'rxjs';
 
-import { IServerConfig, IBACnetAddressInfo, ISequenceFlow } from '../interfaces';
+import {
+    IServerSocketConfig,
+    IServerSocketResponse,
+    IBACnetAddressInfo,
+} from '../interfaces';
 
 import { ApiError } from '../errors';
 import { logger } from '../utils';
 
 import { InputSocket } from './input.socket';
 import { OutputSocket } from './output.socket';
-import { ServiceSocket } from './service.socket';
+
+import { ServerSequence } from '../configs';
 
 import { SequenceManager } from '../managers';
 
-export class Server {
+export class ServerSocket {
     public readonly className: string = 'Server';
 
     private sock: dgram.Socket;
-    private serviceSocket: ServiceSocket;
-    private sequenceManager: SequenceManager;
-    private respFlow: Subject<any>;
+    private respFlow: Subject<IServerSocketResponse>;
 
-    /**
-     * @constructor
-     * @param {IBACnetModule} bacnetModule - module configuration
-     */
-    constructor (private serverConfig: IServerConfig,
-            private mainRouter: any) {
-        this.serviceSocket = new ServiceSocket();
+    private serverConfig: IServerSocketConfig;
+
+    private sequenceManager: SequenceManager;
+
+    public initManager (serverConfig: IServerSocketConfig): void {
+        // Save configuration
+        this.serverConfig = serverConfig;
+        // Create response flow
+        this.respFlow = new Subject();
+        // Create sequence manager
         this.sequenceManager = new SequenceManager(this.serverConfig.outputSequence);
     }
 
@@ -40,6 +46,9 @@ export class Server {
      * @return {Bluebird<any>}
      */
     public destroy (): Bluebird<any> {
+        this.respFlow.complete();
+        this.respFlow = null;
+
         return new Bluebird((resolve, reject) => {
             this.sock.close(() => { resolve(); });
         });
@@ -58,18 +67,14 @@ export class Server {
         });
 
         this.sock.on('message', (msg: Buffer, rinfo: dgram.AddressInfo) => {
-            // Generate Request instance
+            // Generate Input Socket
             const inputSoc = new InputSocket(msg);
-            // Generate Response instance
+            // Generate Output Socket
             const outputSoc = this.genOutputSocket({
                 port: rinfo.port, address: rinfo.address,
             });
-            // Handle request
-            try {
-                this.mainRouter(inputSoc, outputSoc, this.serviceSocket);
-            } catch (error) {
-                logger.error(`Server - router:`, error);
-            }
+
+            this.respFlow.next({ input: inputSoc, output: outputSoc });
         });
 
         const startPromise = new Bluebird((resolve, reject) => {
@@ -83,7 +88,9 @@ export class Server {
         if (!this.serverConfig.port) {
             throw new ApiError(`${this.className} - startServer: Port is required!`);
         }
+
         this.sock.bind(this.serverConfig.port);
+
         return startPromise;
     }
 
@@ -95,9 +102,5 @@ export class Server {
      */
     public genOutputSocket (rinfo: IBACnetAddressInfo): OutputSocket {
         return new OutputSocket(this.sock, rinfo, this.sequenceManager);
-    }
-
-    public registerService (serviceName: string, service: any) {
-        this.serviceSocket.addService(serviceName, service);
     }
 }
