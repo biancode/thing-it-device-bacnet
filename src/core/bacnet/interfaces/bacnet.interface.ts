@@ -17,7 +17,7 @@ export interface IBACnetObjectProperty {
 export interface IBACnetTag {
     num: number;
     type: BACnetTagTypes;
-    value: number;
+    value?: number;
 }
 
 
