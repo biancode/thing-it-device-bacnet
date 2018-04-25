@@ -10,6 +10,8 @@ export interface IBACnetObjectProperty {
     payload: BACnetTypes.BACnetTypeBase | BACnetTypes.BACnetTypeBase[];
     writable?: boolean;
     priority?: number;
+    index?: number;
+    commandable?: boolean;
 }
 
 export interface IBACnetTag {
