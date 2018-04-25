@@ -11,6 +11,12 @@ import {
     BACnetTypeBase,
 } from '../types';
 
+export interface ILayer {
+    blvc: ILayerBLVC;
+    npdu: ILayerNPDU;
+    apdu: ILayerAPDU;
+}
+
 /*
  * BLVC Layer
  */
