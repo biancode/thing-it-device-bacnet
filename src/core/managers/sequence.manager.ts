@@ -4,30 +4,42 @@ import { Subject, Subscription } from 'rxjs';
 
 import {
     ApiError,
-} from '../core/errors';
+} from '../errors';
 
 import {
     ISequenceConfig,
     ISequenceFlow,
-} from '../core/interfaces';
+} from '../interfaces';
 
 import {
     logger,
-} from '../core/utils';
+} from '../utils';
 
 type TObjectID = string;
 
 export class SequenceManager {
+    private sjDataFlow: Subject<ISequenceFlow>;
     private subDataFlow: Subscription;
+
     private freeFlows: Map<TObjectID, ISequenceFlow[]>;
     private busyFlows: Map<TObjectID, number>;
 
-    constructor (private seqConfig: ISequenceConfig,
-        dataFlow: Subject<ISequenceFlow>) {
+    constructor (private seqConfig: ISequenceConfig) {
+    }
+
+    /**
+     * initManager - inits internal data flow storages, data flow subject and
+     * data flow subscription.
+     *
+     * @return {void}
+     */
+    public initManager (): void {
         this.freeFlows = new Map();
         this.busyFlows = new Map();
 
-        this.subDataFlow = dataFlow.subscribe((flow) => {
+        this.sjDataFlow = new Subject();
+
+        this.subDataFlow = this.sjDataFlow.subscribe((flow) => {
             if (!this.busyFlows.has(flow.id)) {
                 this.busyFlows.set(flow.id, 0);
                 this.freeFlows.set(flow.id, []);
@@ -40,6 +52,15 @@ export class SequenceManager {
         });
     }
 
+    /**
+     * next - emits new "value" for sequence data flow.
+     *
+     * @param  {ISequenceFlow} data - value for sequence data flow
+     * @return {void}
+     */
+    public next (data: ISequenceFlow): void {
+        return this.sjDataFlow.next(data);
+    }
 
     /**
      * destroy - unsubscribes from the data flow.
@@ -47,9 +68,18 @@ export class SequenceManager {
      * @return {void}
      */
     public destroy (): void {
-        if (_.get(this, 'subDataFlow.unsubscribe')) {
+        try {
+            this.freeFlows.clear();
+            this.freeFlows = null;
+
+            this.busyFlows.clear();
+            this.busyFlows = null;
+
+            this.sjDataFlow.complete();
+            this.sjDataFlow = null;
+
             this.subDataFlow.unsubscribe();
-        }
+        } catch (error) { ; }
     }
 
     /**

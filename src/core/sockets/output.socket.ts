@@ -2,18 +2,18 @@ import * as dgram from 'dgram';
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 
-import { Subject } from 'rxjs';
-
 import { logger } from '../utils';
 
-import { IBACnetAddressInfo, ISequenceFlow } from '../interfaces';
+import { IBACnetAddressInfo } from '../interfaces';
+
+import { SequenceManager } from '../managers';
 
 export class OutputSocket {
     public readonly className: string = 'OutputSocket';
 
     constructor (private app: dgram.Socket,
         private rinfo: IBACnetAddressInfo,
-        private reqFlow: Subject<ISequenceFlow>) {
+        private seqManager: SequenceManager) {
     }
 
     /**
@@ -46,7 +46,7 @@ export class OutputSocket {
      * @return {Bluebird<any>}
      */
     public send (msg: Buffer, reqMethodName: string): void {
-        this.reqFlow.next({
+        this.seqManager.next({
             id: `${this.rinfo.address}:${this.rinfo.port}`,
             object: this,
             method: this._send,
@@ -86,7 +86,7 @@ export class OutputSocket {
      * @return {Bluebird<any>}
      */
     public sendBroadcast (msg: Buffer, reqMethodName: string): void {
-        this.reqFlow.next({
+        this.seqManager.next({
             id: `${this.rinfo.address}:${this.rinfo.port}`,
             object: this,
             method: this._sendBroadcast,

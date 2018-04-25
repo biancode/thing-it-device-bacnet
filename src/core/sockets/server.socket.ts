@@ -14,14 +14,15 @@ import { InputSocket } from './input.socket';
 import { OutputSocket } from './output.socket';
 import { ServiceSocket } from './service.socket';
 
-import { SequenceManager } from '../../managers/sequence.manager';
+import { SequenceManager } from '../managers';
 
 export class Server {
-    private className: string = 'Server';
+    public readonly className: string = 'Server';
+
     private sock: dgram.Socket;
     private serviceSocket: ServiceSocket;
     private sequenceManager: SequenceManager;
-    private reqFlow: Subject<ISequenceFlow>;
+    private respFlow: Subject<any>;
 
     /**
      * @constructor
@@ -29,9 +30,8 @@ export class Server {
      */
     constructor (private serverConfig: IServerConfig,
             private mainRouter: any) {
-        this.reqFlow = new Subject();
         this.serviceSocket = new ServiceSocket();
-        this.sequenceManager = new SequenceManager(this.serverConfig.outputSequence, this.reqFlow);
+        this.sequenceManager = new SequenceManager(this.serverConfig.outputSequence);
     }
 
     /**
@@ -94,7 +94,7 @@ export class Server {
      * @return {OutputSocket}
      */
     public genOutputSocket (rinfo: IBACnetAddressInfo): OutputSocket {
-        return new OutputSocket(this.sock, rinfo, this.reqFlow);
+        return new OutputSocket(this.sock, rinfo, this.sequenceManager);
     }
 
     public registerService (serviceName: string, service: any) {
