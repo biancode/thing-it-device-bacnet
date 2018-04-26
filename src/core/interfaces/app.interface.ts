@@ -16,7 +16,7 @@ export interface IAppConfig {
 }
 
 /* Socket Server */
-import { OutputSocket } from '../sockets';
+import { OutputSocket, ServerSocket } from '../sockets';
 
 export interface IServerSocketConfig {
     port: number;
@@ -44,7 +44,7 @@ export interface ISequenceConfig {
 
 /* BACnet Service Manager Config */
 export interface IBACnetServiceManagerConfig {
-    socket: OutputSocket;
+    server: ServerSocket;
 }
 
 /* BACnet Flow Manager Config */
