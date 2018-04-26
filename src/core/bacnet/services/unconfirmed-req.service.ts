@@ -14,16 +14,17 @@ import {
 } from '../interfaces';
 
 export class UnconfirmedReqService {
-    private readonly className: string = 'UnconfirmedReq';
+    static readonly className: string = 'UnconfirmedReq';
 
     /**
      * whoIs - sends the "whoIs" request.
      *
+     * @static
      * @param  {IServiceUnconfirmReqWhoIs} opts - request options
      * @param  {OutputSocket} outputSoc - output socket
      * @return {type}
      */
-    public whoIs (opts: IServiceUnconfirmedReqWhoIs) {
+    static whoIs (opts: IServiceUnconfirmedReqWhoIs) {
         // Generate APDU writer
         const writerUnconfirmReq = unconfirmedReqPDU.writeReq(opts);
         const writerWhoIs = unconfirmedReqPDU.writeWhoIs(opts);
@@ -56,11 +57,12 @@ export class UnconfirmedReqService {
     /**
      * iAm - sends the "iAm" unconfirmed request.
      *
+     * @static
      * @param  {IServiceUnconfirmReqIAm} opts - request options
      * @param  {OutputSocket} outputSoc - output socket
      * @return {type}
      */
-    public iAm (opts: IServiceUnconfirmedReqIAm) {
+    static iAm (opts: IServiceUnconfirmedReqIAm) {
         // Generate APDU writer
         const writerUnconfirmReq = unconfirmedReqPDU.writeReq(opts);
         const writerIAm = unconfirmedReqPDU.writeIAm(opts);
@@ -93,11 +95,12 @@ export class UnconfirmedReqService {
     /**
      * covNotification - sends the "COV notification" unconfirmed request.
      *
+     * @static
      * @param  {RequestSocket} req - request object (socket)
      * @param  {ResponseSocket} resp - response object (socket)
      * @return {type}
      */
-    public covNotification (opts: IServiceUnconfirmedReqCOVNotification) {
+    static covNotification (opts: IServiceUnconfirmedReqCOVNotification) {
         // Generate APDU writer
         const writerUnconfirmReq = unconfirmedReqPDU.writeReq(opts);
         const writerCOVNotification = unconfirmedReqPDU.writeCOVNotification(opts);
@@ -121,5 +124,3 @@ export class UnconfirmedReqService {
         return msgBACnet;
     }
 }
-
-export const unconfirmedReqService: UnconfirmedReqService = new UnconfirmedReqService();

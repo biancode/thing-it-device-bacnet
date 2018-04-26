@@ -12,16 +12,17 @@ import {
 } from '../interfaces';
 
 export class ComplexACKService {
-    private readonly className: string = 'ComplexACK';
+    static readonly className: string = 'ComplexACK';
 
     /**
      * readProperty - sends the "readProperty" complex ack request.
      *
+     * @static
      * @param  {IServiceComplexACKReadProperty} opts - request options
      * @param  {OutputSocket} outputSoc - output socket
      * @return {type}
      */
-    public readProperty (opts: IServiceComplexACKReadProperty): Buffer {
+    static readProperty (opts: IServiceComplexACKReadProperty): Buffer {
         // Generate APDU writer
         const writerComplexACK = complexACKPDU.writeReq(opts);
         const writerReadProperty = complexACKPDU.writeReadProperty(opts);
@@ -45,5 +46,3 @@ export class ComplexACKService {
         return msgBACnet;
     }
 }
-
-export const complexACKService: ComplexACKService = new ComplexACKService();

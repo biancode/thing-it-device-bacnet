@@ -13,16 +13,17 @@ import {
 } from '../interfaces';
 
 export class SimpleACKService {
-    private readonly className: string = 'SimpleACK';
+    static readonly className: string = 'SimpleACK';
 
     /**
      * subscribeCOV - sends the "subscribeCOV" simple ack request.
      *
+     * @static
      * @param  {IServiceSimpleACKSubscribeCOV} opts - request options
      * @param  {OutputSocket} outputSoc - output socket
      * @return {type}
      */
-    public subscribeCOV (opts: IServiceSimpleACKSubscribeCOV) {
+    static subscribeCOV (opts: IServiceSimpleACKSubscribeCOV) {
         // Generate APDU writer
         const writerSimpleACKPDU = simpleACKPDU.writeReq(opts);
         const writerSubscribeCOV = simpleACKPDU.writeSubscribeCOV(opts);
@@ -49,11 +50,12 @@ export class SimpleACKService {
     /**
      * writeProperty - sends the "writeProperty" simple ack request.
      *
+     * @static
      * @param  {IServiceSimpleACKWriteProperty} opts - request options
      * @param  {OutputSocket} outputSoc - output socket
      * @return {type}
      */
-    public writeProperty (
+    static writeProperty (
             opts: IServiceSimpleACKWriteProperty) {
         // Generate APDU writer
         const writerSimpleACKPDU = simpleACKPDU.writeReq(opts);
@@ -78,5 +80,3 @@ export class SimpleACKService {
         return msgBACnet;
     }
 }
-
-export const simpleACKService: SimpleACKService = new SimpleACKService();
