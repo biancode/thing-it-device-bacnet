@@ -133,64 +133,6 @@ describe('BACnetWriterUtil', () => {
             testBuffer(bacnetWriterUtil, [ 0x19, 0x1f ]);
         });
     });
-
-    describe('writeObjectIdentifier', () => {
-        let bacnetWriterUtil: BACnetWriterUtil;
-
-        beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
-        });
-
-        it('should set object type 8 and object instance 9999', () => {
-            bacnetWriterUtil.writeObjectIdentifier({ type: 8, instance: 9999 });
-            testBuffer(bacnetWriterUtil, [ 0x02, 0x00, 0x27, 0x0f ]);
-        });
-
-        it('should set object type 5 and object instance 46', () => {
-            bacnetWriterUtil.writeObjectIdentifier({ type: 5, instance: 46 });
-            testBuffer(bacnetWriterUtil, [ 0x01, 0x40, 0x00, 0x2e ]);
-        });
-    });
-
-    describe('writeParam', () => {
-        let bacnetWriterUtil: BACnetWriterUtil;
-
-        beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
-        });
-
-        it('should set tag 1/1/1 and param 0x08', () => {
-            bacnetWriterUtil.writeParam(0x08, 1);
-            testBuffer(bacnetWriterUtil, [ 0x19, 0x08 ]);
-        });
-
-        it('should set tag 2/1/2 and param 0x6708', () => {
-            bacnetWriterUtil.writeParam(0x6708, 2, 0);
-            testBuffer(bacnetWriterUtil, [ 0x22, 0x67, 0x08 ]);
-        });
-
-        it('should set tag 2/1/4 and param 0x12345678', () => {
-            bacnetWriterUtil.writeParam(0x12345678, 2);
-            testBuffer(bacnetWriterUtil, [ 0x2C, 0x12, 0x34, 0x56, 0x78 ]);
-        });
-    });
-
-    describe('writeProperty', () => {
-        let bacnetWriterUtil: BACnetWriterUtil;
-        beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
-        });
-
-        it('should set tag 1/1/1 and param 0x08', () => {
-            bacnetWriterUtil.writeProperty(0x08, 1);
-            testBuffer(bacnetWriterUtil, [ 0x19, 0x08 ]);
-        });
-
-        it('should set tag 2/1/1 and param 0x4f', () => {
-            bacnetWriterUtil.writeProperty(0x4f, 2);
-            testBuffer(bacnetWriterUtil, [ 0x29, 0x4f ]);
-        });
-    });
 });
 
 function testBuffer (bacnetWriterUtil: BACnetWriterUtil, buffer: number[]) {

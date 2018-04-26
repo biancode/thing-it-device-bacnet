@@ -147,19 +147,6 @@ export class BACnetWriterUtil {
     }
 
     /**
-     * writeObjectIdentifier - writes BACnet object identifier to the internal buffer.
-     *
-     * @param  {IBACnetTypeObjectId} objId - object identifier
-     * @return {void}
-     */
-    public writeObjectIdentifier (objId: IBACnetTypeObjectId): void {
-        // Object Identifier = Object Type 10 bits, Object ID 22 bits
-        const objectIdentifier = ((objId.type & 0x03FF) << 22)
-            | (objId.instance & 0x03FFFFF);
-        this.writeUInt32BE(objectIdentifier);
-    }
-
-    /**
      * writeValue - writes BACnet property value to the internal buffer.
      *
      * @param  {BACnetTypes.BACnetTypeBase|BACnetTypes.BACnetTypeBase[]} propValues - bacnet property value

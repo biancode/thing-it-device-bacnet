@@ -77,7 +77,9 @@ export class BACnetObjectId extends BACnetTypeBase {
         // Tag Number - Tag Type - Param Length (bytes)
         writer.writeTag(tag.num, tag.type, dataSize);
         // Write "object identifier" value
-        writer.writeObjectIdentifier(this.data);
+        const objectIdentifier = ((this.data.type & 0x03FF) << 22)
+            | (this.data.instance & 0x03FFFFF);
+        writer.writeUInt32BE(objectIdentifier);
     }
 
     /**
