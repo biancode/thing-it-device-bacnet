@@ -29,6 +29,10 @@ export class BACnetEnumerated extends BACnetTypeBase {
             ? 0 : this.checkAndGetValue(defValue);
     }
 
+    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetEnumerated {
+        return super.readParam(reader, changeOffset);
+    }
+
     /**
      * readValue - parses the message with BACnet "enumerated" value.
      *

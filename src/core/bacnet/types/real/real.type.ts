@@ -29,6 +29,10 @@ export class BACnetReal extends BACnetTypeBase {
             ? 0 : this.checkAndGetValue(defValue);
     }
 
+    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetReal {
+        return super.readParam(reader, changeOffset);
+    }
+
     /**
      * readValue - parses the message with BACnet "real" value.
      *

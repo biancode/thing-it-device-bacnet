@@ -31,6 +31,10 @@ export class BACnetObjectId extends BACnetTypeBase {
             : this.checkAndGetValue(_.clone(defValue));
     }
 
+    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetObjectId {
+        return super.readParam(reader, changeOffset);
+    }
+
     /**
      * readValue - parses the message with BACnet "object identifier" value.
      *

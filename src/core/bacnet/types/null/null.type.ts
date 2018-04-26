@@ -24,6 +24,10 @@ export class BACnetNull extends BACnetTypeBase {
         super();
     }
 
+    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetNull {
+        return super.readParam(reader, changeOffset);
+    }
+
     /**
      * readValue - parses the message with BACnet "null" value.
      *

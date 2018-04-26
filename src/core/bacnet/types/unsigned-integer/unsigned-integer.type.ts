@@ -30,6 +30,10 @@ export class BACnetUnsignedInteger extends BACnetTypeBase {
             ? 0 : this.checkAndGetValue(defValue);
     }
 
+    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetUnsignedInteger {
+        return super.readParam(reader, changeOffset);
+    }
+
     /**
      * readValue - parses the message with BACnet "unsigned integer" value.
      *

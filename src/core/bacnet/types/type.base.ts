@@ -4,10 +4,16 @@ import { BACnetReaderUtil, BACnetWriterUtil } from '../utils';
 
 import { IBACnetTag } from '../interfaces';
 
-export abstract class BACnetTypeBase {
+export class BACnetTypeBase {
     public readonly className: string = 'BACnetTypeBase';
     protected tag: IBACnetTag;
     protected data: any;
+
+    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): any {
+        const inst = new this();
+        inst.readValue(reader, changeOffset);
+        return inst;
+    }
 
     /**
      * readValue - parses the message with BACnet value.
@@ -16,7 +22,7 @@ export abstract class BACnetTypeBase {
      * @param  {type} [changeOffset = true] - change offset in the buffer of reader
      * @return {void}
      */
-    abstract readValue (reader: BACnetReaderUtil, changeOffset?: boolean): void;
+    public readValue (reader: BACnetReaderUtil, changeOffset?: boolean): void { ; }
 
     /**
      * writeValue - writes the BACnet value.
@@ -24,7 +30,7 @@ export abstract class BACnetTypeBase {
      * @param  {BACnetWriterUtil} writer - BACnet writer
      * @return {void}
      */
-    abstract writeValue (writer: BACnetWriterUtil): void;
+    public writeValue (writer: BACnetWriterUtil): void { ; }
 
     public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
         throw new APIError(`${this.className} - writeParam: Not implemented yet`);
@@ -36,28 +42,28 @@ export abstract class BACnetTypeBase {
      * @param  {any} newValue - new "unsigned integer" value
      * @return {void}
      */
-    abstract setValue (newValute: any): void;
+    public setValue (newValute: any): void { ; }
 
     /**
      * getValue - returns the internal state.
      *
      * @return {any}
      */
-    abstract getValue (): any;
+    public getValue (): any { ; }
 
     /**
      * value - sets the new internal state
      *
      * @type {any}
      */
-    abstract get value (): any;
+    public get value (): any { return null; }
 
     /**
      * value - returns the internal state..
      *
      * @type {any}
      */
-    abstract set value (newValute: any);
+    public set value (newValute: any) { ; }
 
     /**
      * getTag - returns the BACnet tag.

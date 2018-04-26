@@ -32,6 +32,10 @@ export class BACnetStatusFlags extends BACnetTypeBase {
         this.data = this.checkAndGetValue(defValue);
     }
 
+    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetStatusFlags {
+        return super.readParam(reader, changeOffset);
+    }
+
     /**
      * readValue - parses the message with BACnet "status flags" value.
      *

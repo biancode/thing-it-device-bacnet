@@ -29,6 +29,10 @@ export class BACnetCharacterString extends BACnetTypeBase {
             ? '' : this.checkAndGetValue(defValue);
     }
 
+    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetCharacterString {
+        return super.readParam(reader, changeOffset);
+    }
+
     /**
      * readValue - parses the message with BACnet "character string" value.
      *
