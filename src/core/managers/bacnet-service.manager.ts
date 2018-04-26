@@ -3,7 +3,10 @@ import { OutputSocket } from '../sockets';
 import { APIService } from '../services';
 import * as APIBACnetServices from '../services/bacnet';
 
-import { IBACnetServiceManagerConfig } from '../interfaces';
+import {
+    IBACnetServiceManagerConfig,
+    IBACnetAddressInfo,
+} from '../interfaces';
 
 export class BACnetServiceManager {
     private config: IBACnetServiceManagerConfig;
@@ -28,18 +31,17 @@ export class BACnetServiceManager {
      */
     public initManager (config: IBACnetServiceManagerConfig): void {
         this.config = config;
-
-        this._apiService = this.createAPIService(config.socket);
     }
 
     /**
      * createAPIServices - creates the API service. Method creates instance of
-     * the each BACnet API service.
+     * each BACnet API service.
      *
-     * @param  {OutputSocket} socket - instance of the OutputSocket
+     * @param  {IBACnetAddressInfo} rinfo - address of the BACnet Device
      * @return {APIService} - instance of the API service
      */
-    private createAPIService (socket: OutputSocket): APIService {
+    public createAPIService (rinfo: IBACnetAddressInfo): APIService {
+        const socket = this.config.server.getOutputSocket(rinfo);
         const apiService = new APIService();
 
         const confirmedReqService = new APIBACnetServices
