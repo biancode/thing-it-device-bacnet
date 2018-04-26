@@ -34,6 +34,16 @@ export class BACnetAppManager {
         return this._flowManager;
     }
 
+    /**
+     * initManager - inits the BACnet Application Manager.
+     * Steps:
+     * - creates, inits and starts the instance of Socket Server.
+     * - creates and inits BACnet Service Manager.
+     * - creates and inits BACnet Flow Manager.
+     *
+     * @async
+     * @return {Promise<void>}
+     */
     public async initManager (): Promise<void> {
         /* Create, init and start socket server */
         this.socketServer = new ServerSocket();
