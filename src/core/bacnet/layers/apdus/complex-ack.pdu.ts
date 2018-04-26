@@ -27,12 +27,6 @@ import {
     IWriteComplexACKReadProperty,
 } from '../../interfaces';
 
-import {
-    BACnetUnsignedInteger,
-    BACnetObjectId,
-    BACnetTypeBase,
-} from '../../types';
-
 import * as BACnetTypes from '../../types';
 
 export class ComplexACKPDU {
@@ -184,7 +178,7 @@ export class ComplexACKPDU {
         // Write Object identifier
         params.unitObjId.writeParam(writer, { num: 0, type: BACnetTagTypes.context });
 
-        // Write PropertyID
+        // Write Property ID
         const unitPropId = new BACnetTypes.BACnetEnumerated(params.unitProp.id);
         unitPropId.writeParam(writer, { num: 1, type: BACnetTagTypes.context });
 
@@ -194,8 +188,8 @@ export class ComplexACKPDU {
             unitPropIndex.writeParam(writer, { num: 2, type: BACnetTagTypes.context });
         }
 
-        // Write PropertyID
-        writer.writeValue(3, params.unitProp.payload);
+        // Write Property Value
+        writer.writeValue(params.unitProp.payload, { num: 3, type: BACnetTagTypes.context });
 
         return writer;
     }

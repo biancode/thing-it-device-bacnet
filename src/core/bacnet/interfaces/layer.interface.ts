@@ -125,10 +125,10 @@ export type ILayerUnconfirmedReqService = ILayerUnconfirmedReqServiceIAm
     | ILayerUnconfirmedReqServiceWhoIs;
 
 export interface ILayerUnconfirmedReqServiceIAm {
-    objId: BACnetObjectId;
-    maxAPDUlength: BACnetUnsignedInteger;
-    segmSupported: BACnetUnsignedInteger;
-    vendorId: BACnetUnsignedInteger;
+    objId: BACnetTypes.BACnetObjectId;
+    maxAPDUlength: BACnetTypes.BACnetUnsignedInteger;
+    segmSupported: BACnetTypes.BACnetEnumerated;
+    vendorId: BACnetTypes.BACnetUnsignedInteger;
 }
 
 export interface ILayerUnconfirmedReqServiceWhoIs {

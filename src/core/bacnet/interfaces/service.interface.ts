@@ -42,8 +42,8 @@ export interface IWriteUnconfirmedReq {
 export interface IWriteUnconfirmedReqWhoIs {
 }
 export interface IWriteUnconfirmedReqIAm {
-    objId: IBACnetObjectProperty;
-    vendorId: IBACnetObjectProperty;
+    objId: BACnetTypes.BACnetObjectId;
+    vendorId: BACnetTypes.BACnetUnsignedInteger;
 }
 export interface IWriteUnconfirmedReqCOVNotification {
     processId: BACnetTypes.BACnetUnsignedInteger;

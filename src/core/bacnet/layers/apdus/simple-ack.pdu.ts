@@ -29,11 +29,7 @@ import {
     BACnetServiceTypes,
 } from '../../enums';
 
-import {
-    BACnetUnsignedInteger,
-    BACnetObjectId,
-    BACnetTypeBase,
-} from '../../types';
+import * as BACnetTypes from '../../types';
 
 export class SimpleACKPDU {
     public readonly className: string = 'SimpleACKPDU';

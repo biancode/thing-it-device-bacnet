@@ -31,11 +31,7 @@ import {
     BACnetServiceTypes,
 } from '../../enums';
 
-import {
-    BACnetUnsignedInteger,
-    BACnetObjectId,
-    BACnetTypeBase,
-} from '../../types';
+import * as BACnetTypes from '../../types';
 
 export class UnconfirmedReqPDU {
     public readonly className: string = 'UnconfirmedReqPDU';
@@ -90,19 +86,19 @@ export class UnconfirmedReqPDU {
      */
     private getIAm (reader: BACnetReaderUtil): ILayerUnconfirmedReqServiceIAm {
         let serviceData: ILayerUnconfirmedReqServiceIAm;
-        let objId: BACnetObjectId,
-            maxAPDUlength: BACnetUnsignedInteger,
-            segmSupported: BACnetUnsignedInteger,
-            vendorId: BACnetUnsignedInteger;
+        let objId: BACnetTypes.BACnetObjectId,
+            maxAPDUlength: BACnetTypes.BACnetUnsignedInteger,
+            segmSupported: BACnetTypes.BACnetEnumerated,
+            vendorId: BACnetTypes.BACnetUnsignedInteger;
 
         try {
-            objId = reader.readObjectIdentifier();
+            objId = BACnetTypes.BACnetObjectId.readParam(reader);
 
-            maxAPDUlength = reader.readParam();
+            maxAPDUlength = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
 
-            segmSupported = reader.readParam();
+            segmSupported = BACnetTypes.BACnetEnumerated.readParam(reader);
 
-            vendorId = reader.readParam();
+            vendorId = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
         } catch (error) {
             throw new BACnetError(`${this.className} - getIAm: Parse - ${error}`);
         }
@@ -174,26 +170,18 @@ export class UnconfirmedReqPDU {
         writer.writeUInt8(BACnetUnconfirmedService.iAm);
 
         // Write Object identifier
-        const objIdPayload = params.objId.payload as BACnetObjectId;
-        writer.writeTag(BACnetPropTypes.objectIdentifier,
-            BACnetTagTypes.application, 4);
-        writer.writeObjectIdentifier(objIdPayload.getValue());
+        params.objId.writeValue(writer);
 
         // Write maxAPDUlength (1476 chars)
-        writer.writeTag(BACnetPropTypes.unsignedInt,
-            BACnetTagTypes.application, 2);
-        writer.writeUInt16BE(0x05c4);
+        const maxAPDUlength = new BACnetTypes.BACnetUnsignedInteger(0x05c4);
+        maxAPDUlength.writeValue(writer);
 
         // Write Segmentation supported
-        writer.writeTag(BACnetPropTypes.enumerated,
-            BACnetTagTypes.application, 1);
-        writer.writeUInt8(0x00);
+        const segmSupported = new BACnetTypes.BACnetEnumerated(0x00);
+        segmSupported.writeValue(writer);
 
         // Write Vendor ID
-        const propIdPayload = params.vendorId.payload as BACnetUnsignedInteger;
-        writer.writeTag(BACnetPropTypes.unsignedInt,
-            BACnetTagTypes.application, 1);
-        writer.writeUInt8(propIdPayload.getValue());
+        params.vendorId.writeValue(writer);
 
         return writer;
     }
@@ -211,28 +199,28 @@ export class UnconfirmedReqPDU {
         writer.writeUInt8(BACnetUnconfirmedService.covNotification);
 
         // Write Process Identifier
-        writer.writeParam(params.processId.getValue(), 0);
+        params.processId.writeParam(writer, { num: 0, type: BACnetTagTypes.context });
 
-        // Write Device Object Identifier
-        writer.writeTag(1, BACnetTagTypes.context, 4);
-        writer.writeObjectIdentifier(params.devObjId.getValue());
+        // Write Object Identifier for master Object
+        params.devObjId.writeParam(writer, { num: 1, type: BACnetTagTypes.context });
 
-        // Write Object Identifier for device port
-        writer.writeTag(2, BACnetTagTypes.context, 4);
-        writer.writeObjectIdentifier(params.unitObjId.getValue());
+        // Write Object Identifier for slave Object
+        params.unitObjId.writeParam(writer, { num: 2, type: BACnetTagTypes.context });
 
         // Write timer remaining
-        writer.writeParam(0x00, 3);
+        const timeRemaining = new BACnetTypes.BACnetUnsignedInteger(0x00);
+        timeRemaining.writeParam(writer, { num: 3, type: BACnetTagTypes.context });
 
         // List of Values
         // Write opening tag for list of values
         writer.writeTag(4, BACnetTagTypes.context, 6);
 
         _.map(params.reportedProps, (reportedProp) => {
-            // Write PropertyID
-            writer.writeParam(reportedProp.id, 0);
-            // Write PropertyValue
-            writer.writeValue(2, reportedProp.payload);
+            // Write Property ID
+            const propId = new BACnetTypes.BACnetEnumerated(reportedProp.id);
+            propId.writeParam(writer, { num: 0, type: BACnetTagTypes.context });
+            // Write Property Value
+            writer.writeValue(reportedProp.payload, { num: 2, type: BACnetTagTypes.context });
         });
 
         // Write closing tag for list of values
