@@ -47,6 +47,11 @@ export interface IBACnetServiceManagerConfig {
     socket: OutputSocket;
 }
 
+/* BACnet Flow Manager Config */
+export interface IBACnetFlowManagerConfig {
+    server: ServerSocket;
+}
+
 /**
  * Alias
  */
