@@ -11,6 +11,8 @@ import {
     BACnetTypeBase,
 } from '../types';
 
+import * as BACnetTypes from '../types';
+
 export interface ILayer {
     blvc: ILayerBLVC;
     npdu: ILayerNPDU;
@@ -91,22 +93,23 @@ export type ILayerConfirmedReqService = ILayerConfirmedReqServiceReadProperty
     | ILayerConfirmedReqServiceWriteProperty;
 
 export interface ILayerConfirmedReqServiceReadProperty {
-    objId: BACnetObjectId;
-    propId: BACnetUnsignedInteger;
+    objId: BACnetTypes.BACnetObjectId;
+    propId: BACnetTypes.BACnetEnumerated;
 }
 
 export interface ILayerConfirmedReqServiceSubscribeCOV {
-    objId: BACnetObjectId;
-    subscriberProcessId: BACnetUnsignedInteger;
-    issConfNotif: BACnetUnsignedInteger;
-    lifeTime: BACnetUnsignedInteger;
+    objId: BACnetTypes.BACnetObjectId;
+    subscriberProcessId: BACnetTypes.BACnetUnsignedInteger;
+    issConfNotif: BACnetTypes.BACnetBoolean;
+    lifeTime: BACnetTypes.BACnetUnsignedInteger;
 }
 
 export interface ILayerConfirmedReqServiceWriteProperty {
-    objId: BACnetObjectId;
-    propId: BACnetUnsignedInteger;
-    propValues: BACnetTypeBase[];
-    priority: BACnetUnsignedInteger;
+    objId: BACnetTypes.BACnetObjectId;
+    propId: BACnetTypes.BACnetEnumerated;
+    propArrayIndex?: BACnetTypes.BACnetUnsignedInteger;
+    propValues: BACnetTypes.BACnetTypeBase[];
+    priority: BACnetTypes.BACnetUnsignedInteger;
 }
 
 /*

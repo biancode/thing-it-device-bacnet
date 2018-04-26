@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import { BACnetError } from '../../errors';
 
 import {
-    OffsetUtil,
     TyperUtil,
     BACnetReaderUtil,
     BACnetWriterUtil,
@@ -31,12 +30,6 @@ import {
     BACnetConfirmedService,
     BACnetServiceTypes,
 } from '../../enums';
-
-import {
-    BACnetUnsignedInteger,
-    BACnetObjectId,
-    BACnetTypeBase,
-} from '../../types';
 
 import * as BACnetTypes from '../../types';
 
@@ -126,12 +119,12 @@ export class ConfirmedReqPDU {
      */
     private getReadProperty (reader: BACnetReaderUtil): ILayerConfirmedReqServiceReadProperty {
         let serviceData: ILayerConfirmedReqServiceReadProperty;
-        let objId: BACnetObjectId, propId: BACnetUnsignedInteger;
+        let objId: BACnetTypes.BACnetObjectId, propId: BACnetTypes.BACnetEnumerated;
 
         try {
-            objId = reader.readObjectIdentifier();
+            objId = BACnetTypes.BACnetObjectId.readParam(reader);
 
-            propId = reader.readParam();
+            propId = BACnetTypes.BACnetEnumerated.readParam(reader);
         } catch (error) {
             throw new BACnetError(`${this.className} - getReadProperty: Parse - ${error}`);
         }
@@ -152,19 +145,19 @@ export class ConfirmedReqPDU {
      */
     private getSubscribeCOV (reader: BACnetReaderUtil): ILayerConfirmedReqServiceSubscribeCOV {
         let serviceData: ILayerConfirmedReqServiceSubscribeCOV;
-        let objId: BACnetObjectId,
-            subscriberProcessId: BACnetUnsignedInteger,
-            issConfNotif: BACnetUnsignedInteger,
-            lifeTime: BACnetUnsignedInteger;
+        let objId: BACnetTypes.BACnetObjectId,
+            subscriberProcessId: BACnetTypes.BACnetUnsignedInteger,
+            issConfNotif: BACnetTypes.BACnetBoolean,
+            lifeTime: BACnetTypes.BACnetUnsignedInteger;
 
         try {
-            subscriberProcessId = reader.readParam();
+            subscriberProcessId = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
 
-            objId = reader.readObjectIdentifier();
+            objId = BACnetTypes.BACnetObjectId.readParam(reader);
 
-            issConfNotif = reader.readParam();
+            issConfNotif = BACnetTypes.BACnetBoolean.readParam(reader);
 
-            lifeTime = reader.readParam();
+            lifeTime = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
         } catch (error) {
             throw new BACnetError(`${this.className} - getSubscribeCOV: Parse - ${error}`);
         }
@@ -187,19 +180,27 @@ export class ConfirmedReqPDU {
      */
     private getWriteProperty (reader: BACnetReaderUtil): ILayerConfirmedReqServiceWriteProperty {
         let serviceData: ILayerConfirmedReqServiceWriteProperty;
-        let objId: BACnetObjectId,
-            propId: BACnetUnsignedInteger,
-            propValues: BACnetTypeBase[],
-            priority: BACnetUnsignedInteger;
+        let objId: BACnetTypes.BACnetObjectId,
+            propId: BACnetTypes.BACnetEnumerated,
+            propArrayIndex: BACnetTypes.BACnetUnsignedInteger,
+            propValues: BACnetTypes.BACnetTypeBase[],
+            priority: BACnetTypes.BACnetUnsignedInteger;
 
         try {
-            objId = reader.readObjectIdentifier();
+            objId = BACnetTypes.BACnetObjectId.readParam(reader);
 
-            propId = reader.readParam();
+            propId = BACnetTypes.BACnetEnumerated.readParam(reader);
+
+            const optTag = reader.readTag(false);
+            const optTagNumber = optTag.num;
+
+            if (optTagNumber === 2) {
+                propArrayIndex = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
+            }
 
             propValues = reader.readParamValue();
 
-            priority = reader.readParam();
+            priority = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
         } catch (error) {
             throw new BACnetError(`${this.className} - getWriteProperty: Parse - ${error}`);
         }
