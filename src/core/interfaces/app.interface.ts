@@ -9,22 +9,13 @@ export interface IBACnetAddressInfo {
     port: number;
 }
 
-/**
- * Configuration
- */
 
 /* Application Config */
-
 export interface IAppConfig {
     server: IServerSocketConfig;
 }
 
-/* BACnet config */
-export interface IBACnetConfig {
-    edeFilePath: string;
-}
-
-/* Server config */
+/* Socket Server */
 import { OutputSocket } from '../sockets';
 
 export interface IServerSocketConfig {
@@ -75,9 +66,4 @@ export interface ISequenceFlow {
     object: any;
     method: any;
     params: any[];
-}
-
-export interface IDistribution {
-    min: number;
-    max: number;
 }
