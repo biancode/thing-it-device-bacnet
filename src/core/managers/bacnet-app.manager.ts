@@ -11,8 +11,28 @@ import { BACnetServiceManager } from './bacnet-service.manager';
 
 export class BACnetAppManager {
     private socketServer: ServerSocket;
-    private serviceManager: BACnetServiceManager;
-    private flowManager: BACnetFlowManager;
+
+    private _serviceManager: BACnetServiceManager;
+
+    /**
+     * Return instance of the BACnet Service Manager
+     *
+     * @type {BACnetServiceManager}
+     */
+    public get serviceManager (): BACnetServiceManager {
+        return this._serviceManager;
+    }
+
+    private _flowManager: BACnetFlowManager;
+
+    /**
+     * Return instance of the BACnet Flow Manager
+     *
+     * @type {BACnetFlowManager}
+     */
+    public get flowManager (): BACnetFlowManager {
+        return this._flowManager;
+    }
 
     public async initManager (): Promise<void> {
         /* Create, init and start socket server */
@@ -21,11 +41,11 @@ export class BACnetAppManager {
         await this.socketServer.startServer();
 
         /* Create and init BACnet Service Manager */
-        this.serviceManager = new BACnetServiceManager();
-        this.serviceManager.initManager({ server: this.socketServer });
+        this._serviceManager = new BACnetServiceManager();
+        this._serviceManager.initManager({ server: this.socketServer });
 
         /* Create and init BACnet Flow Manager */
-        this.flowManager = new BACnetFlowManager();
-        this.flowManager.initManager({ server: this.socketServer });
+        this._flowManager = new BACnetFlowManager();
+        this._flowManager.initManager({ server: this.socketServer });
     }
 }
