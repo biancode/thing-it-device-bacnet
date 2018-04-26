@@ -4,17 +4,14 @@ import { BACnetError } from '../errors';
 
 import {
     IBACnetTypeObjectId,
+    IBACnetTag,
 } from '../interfaces';
 
 import {
-    BACnetPropertyId,
-    BACnetPropTypes,
     OpertionMaxValue,
-    BACnetTagTypes,
 } from '../enums';
 
 import { OffsetUtil } from './offset.util';
-import { TyperUtil } from './typer.util';
 
 import * as BACnetTypes from '../types';
 
@@ -152,8 +149,7 @@ export class BACnetWriterUtil {
     /**
      * writeObjectIdentifier - writes BACnet object identifier to the internal buffer.
      *
-     * @param  {number} objectType - object type
-     * @param  {number} objectId - object id
+     * @param  {IBACnetTypeObjectId} objId - object identifier
      * @return {void}
      */
     public writeObjectIdentifier (objId: IBACnetTypeObjectId): void {
@@ -164,50 +160,16 @@ export class BACnetWriterUtil {
     }
 
     /**
-     * writeParam - writes BACnet param to the internal buffer.
-     *
-     * @param  {number} paramValue - param value
-     * @param  {number} tagNumber - tag number
-     * @param  {BACnetTagTypes} [tagType=BACnetTagTypes.context] - tag type
-     * @return {void}
-     */
-    public writeParam (
-            paramValue: number, tagNumber: number,
-            tagType: BACnetTagTypes = BACnetTagTypes.context): void {
-        const uIntSize = this.getUIntSize(paramValue);
-        // Tag Number - Tag Type - Param Length (bytes)
-        this.writeTag(tagNumber, tagType, uIntSize);
-        // Write unsigned integer value
-        this.writeUIntValue(paramValue);
-    }
-
-    /**
-     * writeProperty - writes BACnet param name to the internal buffer.
-     *
-     * @param  {number} paramName - param name
-     * @param  {number} tagContext - tag context
-     * @return {void}
-     */
-    public writeProperty (propName: number, tagContext: number): void {
-        // Context Number - Context tag - Param Length (bytes)
-        this.writeTag(tagContext, 1, 1);
-
-        // Write property
-        this.writeUInt8(propName);
-    }
-
-    /**
      * writeValue - writes BACnet property value to the internal buffer.
      *
-     * @param  {number} tagNumber - tag number
-     * @param  {BACnetPropTypes} valueType - type of property value
-     * @param  {IBACnetType} value - parama object with value
+     * @param  {BACnetTypes.BACnetTypeBase|BACnetTypes.BACnetTypeBase[]} propValues - bacnet property value
+     * @param  {IBACnetTag} tag - bacnet tag
      * @return {void}
      */
-    public writeValue (tagNumber: number,
-            propValues: BACnetTypes.BACnetTypeBase | BACnetTypes.BACnetTypeBase[]): void {
+    public writeValue (propValues: BACnetTypes.BACnetTypeBase | BACnetTypes.BACnetTypeBase[],
+            tag: IBACnetTag): void {
         // Context Number - Context tag - "Opening" Tag
-        this.writeTag(tagNumber, 1, 6);
+        this.writeTag(tag.num, tag.type, 6);
 
         let values: BACnetTypes.BACnetTypeBase[] = _.isArray(propValues)
             ? propValues : [ propValues ];
@@ -217,7 +179,7 @@ export class BACnetWriterUtil {
         });
 
         // Context Number - Context tag - "Closing" Tag
-        this.writeTag(tagNumber, 1, 7);
+        this.writeTag(tag.num, tag.type, 7);
     }
 
     /**
@@ -234,22 +196,6 @@ export class BACnetWriterUtil {
             this.writeUInt16BE(uIntValue);
         } else if (uIntValue <= OpertionMaxValue.uInt32) {
             this.writeUInt32BE(uIntValue);
-        }
-    }
-
-    /**
-     * getUIntSize - returns the size (byte) of the unsigned int value.
-     *
-     * @param  {number} uIntValue - unsigned int value
-     * @return {number}
-     */
-    public getUIntSize (uIntValue: number): number {
-        if (uIntValue <= OpertionMaxValue.uInt8) {
-            return 1;
-        } else if (uIntValue <= OpertionMaxValue.uInt16) {
-            return 2;
-        } else if (uIntValue <= OpertionMaxValue.uInt32) {
-            return 4;
         }
     }
 }
