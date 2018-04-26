@@ -28,12 +28,12 @@ export interface IServerSocketResponse {
     socket: OutputSocket;
 }
 
-/* BACnet Manager */
+/* BACnet Flow Manager */
 import { ILayer } from '../bacnet/interfaces';
 
 export interface IBACnetResponse {
     layer: ILayer;
-    server: IServerSocketResponse;
+    socket: OutputSocket;
 }
 
 /* Sequence Manager Config */
