@@ -151,10 +151,10 @@ export interface ILayerComplexACK {
 export type ILayerComplexACKService = ILayerComplexACKServiceReadProperty;
 
 export interface ILayerComplexACKServiceReadProperty {
-    objId: BACnetObjectId;
-    propId: BACnetUnsignedInteger;
-    propArrayIndex?: BACnetUnsignedInteger;
-    propValues?: BACnetTypeBase[];
+    objId: BACnetTypes.BACnetObjectId;
+    propId: BACnetTypes.BACnetEnumerated;
+    propArrayIndex?: BACnetTypes.BACnetUnsignedInteger;
+    propValues?: BACnetTypes.BACnetTypeBase[];
 }
 
 /*

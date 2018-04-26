@@ -33,6 +33,8 @@ import {
     BACnetTypeBase,
 } from '../../types';
 
+import * as BACnetTypes from '../../types';
+
 export class ComplexACKPDU {
     public readonly className: string = 'ComplexACKPDU';
 
@@ -103,21 +105,21 @@ export class ComplexACKPDU {
     private getReadProperty (reader: BACnetReaderUtil): ILayerComplexACKServiceReadProperty {
         let serviceData: ILayerComplexACKServiceReadProperty;
 
-        let objId: BACnetObjectId,
-            propId: BACnetUnsignedInteger,
-            propArrayIndex: BACnetUnsignedInteger,
-            propValues: BACnetTypeBase[];
+        let objId: BACnetTypes.BACnetObjectId,
+            propId: BACnetTypes.BACnetEnumerated,
+            propArrayIndex: BACnetTypes.BACnetUnsignedInteger,
+            propValues: BACnetTypes.BACnetTypeBase[];
 
         try {
-            objId = reader.readObjectIdentifier();
+            objId = BACnetTypes.BACnetObjectId.readParam(reader);
 
-            propId = reader.readParam();
+            propId = BACnetTypes.BACnetEnumerated.readParam(reader);
 
             const optTag = reader.readTag(false);
             const optTagNumber = optTag.num;
 
             if (optTagNumber === 2) {
-                propArrayIndex = reader.readParam();
+                propArrayIndex = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
             }
 
             propValues = reader.readParamValue();
@@ -180,11 +182,17 @@ export class ComplexACKPDU {
         writer.writeUInt8(BACnetConfirmedService.ReadProperty);
 
         // Write Object identifier
-        writer.writeTag(0, BACnetTagTypes.context, 4);
-        writer.writeObjectIdentifier(params.unitObjId.getValue());
+        params.unitObjId.writeParam(writer, { num: 0, type: BACnetTagTypes.context });
 
         // Write PropertyID
-        writer.writeParam(params.unitProp.id, 1);
+        const unitPropId = new BACnetTypes.BACnetEnumerated(params.unitProp.id);
+        unitPropId.writeParam(writer, { num: 1, type: BACnetTagTypes.context });
+
+        if (_.isNumber(params.unitProp.index)) {
+            // Write Property Array Index
+            const unitPropIndex = new BACnetTypes.BACnetUnsignedInteger(params.unitProp.index);
+            unitPropIndex.writeParam(writer, { num: 2, type: BACnetTagTypes.context });
+        }
 
         // Write PropertyID
         writer.writeValue(3, params.unitProp.payload);
