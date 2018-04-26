@@ -51,6 +51,11 @@ export interface ISequenceConfig {
     delay: number;
 }
 
+/* BACnet Service Manager Config */
+export interface IBACnetServiceManagerConfig {
+    socket: OutputSocket;
+}
+
 /**
  * Alias
  */
