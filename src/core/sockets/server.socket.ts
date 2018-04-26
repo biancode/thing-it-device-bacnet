@@ -73,7 +73,7 @@ export class ServerSocket {
                 port: rinfo.port, address: rinfo.address,
             });
 
-            this._respFlow.next({ message: msg, output: outputSoc });
+            this._respFlow.next({ message: msg, socket: outputSoc });
         });
 
         const startPromise = new Bluebird((resolve, reject) => {

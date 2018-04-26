@@ -34,7 +34,7 @@ export interface IServerSocketConfig {
 
 export interface IServerSocketResponse {
     message: Buffer;
-    output: OutputSocket;
+    socket: OutputSocket;
 }
 
 /* BACnet Manager */
