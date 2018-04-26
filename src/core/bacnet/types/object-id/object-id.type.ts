@@ -46,10 +46,10 @@ export class BACnetObjectId extends BACnetTypeBase {
         const tag = reader.readTag(changeOffset);
         this.tag = tag;
 
-        const objId = reader.readUInt32BE(changeOffset);
-        const objIdPayload = reader.decodeObjectIdentifier(objId);
+        const encodedObjId = reader.readUInt32BE(changeOffset);
+        const decodedObjId = this.decodeObjectIdentifier(encodedObjId);
 
-        this.data = objIdPayload;
+        this.data = decodedObjId;
     }
 
     /**
@@ -132,5 +132,30 @@ export class BACnetObjectId extends BACnetTypeBase {
         }
 
         return value;
+    }
+
+    /**
+     * HELPERs
+     */
+
+    /**
+     * decodeObjectIdentifier - decodes the Object Identifier and returns the
+     * map with object type and object instance.
+     *
+     * @param  {number} objId - 4 bytes of object identifier
+     * @return {Map<string, any>}
+     */
+    private decodeObjectIdentifier (objId: number): IBACnetTypeObjectId {
+        let objIdPayload: IBACnetTypeObjectId;
+        const objType = (objId >> 22) & 0x03FF;
+
+        const objInstance = objId & 0x03FFFFF;
+
+        objIdPayload = {
+            type: objType,
+            instance: objInstance,
+        };
+
+        return objIdPayload;
     }
 }

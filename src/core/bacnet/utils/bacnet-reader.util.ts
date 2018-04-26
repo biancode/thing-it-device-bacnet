@@ -132,59 +132,6 @@ export class BACnetReaderUtil {
         return tagData;
     }
 
-
-    /**
-     * readObjectIdentifier - reads the BACnet object identifier from the internal
-     * buffer and returns map with:
-     * - tag = param tag (tag map)
-     * - type = object type (number)
-     * - instance = object instance (number)
-     *
-     * @return {Map<string, any>}
-     */
-    public readObjectIdentifier (changeOffset: boolean = true): BACnetTypes.BACnetObjectId {
-        const inst = new BACnetTypes.BACnetObjectId();
-        inst.readValue(this);
-
-        return inst;
-    }
-
-    /**
-     * decodeObjectIdentifier - decodes the Object Identifier and returns the
-     * map with object type and object instance.
-     *
-     * @param  {number} objId - 4 bytes of object identifier
-     * @return {Map<string, any>}
-     */
-    public decodeObjectIdentifier (objId: number): IBACnetTypeObjectId {
-        let objIdPayload: IBACnetTypeObjectId;
-        const objType = (objId >> 22) & 0x03FF;
-
-        const objInstance = objId & 0x03FFFFF;
-
-        objIdPayload = {
-            type: objType,
-            instance: objInstance,
-        };
-
-        return objIdPayload;
-    }
-
-    /**
-     * readParam - reads the BACnet param from the internal buffer and returns
-     * map with:
-     * - tag = param tag (tag map)
-     * - value = param value (number)
-     *
-     * @return {Map<string, any>}
-     */
-    public readParam (changeOffset: boolean = true): BACnetTypes.BACnetUnsignedInteger {
-        const inst = new BACnetTypes.BACnetUnsignedInteger();
-        inst.readValue(this, changeOffset);
-
-        return inst;
-    }
-
     /**
      * readParamValue - reads the param value from internal buffer.
      *
