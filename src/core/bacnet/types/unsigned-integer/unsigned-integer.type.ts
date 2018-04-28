@@ -127,6 +127,29 @@ export class BACnetUnsignedInteger extends BACnetTypeBase {
     }
 
     /**
+     * Performs a comparison between current BACnet value and `data` to determine if
+     * they are equivalent.
+     *
+     * @param  {number|BACnetUnsignedInteger} data - data for comparison
+     * @return {boolean} - result of the comparison
+     */
+    public isEqual (data: number|BACnetUnsignedInteger): boolean {
+        if (_.isNil(data)) {
+            return false;
+        }
+
+        if (typeof data === `number`) {
+            return this.value === data;
+        }
+
+        if (data instanceof BACnetUnsignedInteger) {
+            return this.value === data.value;
+        }
+
+        return false;
+    }
+
+    /**
      * HELPERs
      */
 

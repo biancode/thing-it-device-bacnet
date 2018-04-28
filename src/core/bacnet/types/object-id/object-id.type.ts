@@ -120,6 +120,29 @@ export class BACnetObjectId extends BACnetTypeBase {
     }
 
     /**
+     * Performs a comparison between current BACnet value and `data` to determine if
+     * they are equivalent.
+     *
+     * @param  {IBACnetTypeObjectId|BACnetObjectId} data - data for comparison
+     * @return {boolean} - result of the comparison
+     */
+    public isEqual (data: IBACnetTypeObjectId|BACnetObjectId): boolean {
+        if (_.isNil(data)) {
+            return false;
+        }
+
+        if (data instanceof BACnetObjectId) {
+            return this.isEqualObjectId(this.value, data.value);
+        }
+
+        if (typeof data === `object`) {
+            return this.isEqualObjectId(this.value, data);
+        }
+
+        return false;
+    }
+
+    /**
      * checkAndGetValue - checks if "value" is a correct "object identifier" value,
      * throws the error if "value" has incorrect type.
      *
@@ -137,6 +160,12 @@ export class BACnetObjectId extends BACnetTypeBase {
     /**
      * HELPERs
      */
+
+     private isEqualObjectId (objId1: IBACnetTypeObjectId,
+             objId2: IBACnetTypeObjectId): boolean {
+         return objId1.type === objId2.type
+             && objId1.instance === objId2.instance;
+     }
 
     /**
      * decodeObjectIdentifier - decodes the Object Identifier and returns the
