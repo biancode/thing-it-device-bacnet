@@ -13,7 +13,7 @@ import { ILayer } from '../bacnet/interfaces';
 import { BACnetUtil } from '../bacnet/utils';
 
 import * as BACnetTypes from '../bacnet/types';
-import { BACnetServiceTypes } from '../bacnet/enums';
+import { BACnetServiceTypes, BACnetPropertyId } from '../bacnet/enums';
 
 type BACnetFlowFilter = (resp: IBACnetResponse) => boolean;
 
@@ -118,6 +118,25 @@ export class BACnetFlowManager {
             const respObjId: BACnetTypes.BACnetObjectId =
                 _.get(resp, 'layer.apdu.service.objId', null);
             return !_.isNil(respObjId) && respObjId.isEqual(objId);
+        };
+    }
+
+    /**
+     * isBACnetObject - creates filter for flow, compares the BACnet objects.
+     * Branches:
+     * - If object identifier does not exist in response, filter will return "false".
+     * - If object identifier from response do not equal to object identifier from arguments,
+     * filter will return "false".
+     * - If object identifier from response equal to object identifier from arguments,
+     * filter will return "true".
+     *
+     * @return {BACnetFlowFilter}
+     */
+    public isBACnetProperty (propId: BACnetPropertyId): BACnetFlowFilter {
+        return (resp: IBACnetResponse): boolean => {
+            const respPropId: BACnetTypes.BACnetUnsignedInteger =
+                _.get(resp, 'layer.apdu.service.propId', null);
+            return !_.isNil(respPropId) && respPropId.isEqual(propId);
         };
     }
 }
