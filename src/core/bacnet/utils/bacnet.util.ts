@@ -16,10 +16,4 @@ export class BACnetUtil {
             apdu: _.get(blvcMessage, 'npdu.apdu'),
         };
     }
-
-    static isEqualObjectId (objId1: BACnetTypes.BACnetObjectId,
-            objId2: BACnetTypes.BACnetObjectId): boolean {
-        return objId1.value.type === objId2.value.type
-            && objId1.value.instance === objId2.value.instance;
-    }
 }
