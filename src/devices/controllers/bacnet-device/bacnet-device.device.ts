@@ -38,6 +38,13 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public start () {
         super.start();
 
+        let initResult: Promise<any>;
+        try {
+            initResult = this.initDevice();
+        } catch (error) {
+            this.logError(`BACnetDeviceController - start: ${error}`);
+        }
+
         return this.initDevice();
     }
 
