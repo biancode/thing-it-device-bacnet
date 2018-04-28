@@ -13,6 +13,14 @@ import {
 } from '../../../core/managers';
 
 import {
+    BACnetObjectType,
+    BACnetServiceTypes,
+    BACnetUnconfirmedService,
+} from '../../../core/bacnet/enums';
+
+import * as BACnetTypes from '../../../core/bacnet/types';
+
+import {
     IBACnetDeviceControllerState,
     IBACnetDeviceControllerConfig
 } from '../../../core/interfaces';
@@ -24,6 +32,9 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public appManager: BACnetAppManager;
     public flowManager: BACnetFlowManager;
     public serviceManager: BACnetServiceManager;
+
+    private objectId: BACnetTypes.BACnetObjectId;
+
     public start () {
         super.start();
 
@@ -69,5 +80,20 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         this.appManager = appManager;
         this.flowManager = appManager.flowManager;
         this.serviceManager = appManager.serviceManager;
+    }
+
+    /**
+     * initDeviceParamsFromConfig - creates and inits params of the BACnet Device
+     * from plugin configuration.
+     * Steps:
+     * - creates and inits `objectId`.
+     *
+     * @return {void}
+     */
+    public initDeviceParamsFromConfig (): void {
+        this.objectId = new BACnetTypes.BACnetObjectId({
+            type: BACnetObjectType.Device,
+            instance: this.config.deviceId,
+        });
     }
 }
