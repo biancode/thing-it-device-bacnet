@@ -13,11 +13,11 @@ export class AppStore <RootState> {
     constructor (reducer: Reducer<RootState, any>, initialState: RootState) {
         this.store = createStore(reducer, <any>initialState);
 
-        const reduxState = this.getState();
+        const reduxState = this.getStore();
         this.dataFlow = new BehaviorSubject(reduxState);
 
         this.store.subscribe(() => {
-            const newState = this.getState();
+            const newState = this.getStore();
             this.dataFlow.next(newState);
         });
     }
@@ -30,6 +30,18 @@ export class AppStore <RootState> {
      */
     public dispatch (action: IAction): IAction {
         return this.store.dispatch<IAction>(action);
+    }
+
+    /**
+     * Returns the state by specific selector.
+     *
+     * @param  {string[]|string} selector - store selector (path)
+     * @return {RootState}
+     */
+    public getState (selector: string[]|string): any {
+        const selectorPath = this.calculateSelectorPath(selector);
+        const reduxStore = this.getStore();
+        return _.get(reduxStore, selectorPath);
     }
 
     /**
@@ -48,10 +60,7 @@ export class AppStore <RootState> {
      * @return {Observable<T>}
      */
     public select <T> (selector: string[]|string): Observable<T> {
-        const selectorFixed = selector ? selector : '';
-        const selectorArray = _.isArray(selectorFixed)
-            ? selectorFixed : [selectorFixed];
-        const selectorPath = selectorArray.join('.');
+        const selectorPath = this.calculateSelectorPath(selector);
 
         return this.dataFlow
             .pipe(
@@ -61,5 +70,16 @@ export class AppStore <RootState> {
                 }),
                 distinctUntilChanged(),
             );
+    }
+
+    private calculateSelectorPath (selector: string[]|string): string {
+        const selectorFixed = selector ? selector : '';
+
+        const selectorArray = _.isArray(selectorFixed)
+            ? selectorFixed : [selectorFixed];
+
+        const selectorPath = selectorArray.join('.');
+
+        return selectorPath;
     }
 }
