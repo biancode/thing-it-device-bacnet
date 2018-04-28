@@ -117,7 +117,7 @@ export class BACnetFlowManager {
         return (resp: IBACnetResponse): boolean => {
             const respObjId: BACnetTypes.BACnetObjectId =
                 _.get(resp, 'layer.apdu.service.objId', null);
-            return !_.isNil(respObjId) && BACnetUtil.isEqualObjectId(objId, respObjId);
+            return !_.isNil(respObjId) && respObjId.isEqual(objId);
         };
     }
 }
