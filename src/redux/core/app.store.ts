@@ -37,7 +37,7 @@ export class AppStore <RootState> {
      *
      * @return {RootState}
      */
-    public getState (): RootState {
+    public getStore (): RootState {
         return this.store.getState();
     }
 
