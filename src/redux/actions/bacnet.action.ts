@@ -3,6 +3,7 @@ import { BACnetEvent } from '../events/bacnet.event';
 import { IAction } from '../core/redux.interface';
 
 import { BACnetFlowManager, BACnetServiceManager } from '../../core/managers';
+import { ServerSocket } from '../../core/sockets';
 
 export class BACnetAction {
 
@@ -31,6 +32,20 @@ export class BACnetAction {
         return store.dispatch({
             type: BACnetEvent.setBACnetServiceManager,
             payload: { manager : manager },
+        });
+    }
+
+    /**
+     *  Sets the instance of the BACnet Server to `redux` store.
+     *
+     * @static
+     * @param  {ServerSocket} server - instance of the BACnet Server
+     * @return {IAction}
+     */
+    static setBACnetServer (server: ServerSocket): IAction {
+        return store.dispatch({
+            type: BACnetEvent.setBACnetServiceManager,
+            payload: { server : server },
         });
     }
 }
