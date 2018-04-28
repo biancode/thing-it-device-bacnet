@@ -161,6 +161,13 @@ export class BACnetObjectId extends BACnetTypeBase {
      * HELPERs
      */
 
+     /**
+      * Compares two BACnet "object identifier" values.
+      *
+      * @param  {IBACnetTypeObjectId} objId1 - first "object identifier" value
+      * @param  {IBACnetTypeObjectId} objId2 - second "object identifier" value
+      * @return {boolean} - result of the comparison
+      */
      private isEqualObjectId (objId1: IBACnetTypeObjectId,
              objId2: IBACnetTypeObjectId): boolean {
          return objId1.type === objId2.type
