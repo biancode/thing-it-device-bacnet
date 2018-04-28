@@ -7,6 +7,12 @@ import { ApiError } from '../../../core/errors';
 import { ControllerDevice } from '../controller.device';
 
 import {
+    BACnetAppManager,
+    BACnetFlowManager,
+    BACnetServiceManager,
+} from '../../../core/managers';
+
+import {
     IBACnetDeviceControllerState,
     IBACnetDeviceControllerConfig
 } from '../../../core/interfaces';
@@ -15,6 +21,9 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public state: IBACnetDeviceControllerState;
     public config: IBACnetDeviceControllerConfig;
 
+    public appManager: BACnetAppManager;
+    public flowManager: BACnetFlowManager;
+    public serviceManager: BACnetServiceManager;
     public start () {
         super.start();
 
@@ -32,5 +41,33 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         await super.initDevice();
 
         this.state.initialized = true;
+    }
+
+    /**
+     * createAppManager - creates instance of the BACnet Application Manager.
+     *
+     * @return {BACnetAppManager}
+     */
+    public createAppManager (): BACnetAppManager {
+        return this.isSimulated()
+            ? null
+            : new BACnetAppManager();
+    }
+
+    /**
+     * initBACnetManagers - creates and inits BACnet Managers.
+     * - creates and inits App Manager
+     * - gets Flow Manager
+     * - gets Service Manager
+     *
+     * @return {void}
+     */
+    public initBACnetManagers (): void {
+        const appManager = this.createAppManager();
+        appManager.initManager();
+
+        this.appManager = appManager;
+        this.flowManager = appManager.flowManager;
+        this.serviceManager = appManager.serviceManager;
     }
 }
