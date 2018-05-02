@@ -14,6 +14,16 @@ export class APIConfirmedReqService {
     constructor (private socket: OutputSocket) {}
 
     /**
+     * Destroys the instance.
+     * - removes socket (sets `null`)
+     *
+     * @return {Promise<any>}
+     */
+    public async destroy (): Promise<any> {
+        this.socket = null;
+    }
+
+    /**
      * readProperty - sends "Confirmed ReadProperty" request using the udp sockets.
      *
      * @param  {IServiceConfirmedReqReadPropertyype} opts - request options

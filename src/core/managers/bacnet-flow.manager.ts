@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
+import { ApiError } from '../errors';
+
 import { ServerSocket } from '../sockets';
 
 import {
@@ -21,6 +23,28 @@ export class BACnetFlowManager {
     private config: IBACnetFlowManagerConfig;
     private respFlow: Subject<IServerSocketResponse>;
     private errorFlow: Subject<Error>;
+
+    /**
+     * Destroys the instance.
+     * - removes config (sets `null`)
+     * - removes respFlow (sets `null`)
+     * - destroys errorFlow (calls `unsubscribe` and sets `null`)
+     *
+     * @return {Promise<any>}
+     */
+    public async destroy (): Promise<any> {
+        this.config = null;
+        this.respFlow = null;
+
+        try {
+            this.errorFlow.unsubscribe();
+        } catch (error) {
+            throw new ApiError(`BACnetFlowManager - destroy: ${error}`);
+        }
+        finally {
+            this.errorFlow = null;
+        }
+    }
 
     /**
      * initManager - sets the manager configuration, inits the "error" flow and

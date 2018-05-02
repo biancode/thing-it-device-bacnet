@@ -1,3 +1,5 @@
+import { ApiError } from '../errors';
+
 import { OutputSocket } from '../sockets';
 
 import { APIService } from '../services';
@@ -20,6 +22,25 @@ export class BACnetServiceManager {
      */
     public get apiService (): APIService {
         return this._apiService;
+    }
+
+    /**
+     * Destroys the instance.
+     * - removes config (sets `null`)
+     * - destroys API Service
+     *
+     * @return {Promise<any>}
+     */
+    public async destroy (): Promise<any> {
+        this.config = null;
+        try {
+            await this._apiService.destroy();
+        } catch (error) {
+            throw new ApiError(`BACnetServiceManager - destroy: ${error}`);
+        }
+        finally {
+            this._apiService = null;
+        }
     }
 
     /**

@@ -1,5 +1,7 @@
 import * as _ from 'lodash';
 
+import { ApiError } from '../errors';
+
 import * as APIBACnetServices from './bacnet';
 
 export class APIService {
@@ -50,5 +52,32 @@ export class APIService {
      */
     public get unconfirmedReq (): APIBACnetServices.APIUnconfirmedReqService {
         return this._unconfirmedReq;
+    }
+
+    /**
+     * Destroys the instance.
+     * - destroys Confirmed Request Service
+     * - destroys Unconfirmed Request Service
+     *
+     * @return {Promise<any>}
+     */
+    public async destroy (): Promise<any> {
+        try {
+            await this._confirmedReq.destroy();
+        } catch (error) {
+            throw new ApiError(`APIService - destroy: Confirmed Request Service - ${error}`);
+        }
+        finally {
+            this._confirmedReq = null;
+        }
+
+        try {
+            await this._unconfirmedReq.destroy();
+        } catch (error) {
+            throw new ApiError(`APIService - destroy: Unconfirmed Request Service - ${error}`);
+        }
+        finally {
+            this._unconfirmedReq = null;
+        }
     }
 }
