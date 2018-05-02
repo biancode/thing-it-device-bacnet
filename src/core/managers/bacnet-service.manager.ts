@@ -12,9 +12,13 @@ import {
 } from '../interfaces';
 
 import { Logger } from '../utils';
+import { ServerSocket } from '../sockets';
+
+import { store } from '../../redux';
 
 export class BACnetServiceManager {
     private config: IBACnetServiceManagerConfig;
+    private server: ServerSocket;
 
     private _apiService: APIService;
 
@@ -39,6 +43,8 @@ export class BACnetServiceManager {
      */
     public async destroy (): Promise<any> {
         this.config = null;
+        this.server = null;
+
         try {
             await this._apiService.destroy();
         } catch (error) {
@@ -58,6 +64,8 @@ export class BACnetServiceManager {
      */
     public initManager (config: IBACnetServiceManagerConfig): void {
         this.config = config;
+
+        this.server = store.getState([ 'bacnet', 'bacnetServer' ]);
     }
 
     /**
@@ -70,7 +78,7 @@ export class BACnetServiceManager {
     public createAPIService (rinfo: IBACnetAddressInfo, logger?: Logger): APIService {
         const apiLogger = _.isNil(logger) ? this.logger : logger;
 
-        const socket = this.config.server.getOutputSocket(rinfo);
+        const socket = this.server.getOutputSocket(rinfo);
         const apiService = new APIService();
 
         const confirmedReqService = new APIBACnetServices

@@ -38,12 +38,10 @@ export interface ISequenceConfig {
 
 /* BACnet Service Manager Config */
 export interface IBACnetServiceManagerConfig {
-    server: ServerSocket;
 }
 
 /* BACnet Flow Manager Config */
 export interface IBACnetFlowManagerConfig {
-    server: ServerSocket;
 }
 
 /**

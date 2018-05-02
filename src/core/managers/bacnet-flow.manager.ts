@@ -12,18 +12,19 @@ import { ServerSocket } from '../sockets';
 
 import {
     IBACnetResponse,
-    IServerSocketResponse,
     IBACnetFlowManagerConfig,
 } from '../interfaces';
 
 import { Logger } from '../utils';
 
+import { store } from '../../redux';
+
 type BACnetFlowFilter = (resp: IBACnetResponse) => boolean;
 
 export class BACnetFlowManager {
     private config: IBACnetFlowManagerConfig;
-    private respFlow: Subject<IServerSocketResponse>;
     private errorFlow: Subject<Error>;
+    private server: ServerSocket;
 
     constructor (private logger: Logger) {
     }
@@ -38,7 +39,7 @@ export class BACnetFlowManager {
      */
     public async destroy (): Promise<any> {
         this.config = null;
-        this.respFlow = null;
+        this.server = null;
 
         try {
             this.errorFlow.unsubscribe();
@@ -60,7 +61,8 @@ export class BACnetFlowManager {
         this.config = config;
 
         this.errorFlow = new Subject();
-        this.respFlow = this.config.server.respFlow;
+
+        this.server = store.getState([ 'bacnet', 'bacnetServer' ]);
     }
 
     /**
@@ -78,7 +80,7 @@ export class BACnetFlowManager {
      * @return {Observable<IBACnetResponse>}
      */
     public getResponseFlow (): Observable<IBACnetResponse> {
-        return this.respFlow
+        return this.server.respFlow
             .map((resp) => {
                 let layer: ILayer;
                 try {
