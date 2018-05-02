@@ -18,7 +18,7 @@ export class BACnetServiceManager {
      *
      * @type {apiService}
      */
-    public apiService (): APIService {
+    public get apiService (): APIService {
         return this._apiService;
     }
 
