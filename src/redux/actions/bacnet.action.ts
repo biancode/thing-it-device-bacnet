@@ -3,24 +3,9 @@ import { BACnetEvent } from '../events/bacnet.event';
 import { IAction } from '../core/redux.interface';
 
 import { BACnetFlowManager, BACnetServiceManager } from '../../core/managers';
-import { Logger } from '../../core/utils';
 import { ServerSocket } from '../../core/sockets';
 
 export class BACnetAction {
-
-    /**
-     *  Sets the instance of the TID logger utility to `redux` store.
-     *
-     * @static
-     * @param  {Logger} logger - instance of the TID logger utility
-     * @return {IAction}
-     */
-    static setTIDLogger (logger: Logger): IAction {
-        return store.dispatch({
-            type: BACnetEvent.setTIDLogger,
-            payload: { logger: logger },
-        });
-    }
 
     /**
      *  Sets the instance of the BACnet Flow Manager to `redux` store.
