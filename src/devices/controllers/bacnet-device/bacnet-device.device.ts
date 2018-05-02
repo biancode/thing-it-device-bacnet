@@ -45,7 +45,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             this.logError(`BACnetDeviceController - start: ${error}`);
         }
 
-        return this.initDevice();
+        return initResult;
     }
 
     /**
