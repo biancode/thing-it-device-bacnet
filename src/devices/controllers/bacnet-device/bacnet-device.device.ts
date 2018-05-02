@@ -96,20 +96,22 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      * @return {BACnetAppManager}
      */
     public async createAppManager (): Promise<any> {
+        const logger = this.createLogger();
+
         /* Create, init and start socket server */
-        const socketServer = new ServerSocket();
+        const socketServer = new ServerSocket(logger);
         socketServer.initServer(config.server);
         await socketServer.startServer();
         this.socketServer = socketServer;
         BACnetAction.setBACnetServer(socketServer);
 
         /* Create and init BACnet Service Manager */
-        const serviceManager = new BACnetServiceManager();
+        const serviceManager = new BACnetServiceManager(logger);
         serviceManager.initManager({ server: socketServer });
         BACnetAction.setBACnetServiceManager(serviceManager);
 
         /* Create and init BACnet Flow Manager */
-        const flowManager = new BACnetFlowManager();
+        const flowManager = new BACnetFlowManager(logger);
         flowManager.initManager({ server: socketServer });
         this.flowManager = flowManager;
         BACnetAction.setBACnetFlowManager(flowManager);
