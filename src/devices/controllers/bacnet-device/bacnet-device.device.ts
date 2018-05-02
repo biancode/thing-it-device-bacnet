@@ -111,22 +111,20 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      * @return {BACnetAppManager}
      */
     public async createAppManagers (manangerConfig: IAppConfig): Promise<any> {
-        const logger = this.createLogger();
-
         /* Create, init and start socket server */
-        const socketServer = new ServerSocket(logger);
+        const socketServer = new ServerSocket(this.logger);
         socketServer.initServer(manangerConfig.server);
         await socketServer.startServer();
         this.socketServer = socketServer;
         BACnetAction.setBACnetServer(socketServer);
 
         /* Create and init BACnet Service Manager */
-        const serviceManager = new BACnetServiceManager(logger);
+        const serviceManager = new BACnetServiceManager(this.logger);
         serviceManager.initManager({ server: socketServer });
         BACnetAction.setBACnetServiceManager(serviceManager);
 
         /* Create and init BACnet Flow Manager */
-        const flowManager = new BACnetFlowManager(logger);
+        const flowManager = new BACnetFlowManager(this.logger);
         flowManager.initManager({ server: socketServer });
         this.flowManager = flowManager;
         BACnetAction.setBACnetFlowManager(flowManager);
@@ -149,7 +147,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.name = bacnetProperty.value;
-                this.logDebug(`Name retrieved: ${this.state.name}`);
+                this.logger.logDebug(`Name retrieved: ${this.state.name}`);
             });
 
         const ovDescription = readPropertyFlow
@@ -158,7 +156,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.description = bacnetProperty.value;
-                this.logDebug(`Description retrieved: ${this.state.description}`);
+                this.logger.logDebug(`Description retrieved: ${this.state.description}`);
             });
 
         const ovVendorName = readPropertyFlow
@@ -167,7 +165,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.vendor = bacnetProperty.value;
-                this.logDebug(`Vendor retrieved: ${this.state.vendor}`);
+                this.logger.logDebug(`Vendor retrieved: ${this.state.vendor}`);
             });
 
         const ovModelName = readPropertyFlow
@@ -176,7 +174,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.model = bacnetProperty.value;
-                this.logDebug(`Model retrieved: ${this.state.model}`);
+                this.logger.logDebug(`Model retrieved: ${this.state.model}`);
             });
 
         const ovSoftwareVersion = readPropertyFlow
@@ -185,15 +183,15 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.softwareVersion = bacnetProperty.value;
-                this.logDebug(`Software retrieved: ${this.state.softwareVersion}`);
+                this.logger.logDebug(`Software retrieved: ${this.state.softwareVersion}`);
             });
 
         combineLatest(ovObjectName, ovDescription, ovVendorName,
                 ovModelName, ovSoftwareVersion)
             .first()
             .subscribe(() => {
-                this.logDebug('Device data retrieved.');
-                this.logDebug(`BACnet Device details: ${JSON.stringify(this.state)}`);
+                this.logger.logDebug('Device data retrieved.');
+                this.logger.logDebug(`BACnet Device details: ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             });
     }
@@ -240,7 +238,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 ? `GENERATED_${Math.round(Math.random() * 10000000)}`
                 : this.config.ipAddress;
 
-            this.logDebug(`IP address not configured, using ${this.config.ipAddress}`);
+            this.logger.logDebug(`IP address not configured, using ${this.config.ipAddress}`);
             return Bluebird.resolve(ipAddress);
         }
 
@@ -248,11 +246,11 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             // Get IP Address from DNS server by URL
             dns.lookup(this.config.url, (error, address, family) => {
                 if (error) {
-                    this.logDebug(`Error trying to look up URL "${this.config.url}"`, error);
+                    this.logger.logDebug(`Error trying to look up URL "${this.config.url}" ${error}`);
                     return reject(error);
                 }
 
-                this.logDebug(`Retrieved IP address for URL. ${address} ${this.config.url}`);
+                this.logger.logDebug(`Retrieved IP address for URL. ${address} ${this.config.url}`);
                 return resolve(address);
             });
         });
