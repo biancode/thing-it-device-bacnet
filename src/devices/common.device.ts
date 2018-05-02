@@ -7,13 +7,14 @@ import { ApiError } from '../core/errors';
 
 import { DeviceBase } from '../core/bases/device.base';
 
-import { Logger } from '../core/interfaces/app.interface';
+import { Logger } from '../core/utils';
 import { ICommonState, ICommonConfig } from '../core/interfaces/device.interface';
 
 export class CommonDevice extends DeviceBase {
     public config: ICommonConfig;
     public state: ICommonState;
     public isDestroyed: boolean;
+    public logger: Logger;
 
     constructor (options: any) {
         super();
@@ -46,9 +47,12 @@ export class CommonDevice extends DeviceBase {
         this.state.initialized = false;
 
         this.config = this.configuration;
+
         if (!this.config) {
             throw new ApiError('initDevice - Configuration is not defined!');
         }
+
+        this.logger = this.createLogger();
     }
 
     /**
