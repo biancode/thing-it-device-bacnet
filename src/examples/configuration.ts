@@ -14,6 +14,14 @@ export = {
                 simulated: false,
             },
             actors: [
+                {
+                    id: 'asdfg123',
+                    label: 'Binary Imput Actor 1',
+                    type: 'binary-input.actor',
+                    logLevel: 'debug',
+                    configuration: {
+                    },
+                },
             ],
         },
     ],
