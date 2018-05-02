@@ -48,6 +48,35 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         return initResult;
     }
 
+    public stop () {
+        try {
+            this.socketServer.destroy();
+        } catch (error) {
+            throw new ApiError(`BACnetDeviceControllerDevice - stop: Socket Server - ${error}`);
+        }
+        finally {
+            this.socketServer = null;
+        }
+
+        try {
+            this.serviceManager.destroy();
+        } catch (error) {
+            throw new ApiError(`BACnetDeviceControllerDevice - stop: Service Manager - ${error}`);
+        }
+        finally {
+            this.serviceManager = null;
+        }
+
+        try {
+            this.flowManager.destroy();
+        } catch (error) {
+            throw new ApiError(`BACnetDeviceControllerDevice - stop: Flow Manager - ${error}`);
+        }
+        finally {
+            this.flowManager = null;
+        }
+    }
+
     /**
      * initDevice - inits the Philips controller.
      * - Method creates the API Light service and registrate created
