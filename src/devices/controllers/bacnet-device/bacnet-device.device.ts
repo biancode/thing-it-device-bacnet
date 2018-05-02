@@ -129,4 +129,37 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             instance: this.config.deviceId,
         });
     }
+
+    /**
+     * Calculates the `IP` address of the BACnet device.
+     *
+     * @return {string} - `IP` address of the BACnet device
+     */
+    public getIp (): Bluebird<string> {
+        if (this.config.urlLookupRequired !== true
+                || !_.isString(this.config.url) || !this.config.url) {
+            // Get IP Address from config or Generate new IP Address
+            const ipAddress: string = !_.isString(this.config.ipAddress) || !this.config.ipAddress
+                ? `GENERATED_${Math.round(Math.random() * 10000000)}`
+                : this.config.ipAddress;
+
+            this.logDebug(`IP address not configured, using ${this.config.ipAddress}`);
+            return Bluebird.resolve(ipAddress);
+        }
+
+        return new Bluebird((resolve, reject) => {
+            // Get IP Address from DNS server by URL
+            dns.lookup(this.config.url, (error, address, family) => {
+                if (error) {
+                    this.logDebug(`Error trying to look up URL "${this.config.url}"`, error);
+                    return reject(error);
+                }
+
+                this.config.ipAddress = address;
+
+                this.logDebug(`Retrieved IP address for URL. ${address} ${this.config.url}`);
+                return resolve(address);
+            });
+        });
+    }
 }
