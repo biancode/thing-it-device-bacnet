@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 import { ApiError } from '../errors';
 
 import * as APIBACnetServices from '../services/bacnet';
@@ -25,7 +27,7 @@ export class BACnetServiceManager {
         return this._apiService;
     }
 
-    constructor (logger: Logger) {
+    constructor (private logger: Logger) {
     }
 
     /**
@@ -65,16 +67,18 @@ export class BACnetServiceManager {
      * @param  {IBACnetAddressInfo} rinfo - address of the BACnet Device
      * @return {APIService} - instance of the API service
      */
-    public createAPIService (rinfo: IBACnetAddressInfo): APIService {
+    public createAPIService (rinfo: IBACnetAddressInfo, logger?: Logger): APIService {
+        const apiLogger = _.isNil(logger) ? this.logger : logger;
+
         const socket = this.config.server.getOutputSocket(rinfo);
         const apiService = new APIService();
 
         const confirmedReqService = new APIBACnetServices
-            .APIConfirmedReqService(socket);
+            .APIConfirmedReqService(apiLogger, socket);
         apiService.confirmedReq = confirmedReqService;
 
         const unconfirmedReqService = new APIBACnetServices
-            .APIUnconfirmedReqService(socket);
+            .APIUnconfirmedReqService(apiLogger, socket);
         apiService.unconfirmedReq = unconfirmedReqService;
 
         return apiService;

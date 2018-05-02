@@ -1,5 +1,7 @@
 import { OutputSocket } from '../../sockets';
 
+import { Logger } from '../../utils';
+
 import { ConfirmedReqService } from '../../bacnet/services';
 
 import {
@@ -11,7 +13,8 @@ import {
 
 export class APIConfirmedReqService {
 
-    constructor (private socket: OutputSocket) {}
+    constructor (private logger: Logger,
+        private socket: OutputSocket) {}
 
     /**
      * Destroys the instance.
