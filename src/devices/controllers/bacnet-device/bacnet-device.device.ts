@@ -131,6 +131,79 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
+     * createAppManager - creates `subscribtion` to the BACnet device properties.
+     *
+     * @return {void}
+     */
+    public subscribe (): void {
+        const readPropertyFlow = this.flowManager.getResponseFlow()
+            .filter(this.flowManager.isServiceType(BACnetServiceTypes.ComplexACKPDU))
+            .filter(this.flowManager.isServiceChoice(BACnetConfirmedService.ReadProperty))
+            .filter(this.flowManager.isBACnetObject(this.objectId));
+
+        readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.objectName))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyString(resp);
+
+                this.state.name = bacnetProperty.value;
+                this.logDebug(`Name retrieved: ${this.state.name}`);
+            });
+
+        readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.description))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyString(resp);
+
+                this.state.description = bacnetProperty.value;
+                this.logDebug(`Description retrieved: ${this.state.description}`);
+            });
+
+        readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.vendorName))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyString(resp);
+
+                this.state.vendor = bacnetProperty.value;
+                this.logDebug(`Vendor retrieved: ${this.state.vendor}`);
+            });
+
+        readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.modelName))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyString(resp);
+
+                this.state.model = bacnetProperty.value;
+                this.logDebug(`Model retrieved: ${this.state.model}`);
+            });
+
+        readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.modelName))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyString(resp);
+
+                this.state.softwareVersion = bacnetProperty.value;
+                this.logDebug(`Software retrieved: ${this.state.softwareVersion}`);
+            });
+    }
+
+    /**
+     * getReadPropertyString - extracts the value of the property from BACnet
+     * `ReadProperty` service.
+     *
+     * @param  {IBACnetResponse} resp - response from BACnet Object (device)
+     * @return {BACnetTypes.BACnetCharacterString}
+     */
+    private getReadPropertyString (resp: IBACnetResponse): BACnetTypes.BACnetCharacterString {
+        const respServiceData: ILayerComplexACKServiceReadProperty =
+            _.get(resp, 'layer.apdu.service', null);
+
+        const bacnetProperty = respServiceData.propValues[0] as
+            BACnetTypes.BACnetCharacterString;
+        return bacnetProperty;
+    }
+
+    /**
      * initDeviceParamsFromConfig - creates and inits params of the BACnet Device
      * from plugin configuration.
      * Steps:
