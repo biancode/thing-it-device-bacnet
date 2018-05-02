@@ -13,6 +13,10 @@ function wait (delay, fn?: () => any) {
 describe('[thing-it] Disruptive Technologies Device', () => {
     let testDriver;
 
+    const time = {
+        test1: 8000,
+    }
+
     before(() => {
         testDriver = TestDriver.createTestDriver({ logLevel: 'debug' });
         testDriver.registerDevicePlugin('bacnet', __dirname + '/../bacnet-device.controller');
@@ -28,6 +32,6 @@ describe('[thing-it] Disruptive Technologies Device', () => {
     });
 
     it('should have completed initialization successfully', async () => {
-        await wait(3000);
-    }).timeout(5000);
+        await wait(time.test1);
+    }).timeout(time.test1 + 2000);
 });
