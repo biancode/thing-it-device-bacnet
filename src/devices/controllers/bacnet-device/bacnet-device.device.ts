@@ -252,8 +252,6 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                     return reject(error);
                 }
 
-                this.config.ipAddress = address;
-
                 this.logDebug(`Retrieved IP address for URL. ${address} ${this.config.url}`);
                 return resolve(address);
             });
