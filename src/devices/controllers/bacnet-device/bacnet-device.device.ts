@@ -104,7 +104,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * createAppManager - creates instance of the BACnet Application Manager.
+     * Creates instance of the BACnet Application Manager.
      *
      * @return {BACnetAppManager}
      */
@@ -131,7 +131,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * createAppManager - creates `subscribtion` to the BACnet device properties.
+     * Creates `subscribtion` to the BACnet device properties.
      *
      * @return {void}
      */
@@ -197,8 +197,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * getReadPropertyString - extracts the value of the property from BACnet
-     * `ReadProperty` service.
+     * Extracts the value of the property from BACnet `ReadProperty` service.
      *
      * @param  {IBACnetResponse} resp - response from BACnet Object (device)
      * @return {BACnetTypes.BACnetCharacterString}
@@ -213,8 +212,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * initDeviceParamsFromConfig - creates and inits params of the BACnet Device
-     * from plugin configuration.
+     * Creates and inits params of the BACnet Device from plugin configuration.
      * Steps:
      * - creates and inits `objectId`.
      *
@@ -232,7 +230,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      *
      * @return {string} - `IP` address of the BACnet device
      */
-    public getIp (): Bluebird<string> {
+    public getDeviceIpAddress (): Bluebird<string> {
         if (this.config.urlLookupRequired !== true
                 || !_.isString(this.config.url) || !this.config.url) {
             // Get IP Address from config or Generate new IP Address
