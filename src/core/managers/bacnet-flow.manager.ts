@@ -1,6 +1,11 @@
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
+import { ILayer } from '../bacnet/interfaces';
+import { BACnetUtil } from '../bacnet/utils';
+import * as BACnetTypes from '../bacnet/types';
+import { BACnetServiceTypes, BACnetPropertyId } from '../bacnet/enums';
+
 import { ApiError } from '../errors';
 
 import { ServerSocket } from '../sockets';
@@ -11,11 +16,7 @@ import {
     IBACnetFlowManagerConfig,
 } from '../interfaces';
 
-import { ILayer } from '../bacnet/interfaces';
-import { BACnetUtil } from '../bacnet/utils';
-
-import * as BACnetTypes from '../bacnet/types';
-import { BACnetServiceTypes, BACnetPropertyId } from '../bacnet/enums';
+import { Logger } from '../utils';
 
 type BACnetFlowFilter = (resp: IBACnetResponse) => boolean;
 
@@ -23,6 +24,9 @@ export class BACnetFlowManager {
     private config: IBACnetFlowManagerConfig;
     private respFlow: Subject<IServerSocketResponse>;
     private errorFlow: Subject<Error>;
+
+    constructor (private logger: Logger) {
+    }
 
     /**
      * Destroys the instance.

@@ -1,14 +1,15 @@
 import { ApiError } from '../errors';
 
-import { OutputSocket } from '../sockets';
+import * as APIBACnetServices from '../services/bacnet';
 
 import { APIService } from '../services';
-import * as APIBACnetServices from '../services/bacnet';
 
 import {
     IBACnetServiceManagerConfig,
     IBACnetAddressInfo,
 } from '../interfaces';
+
+import { Logger } from '../utils';
 
 export class BACnetServiceManager {
     private config: IBACnetServiceManagerConfig;
@@ -22,6 +23,9 @@ export class BACnetServiceManager {
      */
     public get apiService (): APIService {
         return this._apiService;
+    }
+
+    constructor (logger: Logger) {
     }
 
     /**
