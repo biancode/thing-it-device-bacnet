@@ -120,12 +120,12 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         /* Create and init BACnet Service Manager */
         const serviceManager = new BACnetServiceManager(this.logger);
-        serviceManager.initManager({ server: socketServer });
+        serviceManager.initManager({});
         BACnetAction.setBACnetServiceManager(serviceManager);
 
         /* Create and init BACnet Flow Manager */
         const flowManager = new BACnetFlowManager(this.logger);
-        flowManager.initManager({ server: socketServer });
+        flowManager.initManager({});
         this.flowManager = flowManager;
         BACnetAction.setBACnetFlowManager(flowManager);
     }
