@@ -16,6 +16,7 @@ describe('[thing-it] Disruptive Technologies Device', () => {
     before(() => {
         testDriver = TestDriver.createTestDriver({ logLevel: 'debug' });
         testDriver.registerDevicePlugin('bacnet', __dirname + '/../bacnet-device.controller');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/binary-input.actor');
         testDriver.start({
             configuration: require('../examples/configuration.js'),
             heartbeat: 10,
