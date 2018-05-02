@@ -1,9 +1,3 @@
-export abstract class Logger {
-    abstract logInfo(message: string): void;
-    abstract logDebug(message: string): void;
-    abstract logError(message: string): void;
-}
-
 export interface IBACnetAddressInfo {
     address: string;
     port: number;
