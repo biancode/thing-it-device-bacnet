@@ -141,49 +141,58 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             .filter(this.flowManager.isServiceChoice(BACnetConfirmedService.ReadProperty))
             .filter(this.flowManager.isBACnetObject(this.objectId));
 
-        readPropertyFlow
+        const ovObjectName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.objectName))
-            .subscribe((resp) => {
+            .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.name = bacnetProperty.value;
                 this.logDebug(`Name retrieved: ${this.state.name}`);
             });
 
-        readPropertyFlow
+        const ovDescription = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.description))
-            .subscribe((resp) => {
+            .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.description = bacnetProperty.value;
                 this.logDebug(`Description retrieved: ${this.state.description}`);
             });
 
-        readPropertyFlow
+        const ovVendorName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.vendorName))
-            .subscribe((resp) => {
+            .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.vendor = bacnetProperty.value;
                 this.logDebug(`Vendor retrieved: ${this.state.vendor}`);
             });
 
-        readPropertyFlow
+        const ovModelName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.modelName))
-            .subscribe((resp) => {
+            .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.model = bacnetProperty.value;
                 this.logDebug(`Model retrieved: ${this.state.model}`);
             });
 
-        readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.modelName))
-            .subscribe((resp) => {
+        const ovSoftwareVersion = readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.applicationSoftwareVersion))
+            .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.softwareVersion = bacnetProperty.value;
                 this.logDebug(`Software retrieved: ${this.state.softwareVersion}`);
+            });
+
+        combineLatest(ovObjectName, ovDescription, ovVendorName,
+                ovModelName, ovSoftwareVersion)
+            .first()
+            .subscribe(() => {
+                this.logDebug('Device data retrieved.');
+                this.logDebug(`BACnet Device details: ${JSON.stringify(this.state)}`);
+                this.publishStateChange();
             });
     }
 
