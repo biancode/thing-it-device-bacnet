@@ -1,6 +1,7 @@
 import * as dns from 'dns';
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
+import { combineLatest } from 'rxjs/observable/combineLatest';
 
 import { ControllerDevice } from '../controller.device';
 
@@ -22,6 +23,7 @@ import {
     IBACnetDeviceControllerState,
     IBACnetDeviceControllerConfig,
     IBACnetResponse,
+    IAppConfig,
 } from '../../../core/interfaces';
 
 import {
@@ -42,7 +44,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public state: IBACnetDeviceControllerState;
     public config: IBACnetDeviceControllerConfig;
 
-    public appManager: BACnetAppManager;
+    public socketServer: ServerSocket;
     public flowManager: BACnetFlowManager;
     public serviceManager: BACnetServiceManager;
 
@@ -108,12 +110,12 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      *
      * @return {BACnetAppManager}
      */
-    public async createAppManager (): Promise<any> {
+    public async createAppManagers (manangerConfig: IAppConfig): Promise<any> {
         const logger = this.createLogger();
 
         /* Create, init and start socket server */
         const socketServer = new ServerSocket(logger);
-        socketServer.initServer(config.server);
+        socketServer.initServer(manangerConfig.server);
         await socketServer.startServer();
         this.socketServer = socketServer;
         BACnetAction.setBACnetServer(socketServer);
