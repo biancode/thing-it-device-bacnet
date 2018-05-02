@@ -31,7 +31,7 @@ export interface IBACnetDeviceControllerConfig extends IControllerConfig {
     deviceIdMatchRequired: number;
     vendorId: number;
     vendorIdMatchRequired: boolean;
-    omitWhoIsConfirmation: boolean;
+    unicastWhoIsIP?: string;
     priority: number;
 }
 
