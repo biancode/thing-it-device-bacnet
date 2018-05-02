@@ -102,6 +102,43 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public async initDevice (): Promise<any> {
         await super.initDevice();
 
+        // Inits specific internal properties
+        this.initDeviceParamsFromConfig();
+
+        // Gets device address information
+        const ipAddress = await this.getDeviceIpAddress();
+        const port = this.getDevicePort();
+
+        // Creates the config for managers
+        const manangerConfig: IAppConfig = {
+            server: {
+                port: port,
+                sequence: AppConfig.server.sequence
+            }
+        };
+
+        // Creates instances of managers
+        await this.createAppManagers(manangerConfig);
+
+        const apiService = this.serviceManager.createAPIService({
+            address: ipAddress,
+            port: port,
+        });
+
+        // Call `init` method in each actor
+        const actors = this.actors;
+        for (let i = 0; i < actors.length; i++) {
+            await actors[i].initDevice();
+        }
+
+        this.flowManager.getResponseFlow()
+            .filter(this.flowManager.isServiceType(BACnetServiceTypes.UnconfirmedReqPDU))
+            .filter(this.flowManager.isServiceChoice(BACnetUnconfirmedService.iAm))
+            .filter(this.flowManager.isBACnetObject(this.objectId))
+            .subscribe(() => {
+
+            });
+
         this.state.initialized = true;
     }
 
