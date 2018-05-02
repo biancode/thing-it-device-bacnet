@@ -9,7 +9,7 @@ import { BACnetAction } from '../../../redux/actions';
 
 import { ApiError } from '../../../core/errors';
 
-import { config } from '../../../core/configs';
+import { AppConfig } from '../../../core/configs';
 
 import { ServerSocket } from '../../../core/sockets';
 
@@ -258,5 +258,22 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 return resolve(address);
             });
         });
+    }
+
+    /**
+     * Calculates the `PORT` of the BACnet device.
+     *
+     * @return {number} - `PORT` of the BACnet device
+     */
+    public getDevicePort (): number {
+        const port = +this.config.port;
+
+        if (port >= 1024 || port <= 65536) {
+            return port;
+        }
+
+        this.logDebug(`Configured port "${this.config.port}" is out of range (1024-65536). `
+            + `Defaulting to port ${AppConfig.server.port}.`);
+        return AppConfig.server.port;
     }
 }
