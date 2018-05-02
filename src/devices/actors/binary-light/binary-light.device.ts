@@ -3,8 +3,6 @@ import * as Bluebird from 'bluebird';
 
 import { ActorDevice } from '../actor.device';
 
-import { APILightService } from '../../../core/services/light/light.service';
-
 import {
     IBinaryLightActorState,
     IBinaryLightActorConfig,
@@ -12,7 +10,6 @@ import {
 
 export class BinaryLightActorDevice extends ActorDevice {
     public readonly className: string = 'BinaryLightActorDevice';
-    protected apiService: APILightService;
     public state: IBinaryLightActorState;
     public config: IBinaryLightActorConfig;
 
@@ -21,16 +18,6 @@ export class BinaryLightActorDevice extends ActorDevice {
 
         this.state.initialized = true;
         this.publishStateChange();
-    }
-
-    /**
-     * setAPIService - gets the API service from "ServiceManager" and sets this
-     * service in "apiService" property.
-     *
-     * @return {void}
-     */
-    public setAPIService (): void {
-        this.apiService = this.serviceManager.getService('light') as APILightService;
     }
 
     /**
