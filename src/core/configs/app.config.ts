@@ -1,6 +1,6 @@
 import { IAppConfig } from '../interfaces';
 
-export const config: IAppConfig = {
+export const AppConfig: IAppConfig = {
     server: {
         port: 47808,
         sequence: {
