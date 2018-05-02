@@ -12,7 +12,7 @@ import {
 } from '../interfaces';
 
 import { ApiError } from '../errors';
-import { logger } from '../utils';
+import { Logger } from '../utils';
 
 import { OutputSocket } from './output.socket';
 
@@ -30,6 +30,9 @@ export class ServerSocket {
     private _respFlow: Subject<IServerSocketResponse>;
     public get respFlow (): Subject<IServerSocketResponse> {
         return this._respFlow;
+    }
+
+    constructor (private logger: Logger) {
     }
 
     public initServer (serverConfig: IServerSocketConfig): void {
@@ -64,7 +67,7 @@ export class ServerSocket {
         this.sock = dgram.createSocket('udp4');
 
         this.sock.on('error', (error) => {
-            logger.error(`${this.className} - startServer: UDP Error - ${error}`);
+            this.logger.logError(`${this.className} - startServer: UDP Error - ${error}`);
         });
 
         this.sock.on('message', (msg: Buffer, rinfo: dgram.AddressInfo) => {
@@ -79,7 +82,8 @@ export class ServerSocket {
         const startPromise = new Bluebird((resolve, reject) => {
             this.sock.on('listening', () => {
                 const addrInfo = this.sock.address();
-                logger.info(`${this.className} - startServer: UDP Server listening ${addrInfo.address}:${addrInfo.port}`);
+                this.logger.logInfo(`${this.className} - startServer: `
+                    + `DEBUG bacNetAdapter: UDP Server listening on ${addrInfo.address}:${addrInfo.port}`);
                 resolve(addrInfo);
             });
         })
