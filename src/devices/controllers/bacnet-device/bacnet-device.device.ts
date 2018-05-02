@@ -1,29 +1,42 @@
+import * as dns from 'dns';
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 
-import { ApiError } from '../../../core/errors';
-
-/* Plugin devices */
 import { ControllerDevice } from '../controller.device';
 
+/* Plugin devices */
+import { BACnetAction } from '../../../redux/actions';
+
+import { ApiError } from '../../../core/errors';
+
+import { config } from '../../../core/configs';
+
+import { ServerSocket } from '../../../core/sockets';
+
 import {
-    BACnetAppManager,
     BACnetFlowManager,
     BACnetServiceManager,
 } from '../../../core/managers';
 
 import {
-    BACnetObjectType,
-    BACnetServiceTypes,
-    BACnetUnconfirmedService,
-} from '../../../core/bacnet/enums';
-
-import * as BACnetTypes from '../../../core/bacnet/types';
+    IBACnetDeviceControllerState,
+    IBACnetDeviceControllerConfig,
+    IBACnetResponse,
+} from '../../../core/interfaces';
 
 import {
-    IBACnetDeviceControllerState,
-    IBACnetDeviceControllerConfig
-} from '../../../core/interfaces';
+    BACnetObjectType,
+    BACnetPropertyId,
+    BACnetServiceTypes,
+    BACnetUnconfirmedService,
+    BACnetConfirmedService,
+} from '../../../core/bacnet/enums';
+
+import {
+    ILayerComplexACKServiceReadProperty,
+} from '../../../core/bacnet/interfaces';
+
+import * as BACnetTypes from '../../../core/bacnet/types';
 
 export class BACnetDeviceControllerDevice extends ControllerDevice {
     public state: IBACnetDeviceControllerState;
