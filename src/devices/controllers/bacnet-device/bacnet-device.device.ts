@@ -99,8 +99,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         /* Create, init and start socket server */
         const socketServer = new ServerSocket();
         socketServer.initServer(config.server);
-        console.log('asdas');
         await socketServer.startServer();
+        this.socketServer = socketServer;
         BACnetAction.setBACnetServer(socketServer);
 
         /* Create and init BACnet Service Manager */
