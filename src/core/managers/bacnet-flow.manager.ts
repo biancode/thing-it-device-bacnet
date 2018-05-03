@@ -133,7 +133,7 @@ export class BACnetFlowManager {
     }
 
     /**
-     * isBACnetObject - creates filter for flow, compares the BACnet objects.
+     * isBACnetObject - creates filter for flow, compares the BACnet object IDs.
      * Branches:
      * - If object identifier does not exist in response, filter will return "false".
      * - If object identifier from response do not equal to object identifier from arguments,
@@ -152,19 +152,19 @@ export class BACnetFlowManager {
     }
 
     /**
-     * isBACnetObject - creates filter for flow, compares the BACnet objects.
+     * isBACnetProperty - creates filter for flow, compares the BACnet property IDs.
      * Branches:
-     * - If object identifier does not exist in response, filter will return "false".
-     * - If object identifier from response do not equal to object identifier from arguments,
+     * - If property identifier does not exist in response, filter will return "false".
+     * - If property identifier from response do not equal to property identifier from arguments,
      * filter will return "false".
-     * - If object identifier from response equal to object identifier from arguments,
+     * - If property identifier from response equal to property identifier from arguments,
      * filter will return "true".
      *
      * @return {BACnetFlowFilter}
      */
     public isBACnetProperty (propId: BACnetPropertyId): BACnetFlowFilter {
         return (resp: IBACnetResponse): boolean => {
-            const respPropId: BACnetTypes.BACnetUnsignedInteger =
+            const respPropId: BACnetTypes.BACnetEnumerated =
                 _.get(resp, 'layer.apdu.service.propId', null);
             return !_.isNil(respPropId) && respPropId.isEqual(propId);
         };
