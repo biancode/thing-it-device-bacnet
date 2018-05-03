@@ -7,6 +7,12 @@ export interface IBACnetAddressInfo {
 /* Application Config */
 export interface IAppConfig {
     server: IServerSocketConfig;
+    manager: IManagerConfig;
+}
+
+export interface IManagerConfig {
+    service: IBACnetServiceManagerConfig;
+    flow: IBACnetFlowManagerConfig;
 }
 
 /* Socket Server */
@@ -38,6 +44,7 @@ export interface ISequenceConfig {
 
 /* BACnet Service Manager Config */
 export interface IBACnetServiceManagerConfig {
+    dest: IBACnetAddressInfo;
 }
 
 /* BACnet Flow Manager Config */
