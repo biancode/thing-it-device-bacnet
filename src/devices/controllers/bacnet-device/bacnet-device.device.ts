@@ -105,25 +105,14 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         // Inits specific internal properties
         this.initDeviceParamsFromConfig();
 
-        // Gets device address information
-        const ipAddress = await this.getDeviceIpAddress();
-        const port = this.getDevicePort();
-
-        // Creates the config for managers
-        const manangerConfig: IAppConfig = {
-            server: {
-                port: port,
-                sequence: AppConfig.server.sequence
-            }
-        };
+        // Creates config for the each component
+        const appComponentConfig = await this.createPluginConfig();
 
         // Creates instances of managers
-        await this.createAppManagers(manangerConfig);
+        await this.createPluginComponents(appComponentConfig);
 
-        const apiService = this.serviceManager.createAPIService({
-            address: ipAddress,
-            port: port,
-        });
+        // Creates instance of the API Service
+        const apiService = this.serviceManager.createAPIService();
 
         // Call `init` method in each actor
         const actors = this.actors;
