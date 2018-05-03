@@ -169,4 +169,23 @@ export class BACnetFlowManager {
             return !_.isNil(respPropId) && respPropId.isEqual(propId);
         };
     }
+
+    /**
+     * isBACnetVendorId - creates filter for flow, compares the BACnet vendor IDs.
+     * Branches:
+     * - If vendor identifier does not exist in response, filter will return "false".
+     * - If vendor identifier from response do not equal to vendor identifier from arguments,
+     * filter will return "false".
+     * - If vendor identifier from response equal to vendor identifier from arguments,
+     * filter will return "true".
+     *
+     * @return {BACnetFlowFilter}
+     */
+    public isBACnetVendorId (vendorId: number): BACnetFlowFilter {
+        return (resp: IBACnetResponse): boolean => {
+            const respVendorId: BACnetTypes.BACnetUnsignedInteger =
+                _.get(resp, 'layer.apdu.service.vendorId', null);
+            return !_.isNil(respVendorId) && respVendorId.isEqual(vendorId);
+        };
+    }
 }
