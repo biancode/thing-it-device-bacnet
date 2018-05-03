@@ -177,11 +177,32 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Creates `subscribtion` to the BACnet device properties.
+     * Step 4. Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow.
      *
      * @return {void}
      */
-    public subscribe (): void {
+    public subscribeToObject (): void {
+        const destAddrInfo = this.pluginConfig.manager.service.dest;
+
+        this.flowManager.getResponseFlow()
+            .filter(this.flowManager.isServiceType(BACnetServiceTypes.UnconfirmedReqPDU))
+            .filter(this.flowManager.isServiceChoice(BACnetUnconfirmedService.iAm))
+            .filter(this.flowManager.matchFilter(this.config.deviceIdMatchRequired,
+                this.flowManager.isBACnetObject(this.objectId), `device ID`))
+            .filter(this.flowManager.matchFilter(this.config.vendorIdMatchRequired,
+                this.flowManager.isBACnetVendorId(this.config.vendorId), `vendor ID`))
+            .filter(this.flowManager.matchFilter(this.config.ipMatchRequired,
+                this.flowManager.isBACnetIPAddress(destAddrInfo.address), `IP Address`))
+            .timeout(AppConfig.whoIsTimeout)
+            .subscribe(() => { this.initProperties(); });
+    }
+
+    /**
+     * Step 5. Creates `subscribtion` to the BACnet device properties.
+     *
+     * @return {void}
+     */
+    public subscribeToProperty (): void {
         const readPropertyFlow = this.flowManager.getResponseFlow()
             .filter(this.flowManager.isServiceType(BACnetServiceTypes.ComplexACKPDU))
             .filter(this.flowManager.isServiceChoice(BACnetConfirmedService.ReadProperty))
