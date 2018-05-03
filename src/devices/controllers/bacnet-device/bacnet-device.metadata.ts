@@ -133,10 +133,10 @@ export const BACnetDeviceControllerMetadata: IMasterMetadata = {
             defaultValue: '',
         },
         {
-            label: 'Unicast WhoIs IP',
-            id: 'unicastWhoIsIP',
+            label: 'Unicast WhoIs Confirmation',
+            id: 'unicastWhoIsConfirmation',
             type: {
-                id: 'string',
+                id: 'boolean',
             },
             defaultValue: '',
         },
