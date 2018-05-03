@@ -1,6 +1,7 @@
 import { IAppConfig } from '../interfaces';
 
 export const AppConfig: IAppConfig = {
+    whoIsTimeout: 30000,
     manager: {
         flow: {},
         service: {
