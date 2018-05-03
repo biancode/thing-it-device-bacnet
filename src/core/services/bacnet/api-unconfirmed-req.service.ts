@@ -28,8 +28,19 @@ export class APIUnconfirmedReqService {
      * @param  {IServiceUnconfirmedReqWhoIs} opts - request options
      * @return {void}
      */
-    public whoIs (opts: IServiceUnconfirmedReqWhoIs): void {
+    public whoIsBroadcast (opts: IServiceUnconfirmedReqWhoIs): void {
         const message = UnconfirmedReqService.whoIs(opts);
-        this.socket.sendBroadcast(message, 'whoIs');
+        this.socket.sendBroadcast(message, 'whoIsBroadcast');
+    }
+
+    /**
+     * whoIs - sends "Unconfirmed WhoIs" request using the udp sockets.
+     *
+     * @param  {IServiceUnconfirmedReqWhoIs} opts - request options
+     * @return {void}
+     */
+    public whoIsUnicast (opts: IServiceUnconfirmedReqWhoIs): void {
+        const message = UnconfirmedReqService.whoIs(opts);
+        this.socket.send(message, 'whoIsUnicast');
     }
 }
