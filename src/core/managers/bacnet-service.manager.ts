@@ -20,17 +20,6 @@ export class BACnetServiceManager {
     private config: IBACnetServiceManagerConfig;
     private server: ServerSocket;
 
-    private _apiService: APIService;
-
-    /**
-     * Return instance of API Service
-     *
-     * @type {apiService}
-     */
-    public get apiService (): APIService {
-        return this._apiService;
-    }
-
     constructor (private logger: Logger) {
     }
 
@@ -44,15 +33,6 @@ export class BACnetServiceManager {
     public async destroy (): Promise<any> {
         this.config = null;
         this.server = null;
-
-        try {
-            await this._apiService.destroy();
-        } catch (error) {
-            throw new ApiError(`BACnetServiceManager - destroy: ${error}`);
-        }
-        finally {
-            this._apiService = null;
-        }
     }
 
     /**
