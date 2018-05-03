@@ -131,15 +131,35 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             await actors[i].initDevice();
         }
 
-        this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnetServiceTypes.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnetUnconfirmedService.iAm))
-            .filter(this.flowManager.isBACnetObject(this.objectId))
-            .subscribe(() => {
-
-            });
-
         this.state.initialized = true;
+    }
+
+    /**
+     * Creates the configuration for the each plugin component.
+     *
+     * @return {Promise<IAppConfig>}
+     */
+    public async createPluginConfig (): Promise<IAppConfig> {
+        // Gets device address information
+        const ipAddress = await this.getDeviceIpAddress();
+        const port = this.getDevicePort();
+
+        // Creates the config for each plugin components
+        return {
+            server: {
+                port: port,
+                sequence: AppConfig.server.sequence
+            },
+            manager: {
+                flow: {},
+                service: {
+                    dest: {
+                        address: ipAddress,
+                        port: port,
+                    }
+                }
+            }
+        };
     }
 
     /**
