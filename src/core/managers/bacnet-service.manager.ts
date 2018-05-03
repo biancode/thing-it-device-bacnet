@@ -69,22 +69,27 @@ export class BACnetServiceManager {
     }
 
     /**
-     * createAPIServices - creates the API service. Method creates instance of
-     * each BACnet API service.
+     * Creates the API service. Method creates instance of the each BACnet API service.
      *
-     * @param  {IBACnetAddressInfo} rinfo - address of the BACnet Device
+     * @param  {Logger} logger - instance of the logger
      * @return {APIService} - instance of the API service
      */
-    public createAPIService (rinfo: IBACnetAddressInfo, logger?: Logger): APIService {
+    public createAPIService (logger?: Logger): APIService {
+        // Uses default logger if api logger is not provided
         const apiLogger = _.isNil(logger) ? this.logger : logger;
 
-        const socket = this.server.getOutputSocket(rinfo);
+        // Creates output socket
+        const socket = this.server.getOutputSocket(this.config.dest);
+
+        // Create API Service
         const apiService = new APIService();
 
+        // Create API Confirmed Request Service
         const confirmedReqService = new APIBACnetServices
             .APIConfirmedReqService(apiLogger, socket);
         apiService.confirmedReq = confirmedReqService;
 
+        // Create API Unconfirmed Request Service
         const unconfirmedReqService = new APIBACnetServices
             .APIUnconfirmedReqService(apiLogger, socket);
         apiService.unconfirmedReq = unconfirmedReqService;
