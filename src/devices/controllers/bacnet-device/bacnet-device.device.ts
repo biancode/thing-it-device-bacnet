@@ -104,17 +104,30 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public async initDevice (): Promise<any> {
         await super.initDevice();
 
-        // Inits specific internal properties
+        // Step 1. Inits specific internal properties
         this.initDeviceParamsFromConfig();
 
-        // Creates config for the each component
+        // Step 2. Creates config for the each component
         this.pluginConfig = await this.createPluginConfig();
 
-        // Creates instances of managers
+        // Step 3. Creates instances of managers
         await this.createPluginComponents();
 
-        // Creates instance of the API Service
+        // Step 4. Creates instance of the API Service
         const apiService = this.serviceManager.createAPIService();
+
+        // Step 5. Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow
+        this.subscribeToObject();
+
+        // Step 6. Creates `subscribtion` to the BACnet device properties
+        this.subscribeToProperty();
+
+        // Step 7. Send `WhoIs` request
+        if (this.config.unicastWhoIsConfirmation === true) {
+            apiService.unconfirmedReq.whoIsUnicast({});
+        } else {
+            apiService.unconfirmedReq.whoIsBroadcast({});
+        }
 
         // Call `init` method in each actor
         const actors = this.actors;
@@ -125,8 +138,26 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         this.state.initialized = true;
     }
 
+    public async initProperties (): Promise<void> {
+        return;
+    }
+
     /**
-     * Creates the configuration for the each plugin component.
+     * Step 1. Creates and inits params of the BACnet Device from plugin configuration.
+     * Steps:
+     * - creates and inits `objectId`.
+     *
+     * @return {void}
+     */
+    public initDeviceParamsFromConfig (): void {
+        this.objectId = new BACnetTypes.BACnetObjectId({
+            type: BACnetObjectType.Device,
+            instance: this.config.deviceId,
+        });
+    }
+
+    /**
+     * Step 2. Creates the configuration for the each plugin component.
      *
      * @return {Promise<IAppConfig>}
      */
@@ -152,7 +183,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Creates the instance of the each plugin componet.
+     * Step 3. Creates the instance of the each plugin componet.
      *
      * @return {Promise<void>}
      */
@@ -264,6 +295,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
+     * HELPERs
+     */
+
+    /**
      * Extracts the value of the property from BACnet `ReadProperty` service.
      *
      * @param  {IBACnetResponse} resp - response from BACnet Object (device)
@@ -276,20 +311,6 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const bacnetProperty = respServiceData.propValues[0] as
             BACnetTypes.BACnetCharacterString;
         return bacnetProperty;
-    }
-
-    /**
-     * Creates and inits params of the BACnet Device from plugin configuration.
-     * Steps:
-     * - creates and inits `objectId`.
-     *
-     * @return {void}
-     */
-    public initDeviceParamsFromConfig (): void {
-        this.objectId = new BACnetTypes.BACnetObjectId({
-            type: BACnetObjectType.Device,
-            instance: this.config.deviceId,
-        });
     }
 
     /**
