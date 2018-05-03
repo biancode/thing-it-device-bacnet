@@ -97,7 +97,7 @@ export class BACnetFlowManager {
      */
 
     /**
-     * isServiceType - creates filter for flow, compares the BACnet service types.
+     * Creates filter for flow, compares the BACnet service types.
      * Branches:
      * - If service type does not exist in response, filter will return "false".
      * - If service type from response do not equal to service type from arguments,
@@ -115,7 +115,7 @@ export class BACnetFlowManager {
     }
 
     /**
-     * isServiceChoice - creates filter for flow, compares the BACnet service choices.
+     * Creates filter for flow, compares the BACnet service choices.
      * Branches:
      * - If service choice does not exist in response, filter will return "false".
      * - If service choice from response do not equal to service choice from arguments,
@@ -133,7 +133,7 @@ export class BACnetFlowManager {
     }
 
     /**
-     * isBACnetObject - creates filter for flow, compares the BACnet object IDs.
+     * Creates filter for flow, compares the BACnet object IDs.
      * Branches:
      * - If object identifier does not exist in response, filter will return "false".
      * - If object identifier from response do not equal to object identifier from arguments,
@@ -152,7 +152,7 @@ export class BACnetFlowManager {
     }
 
     /**
-     * isBACnetProperty - creates filter for flow, compares the BACnet property IDs.
+     * Creates filter for flow, compares the BACnet property IDs.
      * Branches:
      * - If property identifier does not exist in response, filter will return "false".
      * - If property identifier from response do not equal to property identifier from arguments,
@@ -171,7 +171,7 @@ export class BACnetFlowManager {
     }
 
     /**
-     * isBACnetVendorId - creates filter for flow, compares the BACnet vendor IDs.
+     * Creates filter for flow, compares the BACnet vendor IDs.
      * Branches:
      * - If vendor identifier does not exist in response, filter will return "false".
      * - If vendor identifier from response do not equal to vendor identifier from arguments,
