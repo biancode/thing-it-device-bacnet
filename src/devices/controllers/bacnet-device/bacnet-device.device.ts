@@ -44,6 +44,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public state: IBACnetDeviceControllerState;
     public config: IBACnetDeviceControllerConfig;
 
+    public pluginConfig: IAppConfig;
+
     public socketServer: ServerSocket;
     public flowManager: BACnetFlowManager;
     public serviceManager: BACnetServiceManager;
@@ -106,10 +108,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         this.initDeviceParamsFromConfig();
 
         // Creates config for the each component
-        const appComponentConfig = await this.createPluginConfig();
+        this.pluginConfig = await this.createPluginConfig();
 
         // Creates instances of managers
-        await this.createPluginComponents(appComponentConfig);
+        await this.createPluginComponents();
 
         // Creates instance of the API Service
         const apiService = this.serviceManager.createAPIService();
@@ -154,22 +156,22 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      *
      * @return {Promise<void>}
      */
-    public async createPluginComponents (appComponentConfig: IAppConfig): Promise<void> {
+    public async createPluginComponents (): Promise<void> {
         /* Create, init and start socket server */
         const socketServer = new ServerSocket(this.logger);
-        socketServer.initServer(appComponentConfig.server);
+        socketServer.initServer(this.pluginConfig.server);
         await socketServer.startServer();
         this.socketServer = socketServer;
         BACnetAction.setBACnetServer(socketServer);
 
         /* Create and init BACnet Service Manager */
         const serviceManager = new BACnetServiceManager(this.logger);
-        serviceManager.initManager(appComponentConfig.manager.service);
+        serviceManager.initManager(this.pluginConfig.manager.service);
         BACnetAction.setBACnetServiceManager(serviceManager);
 
         /* Create and init BACnet Flow Manager */
         const flowManager = new BACnetFlowManager(this.logger);
-        flowManager.initManager(appComponentConfig.manager.flow);
+        flowManager.initManager(this.pluginConfig.manager.flow);
         this.flowManager = flowManager;
         BACnetAction.setBACnetFlowManager(flowManager);
     }
