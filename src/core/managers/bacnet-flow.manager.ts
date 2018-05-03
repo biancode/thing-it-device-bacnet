@@ -188,4 +188,22 @@ export class BACnetFlowManager {
             return !_.isNil(respVendorId) && respVendorId.isEqual(vendorId);
         };
     }
+
+    /**
+     * Creates filter for flow, compares the BACnet device IP address.
+     * Branches:
+     * - If IP address does not exist in response, filter will return "false".
+     * - If IP address from response do not equal to IP address from arguments,
+     * filter will return "false".
+     * - If IP address from response equal to IP address from arguments,
+     * filter will return "true".
+     *
+     * @return {BACnetFlowFilter}
+     */
+    public isBACnetIPAddress (ipAddress: string): BACnetFlowFilter {
+        return (resp: IBACnetResponse): boolean => {
+            const respAddrInfo = resp.socket.getAddressInfo();
+            return respAddrInfo.address === ipAddress;
+        };
+    }
 }
