@@ -28,7 +28,7 @@ export interface IBACnetDeviceControllerConfig extends IControllerConfig {
     urlLookupRequired: boolean;
     port: number;
     deviceId: number;
-    deviceIdMatchRequired: number;
+    deviceIdMatchRequired: boolean;
     vendorId: number;
     vendorIdMatchRequired: boolean;
     unicastWhoIsConfirmation?: boolean;
