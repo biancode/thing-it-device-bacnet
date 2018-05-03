@@ -114,6 +114,29 @@ export class BACnetEnumerated extends BACnetTypeBase {
     }
 
     /**
+     * Performs a comparison between current BACnet value and `data` to determine if
+     * they are equivalent.
+     *
+     * @param  {number|BACnetEnumerated} data - data for comparison
+     * @return {boolean} - result of the comparison
+     */
+    public isEqual (data: number|BACnetEnumerated): boolean {
+        if (_.isNil(data)) {
+            return false;
+        }
+
+        if (typeof data === `number`) {
+            return this.value === data;
+        }
+
+        if (data instanceof BACnetEnumerated) {
+            return this.value === data.value;
+        }
+
+        return false;
+    }
+
+    /**
      * checkAndGetValue - checks if "value" is a correct "enumerated" value, throws
      * the error if "value" has incorrect type.
      *
