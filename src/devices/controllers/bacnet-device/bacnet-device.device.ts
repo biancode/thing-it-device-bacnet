@@ -163,26 +163,26 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Creates instance of the BACnet Application Manager.
+     * Creates the instance of the each plugin componet.
      *
-     * @return {BACnetAppManager}
+     * @return {Promise<void>}
      */
-    public async createAppManagers (manangerConfig: IAppConfig): Promise<any> {
+    public async createPluginComponents (appComponentConfig: IAppConfig): Promise<void> {
         /* Create, init and start socket server */
         const socketServer = new ServerSocket(this.logger);
-        socketServer.initServer(manangerConfig.server);
+        socketServer.initServer(appComponentConfig.server);
         await socketServer.startServer();
         this.socketServer = socketServer;
         BACnetAction.setBACnetServer(socketServer);
 
         /* Create and init BACnet Service Manager */
         const serviceManager = new BACnetServiceManager(this.logger);
-        serviceManager.initManager({});
+        serviceManager.initManager(appComponentConfig.manager.service);
         BACnetAction.setBACnetServiceManager(serviceManager);
 
         /* Create and init BACnet Flow Manager */
         const flowManager = new BACnetFlowManager(this.logger);
-        flowManager.initManager({});
+        flowManager.initManager(appComponentConfig.manager.flow);
         this.flowManager = flowManager;
         BACnetAction.setBACnetFlowManager(flowManager);
     }
