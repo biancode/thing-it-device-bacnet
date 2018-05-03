@@ -134,21 +134,19 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const port = this.getDevicePort();
 
         // Creates the config for each plugin components
-        return {
+        return _.assign({}, _.cloneDeep(AppConfig), {
             server: {
                 port: port,
-                sequence: AppConfig.server.sequence
             },
             manager: {
-                flow: {},
                 service: {
                     dest: {
                         address: ipAddress,
                         port: port,
-                    }
-                }
-            }
-        };
+                    },
+                },
+            },
+        });
     }
 
     /**
