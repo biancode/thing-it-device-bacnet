@@ -83,7 +83,7 @@ export class ServerSocket {
             this.sock.on('listening', () => {
                 const addrInfo = this.sock.address();
                 this.logger.logInfo(`${this.className} - startServer: `
-                    + `DEBUG bacNetAdapter: UDP Server listening on ${addrInfo.address}:${addrInfo.port}`);
+                    + `UDP Server listening on ${addrInfo.address}:${addrInfo.port}`);
                 resolve(addrInfo);
             });
         })
