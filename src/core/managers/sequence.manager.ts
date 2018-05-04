@@ -18,13 +18,14 @@ import {
 type TObjectID = string;
 
 export class SequenceManager {
+    private config: ISequenceConfig;
     private sjDataFlow: Subject<ISequenceFlow>;
     private subDataFlow: Subscription;
 
     private freeFlows: Map<TObjectID, ISequenceFlow[]>;
     private busyFlows: Map<TObjectID, number>;
 
-    constructor (private seqConfig: ISequenceConfig) {
+    constructor () {
     }
 
     /**
@@ -33,7 +34,9 @@ export class SequenceManager {
      *
      * @return {void}
      */
-    public initManager (): void {
+    public initManager (config: ISequenceConfig): void {
+        this.config = config;
+
         this.freeFlows = new Map();
         this.busyFlows = new Map();
 
@@ -92,7 +95,7 @@ export class SequenceManager {
         const busyFlows = this.busyFlows.get(flow.id);
         const freeFlows = this.freeFlows.get(flow.id);
 
-        if (busyFlows >= this.seqConfig.thread || !freeFlows.length) {
+        if (busyFlows >= this.config.thread || !freeFlows.length) {
             return;
         }
         this.busyFlows.set(flow.id, busyFlows + 1);
@@ -106,7 +109,7 @@ export class SequenceManager {
             logger.error(`SequenceManager - updateQueue: ${error}`);
         }
 
-        Bluebird.resolve(endPromise).delay(this.seqConfig.delay).then(() => {
+        Bluebird.resolve(endPromise).delay(this.config.delay).then(() => {
             this.busyFlows.set(flow.id, busyFlows);
             this.updateQueue(flow);
         });
