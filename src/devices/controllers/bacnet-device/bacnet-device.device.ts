@@ -100,9 +100,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * initDevice - inits the Philips controller.
-     * - Method creates the API Light service and registrate created
-     * service in "ServiceManager".
+     * Inits the BACnet controller.
      *
      * @return {Promise<any>}
      */
@@ -128,10 +126,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         this.subscribeToProperty();
 
         // Step 7. Send `WhoIs` request
-        if (this.config.unicastWhoIsConfirmation === true) {
-            apiService.unconfirmedReq.whoIsUnicast({});
+        if (this.config.unicastWhoIsConfirmation) {
+            this.apiService.unconfirmedReq.whoIsUnicast({});
         } else {
-            apiService.unconfirmedReq.whoIsBroadcast({});
+            this.apiService.unconfirmedReq.whoIsBroadcast({});
         }
 
         // Call `init` method in each actor
