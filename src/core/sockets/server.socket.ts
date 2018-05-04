@@ -41,7 +41,8 @@ export class ServerSocket {
         // Create response flow
         this._respFlow = new Subject();
         // Create sequence manager
-        this.sequenceManager = new SequenceManager(this.serverConfig.sequence);
+        this.sequenceManager = new SequenceManager();
+        this.sequenceManager.initManager(this.serverConfig.sequence);
     }
 
     /**
