@@ -110,24 +110,38 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         await super.initDevice();
 
         // Step 1. Inits specific internal properties
+        this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
+            + `Inits specific internal properties`);
         this.initDeviceParamsFromConfig();
 
-        // Step 2. Creates config for the each component
+        // Step 2. Creates the config for the plugin components
+        this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
+            + `Creates the config for the plugin components`);
         this.pluginConfig = await this.createPluginConfig();
 
-        // Step 3. Creates instances of managers
+        // Step 3. Creates instances of the plugin componets
+        this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
+            + `Creates instances of the plugin componets`);
         await this.createPluginComponents();
 
         // Step 4. Creates instance of the API Service
+        this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
+            + `Creates the instance of the API Service`);
         this.apiService = this.serviceManager.createAPIService();
 
         // Step 5. Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow
+        this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
+            + `Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow`);
         this.subscribeToObject();
 
         // Step 6. Creates `subscribtion` to the BACnet device properties
+        this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
+            + `Creates "subscribtion" to the BACnet device properties`);
         this.subscribeToProperty();
 
         // Step 7. Send `WhoIs` request
+        this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
+            + `Send "WhoIs" request`);
         if (this.config.unicastWhoIsConfirmation) {
             this.apiService.unconfirmedReq.whoIsUnicast({});
         } else {
@@ -152,7 +166,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 2. Creates the configuration for the each plugin component.
+     * Step 2. Creates the configuration for the plugin components.
      *
      * @return {Promise<IAppConfig>}
      */
@@ -178,7 +192,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 3. Creates the instance of the each plugin componet.
+     * Step 3. Creates instances of the plugin componets.
      *
      * @return {Promise<void>}
      */
@@ -227,9 +241,11 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
                 if (curAddrInfo.address !== respAddrInfo.address) {
                     if (curAddrInfo.address.indexOf('GENERATED_') > -1) {
-                        this.logger.logInfo(`Device ID not configured, found at ${respAddrInfo.address}`);
+                        this.logger.logInfo(`BACnetDeviceControllerDevice - subscribeToObject: `
+                            + `Device ID not configured, found at ${respAddrInfo.address}`);
                     } else {
-                        this.logger.logInfo(`Device configured with ${curAddrInfo.address} found at ${respAddrInfo.address}`);
+                        this.logger.logInfo(`BACnetDeviceControllerDevice - subscribeToObject: `
+                            + `Device configured with ${curAddrInfo.address} found at ${respAddrInfo.address}`);
                     }
 
                     // Sets IP from response to `plugin` config
@@ -321,14 +337,14 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             .timeout(AppConfig.response.readProperty.timeout)
             .first()
             .subscribe(() => {
-                this.logger.logDebug('BACnetDeviceControllerDevice - subscribeToProperty:',
-                    `Device properties were received`);
-                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty:`,
-                    `BACnet Device details: ${JSON.stringify(this.state)}`);
+                this.logger.logDebug('BACnetDeviceControllerDevice - subscribeToProperty: '
+                    + `Device properties were received`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                    + `BACnet Device details: ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             }, (error) => {
-                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty:`,
-                    `Device properties were not received`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                    + `Device properties were not received`);
                 this.publishStateChange();
             });
     }
@@ -417,7 +433,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 ? `GENERATED_${Math.round(Math.random() * 10000000)}`
                 : this.config.ipAddress;
 
-            this.logger.logDebug(`IP address not configured, using ${this.config.ipAddress}`);
+            this.logger.logDebug(`BACnetDeviceControllerDevice - getDeviceIpAddress: `
+                + `IP address not configured, using "${ipAddress}"`);
             return Bluebird.resolve(ipAddress);
         }
 
@@ -425,11 +442,13 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             // Get IP Address from DNS server by URL
             dns.lookup(this.config.url, (error, address, family) => {
                 if (error) {
-                    this.logger.logDebug(`Error trying to look up URL "${this.config.url}" ${error}`);
+                    this.logger.logDebug(`BACnetDeviceControllerDevice - getDeviceIpAddress: `
+                        + `Error trying to look up URL "${this.config.url}" ${error}`);
                     return reject(error);
                 }
 
-                this.logger.logDebug(`Retrieved IP address for URL. ${address} ${this.config.url}`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - getDeviceIpAddress: `
+                    + `Retrieved IP address "${address}" for URL "${this.config.url}"`);
                 return resolve(address);
             });
         });
@@ -447,8 +466,9 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             return port;
         }
 
-        this.logDebug(`Configured port "${this.config.port}" is out of range (1024-65536). `
-            + `Defaulting to port ${AppConfig.server.port}.`);
+        this.logDebug(`BACnetDeviceControllerDevice - getDevicePort: `
+            + `Configured port "${this.config.port}" is out of range (1024-65536). `
+            + `Defaulting to port "${AppConfig.server.port}"`);
         return AppConfig.server.port;
     }
 }
