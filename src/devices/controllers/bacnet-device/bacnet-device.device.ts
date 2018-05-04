@@ -221,7 +221,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 this.flowManager.isBACnetVendorId(this.config.vendorId), `vendor ID`))
             .filter(this.flowManager.matchFilter(this.config.ipMatchRequired,
                 this.flowManager.isBACnetIPAddress(destAddrInfo.address), `IP Address`))
-            .timeout(AppConfig.request.whoIs.timeout)
+            .timeout(AppConfig.response.iAm.timeout)
             .first()
             .subscribe((resp) => {
                 // Step 8. Handles `iAm` response
