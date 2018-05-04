@@ -71,6 +71,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     public stop () {
+        super.stop();
+
         try {
             this.socketServer.destroy();
         } catch (error) {
