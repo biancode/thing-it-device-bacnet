@@ -132,12 +132,6 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             this.apiService.unconfirmedReq.whoIsBroadcast({});
         }
 
-        // Call `init` method in each actor
-        const actors = this.actors;
-        for (let i = 0; i < actors.length; i++) {
-            await actors[i].initDevice();
-        }
-
         this.state.initialized = true;
     }
 
@@ -252,6 +246,12 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 this.state.initialized = true;
                 this.logger.logDebug(`State: ${this.state}`);
 
+                // Step 9. Call `init` method each actor
+                Bluebird.map(this.actors, (actor) => {
+                    return actor.initDevice();
+                }, { concurrency: 1 });
+
+                // Step 10. Inits the BACnet properties
                 this.initProperties();
             }, (error) => {
                 this.logError(`BACnetDeviceControllerDevice - subscribeToObject: ${error}`);
@@ -332,7 +332,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 9. Inits the BACnet properties.
+     * Step 10. Inits the BACnet properties.
      *
      * @return {Promise<void>}
      */
