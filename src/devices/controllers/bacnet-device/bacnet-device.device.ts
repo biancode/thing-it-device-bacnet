@@ -188,22 +188,20 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      */
     public async createPluginComponents (): Promise<void> {
         /* Create, init and start socket server */
-        const socketServer = new ServerSocket(this.logger);
-        socketServer.initServer(this.pluginConfig.server);
-        await socketServer.startServer();
-        this.socketServer = socketServer;
-        BACnetAction.setBACnetServer(socketServer);
+        this.socketServer = new ServerSocket(this.logger);
+        this.socketServer.initServer(this.pluginConfig.server);
+        await this.socketServer.startServer();
+        BACnetAction.setBACnetServer(this.socketServer);
 
         /* Create and init BACnet Service Manager */
-        const serviceManager = new BACnetServiceManager(this.logger);
-        serviceManager.initManager(this.pluginConfig.manager.service);
-        BACnetAction.setBACnetServiceManager(serviceManager);
+        this.serviceManager = new BACnetServiceManager(this.logger);
+        this.serviceManager.initManager(this.pluginConfig.manager.service);
+        BACnetAction.setBACnetServiceManager(this.serviceManager);
 
         /* Create and init BACnet Flow Manager */
-        const flowManager = new BACnetFlowManager(this.logger);
-        flowManager.initManager(this.pluginConfig.manager.flow);
-        this.flowManager = flowManager;
-        BACnetAction.setBACnetFlowManager(flowManager);
+        this.flowManager = new BACnetFlowManager(this.logger);
+        this.flowManager.initManager(this.pluginConfig.manager.flow);
+        BACnetAction.setBACnetFlowManager(this.flowManager);
     }
 
     /**
