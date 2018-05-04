@@ -206,7 +206,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public subscribeToObject (): void {
         const destAddrInfo = this.pluginConfig.manager.service.dest;
 
-        this.flowManager.getResponseFlow()
+        this.subManager.subscribe = this.flowManager.getResponseFlow()
             .filter(this.flowManager.isServiceType(BACnetServiceTypes.UnconfirmedReqPDU))
             .filter(this.flowManager.isServiceChoice(BACnetUnconfirmedService.iAm))
             .filter(this.flowManager.matchFilter(this.config.deviceIdMatchRequired,
@@ -314,7 +314,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 this.logger.logDebug(`Software retrieved: ${this.state.softwareVersion}`);
             });
 
-        combineLatest(ovObjectName, ovDescription, ovVendorName,
+        this.subManager.subscribe = combineLatest(ovObjectName, ovDescription, ovVendorName,
                 ovModelName, ovSoftwareVersion)
             .timeout(AppConfig.response.readProperty.timeout)
             .first()
