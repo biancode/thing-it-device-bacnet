@@ -49,6 +49,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public socketServer: ServerSocket;
     public flowManager: BACnetFlowManager;
     public serviceManager: BACnetServiceManager;
+    public apiService: APIService;
 
     private objectId: BACnetTypes.BACnetObjectId;
 
@@ -114,7 +115,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         await this.createPluginComponents();
 
         // Step 4. Creates instance of the API Service
-        const apiService = this.serviceManager.createAPIService();
+        this.apiService = this.serviceManager.createAPIService();
 
         // Step 5. Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow
         this.subscribeToObject();
