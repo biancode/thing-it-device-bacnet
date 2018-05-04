@@ -138,10 +138,6 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         this.state.initialized = true;
     }
 
-    public async initProperties (): Promise<void> {
-        return;
-    }
-
     /**
      * Step 1. Creates and inits params of the BACnet Device from plugin configuration.
      * Steps:
@@ -292,6 +288,58 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 this.logger.logDebug(`BACnet Device details: ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             });
+    }
+
+    /**
+     * Step 9. Inits the BACnet properties.
+     *
+     * @return {Promise<void>}
+     */
+    public async initProperties (): Promise<void> {
+        // Gets the `objectName` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            unitObjId: this.objectId,
+            unitProp: {
+                id: BACnetPropertyId.objectName,
+            },
+        });
+
+        // Gets the `description` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            unitObjId: this.objectId,
+            unitProp: {
+                id: BACnetPropertyId.description,
+            },
+        });
+
+        // Gets the `vendorName` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            unitObjId: this.objectId,
+            unitProp: {
+                id: BACnetPropertyId.vendorName,
+            },
+        });
+
+        // Gets the `modelName` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            unitObjId: this.objectId,
+            unitProp: {
+                id: BACnetPropertyId.modelName,
+            },
+        });
+
+        // Gets the `applicationSoftwareVersion` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            unitObjId: this.objectId,
+            unitProp: {
+                id: BACnetPropertyId.applicationSoftwareVersion,
+            },
+        });
     }
 
     /**
