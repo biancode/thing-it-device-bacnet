@@ -6,9 +6,18 @@ export interface IBACnetAddressInfo {
 
 /* Application Config */
 export interface IAppConfig {
-    whoIsTimeout: number;
+    request: IBACnetRequestConfig;
     server: IServerSocketConfig;
     manager: IManagerConfig;
+}
+
+export interface IBACnetRequestConfig {
+    whoIs: IRequestConfig;
+    readProperty: IRequestConfig;
+}
+
+export interface IRequestConfig {
+    timeout?: number;
 }
 
 export interface IManagerConfig {

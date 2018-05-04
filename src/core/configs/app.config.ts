@@ -1,7 +1,14 @@
 import { IAppConfig } from '../interfaces';
 
 export const AppConfig: IAppConfig = {
-    whoIsTimeout: 30000,
+    request: {
+        whoIs: {
+            timeout: 30000,
+        },
+        readProperty: {
+            timeout: 30000,
+        },
+    },
     manager: {
         flow: {},
         service: {
