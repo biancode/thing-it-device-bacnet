@@ -44,7 +44,7 @@ export class BACnetAction {
      */
     static setBACnetServer (server: ServerSocket): IAction {
         return store.dispatch({
-            type: BACnetEvent.setBACnetServiceManager,
+            type: BACnetEvent.setBACnetServer,
             payload: { server: server },
         });
     }
