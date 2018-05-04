@@ -38,6 +38,10 @@ export interface IServerSocketResponse {
     socket: OutputSocket;
 }
 
+export interface IOutputSocketConfig {
+    rinfo: IBACnetAddressInfo;
+}
+
 /* BACnet Flow Manager */
 import { ILayer } from '../bacnet/interfaces';
 
