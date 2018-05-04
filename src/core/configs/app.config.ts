@@ -1,8 +1,8 @@
 import { IAppConfig } from '../interfaces';
 
 export const AppConfig: IAppConfig = {
-    request: {
-        whoIs: {
+    response: {
+        iAm: {
             timeout: 30000,
         },
         readProperty: {
