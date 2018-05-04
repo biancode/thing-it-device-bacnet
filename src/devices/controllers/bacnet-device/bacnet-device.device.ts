@@ -175,7 +175,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const ipAddress = await this.getDeviceIpAddress();
         const port = this.getDevicePort();
 
-        // Creates the config for each plugin components
+        // Creates the config for the plugin components
         return _.merge({}, _.cloneDeep(AppConfig), {
             server: {
                 port: port,
@@ -287,51 +287,62 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             .filter(this.flowManager.isServiceChoice(BACnetConfirmedService.ReadProperty))
             .filter(this.flowManager.isBACnetObject(this.objectId));
 
+        // Gets the `objectName` property
         const ovObjectName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.objectName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.name = bacnetProperty.value;
-                this.logger.logDebug(`Name retrieved: ${this.state.name}`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                    + `Name retrieved: ${this.state.name}`);
             });
 
+        // Gets the `description` property
         const ovDescription = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.description))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.description = bacnetProperty.value;
-                this.logger.logDebug(`Description retrieved: ${this.state.description}`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                    + `Description retrieved: ${this.state.description}`);
             });
 
+        // Gets the `vendorName` property
         const ovVendorName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.vendorName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.vendor = bacnetProperty.value;
-                this.logger.logDebug(`Vendor retrieved: ${this.state.vendor}`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                    + `Vendor retrieved: ${this.state.vendor}`);
             });
 
+        // Gets the `modelName` property
         const ovModelName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.modelName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.model = bacnetProperty.value;
-                this.logger.logDebug(`Model retrieved: ${this.state.model}`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                    + `Model retrieved: ${this.state.model}`);
             });
 
+        // Gets the `applicationSoftwareVersion` property
         const ovSoftwareVersion = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.applicationSoftwareVersion))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
                 this.state.softwareVersion = bacnetProperty.value;
-                this.logger.logDebug(`Software retrieved: ${this.state.softwareVersion}`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                    + `Software retrieved: ${this.state.softwareVersion}`);
             });
 
+        // Gets the summary `readProperty` response
         this.subManager.subscribe = combineLatest(ovObjectName, ovDescription, ovVendorName,
                 ovModelName, ovSoftwareVersion)
             .timeout(AppConfig.response.readProperty.timeout)
