@@ -51,7 +51,7 @@ export class ServerSocket {
      * @return {Bluebird<any>}
      */
     public destroy (): Bluebird<any> {
-        this._respFlow.complete();
+        this._respFlow.unsubscribe();
         this._respFlow = null;
 
         return new Bluebird((resolve, reject) => {
