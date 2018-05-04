@@ -166,7 +166,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const port = this.getDevicePort();
 
         // Creates the config for each plugin components
-        return _.assign({}, _.cloneDeep(AppConfig), {
+        return _.merge({}, _.cloneDeep(AppConfig), {
             server: {
                 port: port,
             },
@@ -237,7 +237,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                     }
 
                     // Sets IP from response to `plugin` config
-                    this.pluginConfig = _.assign({}, _.cloneDeep(this.pluginConfig), {
+                    this.pluginConfig = _.merge({}, _.cloneDeep(this.pluginConfig), {
                         manager: { service: { dest: { address: respAddrInfo.address } } },
                     });
 
