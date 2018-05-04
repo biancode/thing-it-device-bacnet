@@ -204,7 +204,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 4. Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow.
+     * Step 5. Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow.
      *
      * @return {void}
      */
@@ -221,11 +221,42 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             .filter(this.flowManager.matchFilter(this.config.ipMatchRequired,
                 this.flowManager.isBACnetIPAddress(destAddrInfo.address), `IP Address`))
             .timeout(AppConfig.whoIsTimeout)
-            .subscribe(() => { this.initProperties(); });
+            .first()
+            .subscribe((resp) => {
+                // Step 8. Handles `iAm` response
+                this.logger.logInfo('Initialized BACnet device successfully.');
+                const curAddrInfo = this.pluginConfig.manager.service.dest;
+                const respAddrInfo = resp.socket.getAddressInfo();
+
+                if (curAddrInfo.address !== respAddrInfo.address) {
+                    if (curAddrInfo.address.indexOf('GENERATED_') > -1) {
+                        this.logger.logInfo(`Device ID not configured, found at ${respAddrInfo.address}`);
+                    } else {
+                        this.logger.logInfo(`Device configured with ${curAddrInfo.address} found at ${respAddrInfo.address}`);
+                    }
+
+                    // Sets IP from response to `plugin` config
+                    this.pluginConfig = _.assign({}, _.cloneDeep(this.pluginConfig), {
+                        manager: { service: { dest: { address: respAddrInfo.address } } },
+                    });
+
+                    // Create new instance of the `service` manager
+                    this.serviceManager.destroy();
+                    this.serviceManager.initManager(this.pluginConfig.manager.service);
+                    // Create new instance of the API service
+                    this.apiService.destroy();
+                    this.apiService = this.serviceManager.createAPIService();
+                }
+
+                this.state.initialized = true;
+                this.logger.logDebug(`State: ${this.state}`);
+
+                this.initProperties();
+            });
     }
 
     /**
-     * Step 5. Creates `subscribtion` to the BACnet device properties.
+     * Step 6. Creates `subscribtion` to the BACnet device properties.
      *
      * @return {void}
      */
