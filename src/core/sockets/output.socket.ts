@@ -17,7 +17,34 @@ export class OutputSocket {
     }
 
     /**
-     * send - sends the message by unicast channel.
+     * Initializes the `output` socket.
+     * - sets configuration
+     *
+     * @param  {IOutputSocketConfig} config - configuration of the `output` socket
+     * @return {Promise<void>}
+     */
+    public initialize (config: IOutputSocketConfig): void {
+        this.config = config;
+    }
+
+    /**
+     * Destroys the instance of the `output` socket.
+     * - removes config (sets `null`)
+     * - removes socket (sets `null`)
+     * - removes seqManager (sets `null`)
+     * - removes logger (sets `null`)
+     *
+     * @return {Promise<void>}
+     */
+    public destroy (): void {
+        this.config = null;
+        this.socket = null;
+        this.seqManager = null;
+        this.logger = null;
+    }
+
+    /**
+     * Sends the message by unicast channel.
      *
      * @param  {Buffer} msg - message (bytes)
      * @param  {string} reqMethodName - name of the BACnet service
