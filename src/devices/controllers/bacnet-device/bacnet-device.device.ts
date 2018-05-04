@@ -20,6 +20,10 @@ import {
 } from '../../../core/managers';
 
 import {
+    APIService,
+} from '../../../core/services';
+
+import {
     IBACnetDeviceControllerState,
     IBACnetDeviceControllerConfig,
     IBACnetResponse,
