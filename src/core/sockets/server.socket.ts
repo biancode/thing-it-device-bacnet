@@ -99,12 +99,18 @@ export class ServerSocket {
     }
 
     /**
-     * genOutputSocket - generates and returns the instance of OutputSocket.
+     * genOutputSocket - creates the instance of `Output` socket.
      *
      * @param  {IBACnetAddressInfo} rinfo - object with endpoint address and port
+     * @param  {Logger} [logger] - instance of the `Logger`
      * @return {OutputSocket}
      */
-    public getOutputSocket (rinfo: IBACnetAddressInfo): OutputSocket {
-        return new OutputSocket(this.sock, rinfo, this.sequenceManager);
+    public getOutputSocket (rinfo: IBACnetAddressInfo, logger?: Logger): OutputSocket {
+        const apiLogger = _.isNil(logger) ? this.logger : logger;
+
+        const outputSocket = new OutputSocket(apiLogger, this.sock, this.sequenceManager);
+        outputSocket.initialize({ rinfo: rinfo });
+
+        return outputSocket;
     }
 }

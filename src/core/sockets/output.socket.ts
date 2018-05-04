@@ -1,18 +1,20 @@
-import * as dgram from 'dgram';
+import { Socket } from 'dgram';
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 
-import { logger } from '../utils';
-
-import { IBACnetAddressInfo } from '../interfaces';
+import { IBACnetAddressInfo, IOutputSocketConfig } from '../interfaces';
 
 import { SequenceManager } from '../managers';
+import { Logger } from '../utils';
+
+const BroadcastAddress: string = `255.255.255.255`;
 
 export class OutputSocket {
     public readonly className: string = 'OutputSocket';
+    private config: IOutputSocketConfig;
 
-    constructor (private app: dgram.Socket,
-        private rinfo: IBACnetAddressInfo,
+    constructor (private logger: Logger,
+        private socket: Socket,
         private seqManager: SequenceManager) {
     }
 
@@ -51,12 +53,12 @@ export class OutputSocket {
      * @return {Bluebird<any>}
      */
     private _send (msg: Buffer, reqMethodName: string): Bluebird<any> {
-        const ucAddress = this.rinfo.address;
-        const ucPort = this.rinfo.port;
+        const ucAddress = this.config.rinfo.address;
+        const ucPort = this.config.rinfo.port;
 
         this.logSendMethods(ucAddress, ucPort, msg, 'send', reqMethodName);
         return new Bluebird((resolve, reject) => {
-            this.app.send(msg, 0, msg.length, ucPort, ucAddress, (error, data) => {
+            this.socket.send(msg, 0, msg.length, ucPort, ucAddress, (error, data) => {
                 if (error) {
                     return reject(error);
                 }
@@ -74,7 +76,7 @@ export class OutputSocket {
      */
     public send (msg: Buffer, reqMethodName: string): void {
         this.seqManager.next({
-            id: `${this.rinfo.address}:${this.rinfo.port}`,
+            id: `${this.config.rinfo.address}:${this.config.rinfo.port}`,
             object: this,
             method: this._send,
             params: [msg, reqMethodName],
@@ -89,14 +91,14 @@ export class OutputSocket {
      * @return {Bluebird<any>}
      */
     public _sendBroadcast (msg: Buffer, reqMethodName: string): Bluebird<any> {
-        this.app.setBroadcast(true);
-        const bcAddress = `255.255.255.255`;
-        const bcPort = this.rinfo.port;
+        this.socket.setBroadcast(true);
+        const bcAddress = BroadcastAddress;
+        const bcPort = this.config.rinfo.port;
 
         this.logSendMethods(bcAddress, bcPort, msg, 'sendBroadcast', reqMethodName);
         return new Bluebird((resolve, reject) => {
-            this.app.send(msg, 0, msg.length, bcPort, bcAddress, (error, data) => {
-                this.app.setBroadcast(false);
+            this.socket.send(msg, 0, msg.length, bcPort, bcAddress, (error, data) => {
+                this.socket.setBroadcast(false);
                 if (error) {
                     return reject(error);
                 }
@@ -114,7 +116,7 @@ export class OutputSocket {
      */
     public sendBroadcast (msg: Buffer, reqMethodName: string): void {
         this.seqManager.next({
-            id: `${this.rinfo.address}:${this.rinfo.port}`,
+            id: `${BroadcastAddress}:${this.config.rinfo.port}`,
             object: this,
             method: this._sendBroadcast,
             params: [msg, reqMethodName],
@@ -134,10 +136,10 @@ export class OutputSocket {
     private logSendMethods (address: string, port: number, msg: Buffer,
             sendMethodName: string, reqMethodName: string): void {
         try {
-            logger.debug(`${this.className} - ${sendMethodName} (${address}:${port}): ${reqMethodName}`);
-            logger.debug(`${this.className} - ${sendMethodName} (${address}:${port}): ${msg.toString('hex')}`);
+            this.logger.logDebug(`${this.className} - ${sendMethodName} (${address}:${port}): `
+                + `${reqMethodName} - ${msg.toString('hex')}`);
         } catch (error) {
-            logger.error(`${this.className} - ${sendMethodName} (${address}:${port}): ${error}`);
+            this.logger.logDebug(`${this.className} - ${sendMethodName} (${address}:${port}): ${error}`);
         }
     }
 
@@ -147,6 +149,6 @@ export class OutputSocket {
      * @return {IBACnetAddressInfo}
      */
     public getAddressInfo (): IBACnetAddressInfo {
-        return _.cloneDeep(this.rinfo);
+        return _.cloneDeep(this.config.rinfo);
     }
 }
