@@ -253,6 +253,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 this.logger.logDebug(`State: ${this.state}`);
 
                 this.initProperties();
+            }, (error) => {
+                this.logError(`BACnetDeviceControllerDevice - subscribeToObject: ${error}`);
             });
     }
 
