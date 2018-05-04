@@ -10,9 +10,6 @@ export class ControllerDevice extends CommonDevice {
     public configuration: IControllerConfig;
     public state: IControllerState;
 
-    public stop (): void {
-    }
-
     public async initDevice (): Promise<any> {
         super.initDevice();
     }
