@@ -319,8 +319,14 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             .timeout(AppConfig.response.readProperty.timeout)
             .first()
             .subscribe(() => {
-                this.logger.logDebug('Device data retrieved.');
-                this.logger.logDebug(`BACnet Device details: ${JSON.stringify(this.state)}`);
+                this.logger.logDebug('BACnetDeviceControllerDevice - subscribeToProperty:',
+                    `Device properties were received`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty:`,
+                    `BACnet Device details: ${JSON.stringify(this.state)}`);
+                this.publishStateChange();
+            }, (error) => {
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty:`,
+                    `Device properties were not received`);
                 this.publishStateChange();
             });
     }
