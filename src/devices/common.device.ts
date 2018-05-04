@@ -1,11 +1,11 @@
-import * as requestPromise from 'request-promise';
-import * as request from 'request';
+import { Subscription } from 'rxjs';
 
 import * as _ from 'lodash';
 
 import { ApiError } from '../core/errors';
 
 import { DeviceBase } from '../core/bases/device.base';
+import { SubscriptionManager } from '../core/managers';
 
 import { Logger } from '../core/utils';
 import { ICommonState, ICommonConfig } from '../core/interfaces/device.interface';
@@ -15,6 +15,7 @@ export class CommonDevice extends DeviceBase {
     public state: ICommonState;
     public isDestroyed: boolean;
     public logger: Logger;
+    public subManager: SubscriptionManager;
 
     constructor (options: any) {
         super();
@@ -26,6 +27,9 @@ export class CommonDevice extends DeviceBase {
      */
     public async start (): Promise<any> {
         this.isDestroyed = false;
+
+        this.subManager = new SubscriptionManager();
+        await this.subManager.initManager();
     }
 
     /**
@@ -34,6 +38,8 @@ export class CommonDevice extends DeviceBase {
     */
     public stop (): void {
         this.isDestroyed = true;
+
+        this.subManager.destroy();
     }
 
     /**
