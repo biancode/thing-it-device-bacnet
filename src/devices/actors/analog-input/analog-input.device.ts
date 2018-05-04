@@ -46,6 +46,9 @@ export class AnalogInputActorDevice extends ActorDevice {
 
         this.flowManager = store.getState([ 'bacnet', 'flowManager' ]);
         this.serviceManager = store.getState([ 'bacnet', 'serviceManager' ]);
+
+        this.subscribeToProperty();
+
         this.state.initialized = true;
         this.publishStateChange();
     }
@@ -79,6 +82,33 @@ export class AnalogInputActorDevice extends ActorDevice {
             instance: objectId,
         });
     }
+
+    /**
+     * Step 6. Creates `subscribtion` to the BACnet device properties.
+     *
+     * @return {void}
+     */
+    public subscribeToProperty (): void {
+        const covNotification = this.flowManager.getResponseFlow()
+            .filter(this.flowManager.isServiceType(BACnetServiceTypes.UnconfirmedReqPDU))
+            .filter(this.flowManager.isServiceChoice(BACnetUnconfirmedService.covNotification))
+            .filter(this.flowManager.isBACnetObject(this.objectId))
+            .subscribe(() => {
+                // this.logger.logDebug('BACnetDeviceControllerDevice - subscribeToProperty: '
+                //     + `Device properties were received`);
+                // this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                //     + `BACnet Device details: ${JSON.stringify(this.state)}`);
+                // this.publishStateChange();
+            }, (error) => {
+                // this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                //     + `Device properties were not received`);
+                // this.publishStateChange();
+            });
+    }
+
+    /**
+     * TID API Methods
+     */
 
     /**
      * Service Stub
