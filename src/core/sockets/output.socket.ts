@@ -68,7 +68,7 @@ export class OutputSocket {
     }
 
     /**
-     * send - sends the message by unicast channel.
+     * Sends the message by unicast channel.
      *
      * @param  {Buffer} msg - message (bytes)
      * @param  {string} reqMethodName - name of the BACnet service
@@ -84,7 +84,7 @@ export class OutputSocket {
     }
 
     /**
-     * sendBroadcast - sends the message by broadcast channel.
+     * Sends the message by broadcast channel.
      *
      * @param  {Buffer} msg - message (bytes)
      * @param  {string} reqMethodName - name of the BACnet service
@@ -108,7 +108,7 @@ export class OutputSocket {
     }
 
     /**
-     * sendBroadcast - sends the message by broadcast channel.
+     * Sends the message by broadcast channel.
      *
      * @param  {Buffer} msg - message (bytes)
      * @param  {string} reqMethodName - name of the BACnet service
@@ -124,7 +124,7 @@ export class OutputSocket {
     }
 
     /**
-     * logSendMethods - logs the "send" methods.
+     * Logs the "send" methods.
      *
      * @param  {string} address - address of the BACnet device
      * @param  {number} port - port of the BACnet device
@@ -144,7 +144,7 @@ export class OutputSocket {
     }
 
     /**
-     * getAddressInfo - returns the address and port of the BACnet device.
+     * Returns the address and port of the BACnet device.
      *
      * @return {IBACnetAddressInfo}
      */
