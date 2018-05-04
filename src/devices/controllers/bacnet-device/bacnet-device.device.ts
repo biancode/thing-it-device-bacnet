@@ -316,6 +316,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         combineLatest(ovObjectName, ovDescription, ovVendorName,
                 ovModelName, ovSoftwareVersion)
+            .timeout(AppConfig.response.readProperty.timeout)
             .first()
             .subscribe(() => {
                 this.logger.logDebug('Device data retrieved.');
