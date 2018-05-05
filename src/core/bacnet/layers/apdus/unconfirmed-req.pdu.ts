@@ -14,6 +14,7 @@ import {
     ILayerUnconfirmedReqService,
     ILayerUnconfirmedReqServiceIAm,
     ILayerUnconfirmedReqServiceWhoIs,
+    ILayerUnconfirmedReqServiceCOVNotification,
 } from '../../interfaces';
 
 import {
@@ -63,6 +64,9 @@ export class UnconfirmedReqPDU {
                     break;
                 case BACnetUnconfirmedService.whoIs:
                     serviceData = this.getWhoIs(reader);
+                    break;
+                case BACnetUnconfirmedService.covNotification:
+                    serviceData = this.getCOVNotification(reader);
                     break;
             }
         } catch (error) {
@@ -121,6 +125,46 @@ export class UnconfirmedReqPDU {
      */
     private getWhoIs (reader: BACnetReaderUtil): ILayerUnconfirmedReqServiceWhoIs {
         const serviceData: ILayerUnconfirmedReqServiceWhoIs = {};
+
+        return serviceData;
+    }
+
+    /**
+     * Parses the "APDU Unconfirmed Request COV Notification" message.
+     *
+     * @param  {BACnetReaderUtil} reader - BACnet reader with "APDU Unconfirmed Request COV Notification" message
+     * @return {ILayerUnconfirmedReqServiceCOVNotification}
+     */
+    private getCOVNotification (reader: BACnetReaderUtil): ILayerUnconfirmedReqServiceCOVNotification {
+        let serviceData: ILayerUnconfirmedReqServiceCOVNotification;
+
+        let subProcessId: BACnetTypes.BACnetUnsignedInteger;
+        let devId: BACnetTypes.BACnetObjectId;
+        let objId: BACnetTypes.BACnetObjectId;
+        let timeRemaining: BACnetTypes.BACnetUnsignedInteger;
+        let listOfValues: BACnetTypes.BACnetTypeBase[];
+
+        try {
+            subProcessId = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
+
+            devId = BACnetTypes.BACnetObjectId.readParam(reader);
+
+            objId = BACnetTypes.BACnetObjectId.readParam(reader);
+
+            timeRemaining = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
+
+            listOfValues = reader.readListOfValues();
+        } catch (error) {
+            throw new BACnetError(`${this.className} - getIAm: Parse - ${error}`);
+        }
+
+        serviceData = {
+            subProcessId: subProcessId,
+            devId: devId,
+            objId: objId,
+            timeRemaining: timeRemaining,
+            listOfValues: listOfValues,
+        };
 
         return serviceData;
     }

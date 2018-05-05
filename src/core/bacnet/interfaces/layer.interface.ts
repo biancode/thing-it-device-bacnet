@@ -133,6 +133,18 @@ export interface ILayerUnconfirmedReqServiceIAm {
 
 export interface ILayerUnconfirmedReqServiceWhoIs {
 }
+export interface ILayerUnconfirmedReqServiceCOVNotification {
+    // Identify the process within the COV client.
+    subProcessId: BACnetTypes.BACnetUnsignedInteger;
+    // Device that initiated the `COV Notification` service request
+    devId: BACnetTypes.BACnetObjectId;
+    // Object that has changed
+    objId: BACnetTypes.BACnetObjectId;
+    // Remaining lifetime of the subscription in seconds. 00 - indefinite lifetime
+    timeRemaining: BACnetTypes.BACnetUnsignedInteger;
+    // List of one or more `notification` property values
+    listOfValues: BACnetTypes.BACnetTypeBase[];
+}
 
 /*
  * Complex ACK APDU Layer
