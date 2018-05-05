@@ -6,14 +6,14 @@ import {
     BLVCFunction,
 } from '../enums';
 
-import { BACnetWriterUtil } from '../utils';
+import { BACnetWriter } from '../io';
 
 import * as BACnetTypes from '../types';
 
 export interface IWriteBLVC {
     func: BLVCFunction;
-    npdu: BACnetWriterUtil;
-    apdu: BACnetWriterUtil;
+    npdu: BACnetWriter;
+    apdu: BACnetWriter;
 }
 
 export interface IWriteNPDU {

@@ -2,12 +2,9 @@ import * as _ from 'lodash';
 
 import { BACnetError } from '../../errors';
 
-import {
-    OffsetUtil,
-    TyperUtil,
-    BACnetReaderUtil,
-    BACnetWriterUtil,
-} from '../../utils';
+import { TyperUtil, BACnetReaderUtil } from '../../utils';
+
+import { BACnetReader, BACnetWriter } from '../../io';
 
 import {
     BACnetPropTypes,
@@ -17,6 +14,7 @@ import {
 } from '../../enums';
 
 import {
+    IBACnetPropertyValue,
     ILayerComplexACK,
     ILayerComplexACKService,
     ILayerComplexACKServiceReadProperty,
@@ -39,7 +37,7 @@ export class ComplexACKPDU {
      * @return {ILayerComplexACK}
      */
     private getFromBuffer (buf: Buffer): ILayerComplexACK {
-        const reader = new BACnetReaderUtil(buf);
+        const reader = new BACnetReader(buf);
 
         let reqMap: ILayerComplexACK;
         let serviceChoice: BACnetConfirmedService, serviceData: ILayerComplexACKService;
@@ -93,39 +91,26 @@ export class ComplexACKPDU {
     /**
      * getReadProperty - parses the "APDU Complex ACK Read Property" message.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "APDU Complex ACK Read Property" message
+     * @param  {BACnetReader} reader - BACnet reader with "APDU Complex ACK Read Property" message
      * @return {ILayerComplexACKServiceReadProperty}
      */
-    private getReadProperty (reader: BACnetReaderUtil): ILayerComplexACKServiceReadProperty {
+    private getReadProperty (reader: BACnetReader): ILayerComplexACKServiceReadProperty {
         let serviceData: ILayerComplexACKServiceReadProperty;
 
-        let objId: BACnetTypes.BACnetObjectId,
-            propId: BACnetTypes.BACnetEnumerated,
-            propArrayIndex: BACnetTypes.BACnetUnsignedInteger,
-            propValues: BACnetTypes.BACnetTypeBase[];
+        let objId: BACnetTypes.BACnetObjectId;
+        let prop: IBACnetPropertyValue;
 
         try {
             objId = BACnetTypes.BACnetObjectId.readParam(reader);
 
-            propId = BACnetTypes.BACnetEnumerated.readParam(reader);
-
-            const optTag = reader.readTag(false);
-            const optTagNumber = optTag.num;
-
-            if (optTagNumber === 2) {
-                propArrayIndex = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
-            }
-
-            propValues = reader.readListOfValues();
+            prop = BACnetReaderUtil.readProperty(reader);
         } catch (error) {
             throw new BACnetError(`${this.className} - getReadProperty: Parse - ${error}`);
         }
 
         serviceData = {
             objId: objId,
-            propId: propId,
-            propArrayIndex: propArrayIndex,
-            propValues: propValues,
+            prop: prop,
         };
 
         return serviceData;
@@ -135,10 +120,10 @@ export class ComplexACKPDU {
      * writeReq - writes the "APDU Complex ACK" header.
      *
      * @param  {IWriteComplexACK} params - "APDU Complex ACK" write params
-     * @return {BACnetWriterUtil}
+     * @return {BACnetWriter}
      */
-    public writeReq (params: IWriteComplexACK): BACnetWriterUtil {
-        const writer = new BACnetWriterUtil();
+    public writeReq (params: IWriteComplexACK): BACnetWriter {
+        const writer = new BACnetWriter();
 
         // Write service meta
         // Set service type
@@ -167,10 +152,10 @@ export class ComplexACKPDU {
      * writeReq - writes the "APDU Complex ACK Read Property" message.
      *
      * @param  {IWriteComplexACKReadProperty} params - "APDU Complex ACK Read Property" write params
-     * @return {BACnetWriterUtil}
+     * @return {BACnetWriter}
      */
-    public writeReadProperty (params: IWriteComplexACKReadProperty): BACnetWriterUtil {
-        const writer = new BACnetWriterUtil();
+    public writeReadProperty (params: IWriteComplexACKReadProperty): BACnetWriter {
+        const writer = new BACnetWriter();
 
         // Write Service choice
         writer.writeUInt8(BACnetConfirmedService.ReadProperty);

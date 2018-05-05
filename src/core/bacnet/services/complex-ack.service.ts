@@ -5,7 +5,7 @@ import {
 import { complexACKPDU } from '../layers/apdus';
 import { blvc, npdu } from '../layers';
 
-import { BACnetWriterUtil } from '../utils';
+import { BACnetWriter } from '../io';
 
 import {
     IServiceComplexACKReadProperty,
@@ -26,7 +26,7 @@ export class ComplexACKService {
         // Generate APDU writer
         const writerComplexACK = complexACKPDU.writeReq(opts);
         const writerReadProperty = complexACKPDU.writeReadProperty(opts);
-        const writerAPDU = BACnetWriterUtil.concat(writerComplexACK, writerReadProperty);
+        const writerAPDU = BACnetWriter.concat(writerComplexACK, writerReadProperty);
 
         // Generate NPDU writer
         const writerNPDU = npdu.writeNPDULayer({});
@@ -39,7 +39,7 @@ export class ComplexACKService {
         });
 
         // Concat messages
-        const writerBACnet = BACnetWriterUtil.concat(writerBLVC, writerNPDU, writerAPDU);
+        const writerBACnet = BACnetWriter.concat(writerBLVC, writerNPDU, writerAPDU);
 
         // Get and send BACnet message
         const msgBACnet = writerBACnet.getBuffer();

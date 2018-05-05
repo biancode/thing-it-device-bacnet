@@ -13,6 +13,8 @@ import {
 
 import * as BACnetTypes from '../types';
 
+import { IBACnetPropertyValue } from './bacnet.interface';
+
 export interface ILayer {
     blvc: ILayerBLVC;
     npdu: ILayerNPDU;
@@ -106,10 +108,7 @@ export interface ILayerConfirmedReqServiceSubscribeCOV {
 
 export interface ILayerConfirmedReqServiceWriteProperty {
     objId: BACnetTypes.BACnetObjectId;
-    propId: BACnetTypes.BACnetEnumerated;
-    propArrayIndex?: BACnetTypes.BACnetUnsignedInteger;
-    propValues: BACnetTypes.BACnetTypeBase[];
-    priority: BACnetTypes.BACnetUnsignedInteger;
+    prop: IBACnetPropertyValue;
 }
 
 /*
@@ -164,9 +163,7 @@ export type ILayerComplexACKService = ILayerComplexACKServiceReadProperty;
 
 export interface ILayerComplexACKServiceReadProperty {
     objId: BACnetTypes.BACnetObjectId;
-    propId: BACnetTypes.BACnetEnumerated;
-    propArrayIndex?: BACnetTypes.BACnetUnsignedInteger;
-    propValues?: BACnetTypes.BACnetTypeBase[];
+    prop: IBACnetPropertyValue;
 }
 
 /*

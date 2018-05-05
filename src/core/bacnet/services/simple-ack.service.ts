@@ -5,7 +5,7 @@ import {
 import { complexACKPDU, simpleACKPDU } from '../layers/apdus';
 import { blvc, npdu } from '../layers';
 
-import { BACnetWriterUtil } from '../utils';
+import { BACnetWriter } from '../io';
 
 import {
     IServiceSimpleACKSubscribeCOV,
@@ -27,7 +27,7 @@ export class SimpleACKService {
         // Generate APDU writer
         const writerSimpleACKPDU = simpleACKPDU.writeReq(opts);
         const writerSubscribeCOV = simpleACKPDU.writeSubscribeCOV(opts);
-        const writerAPDU = BACnetWriterUtil.concat(writerSimpleACKPDU, writerSubscribeCOV);
+        const writerAPDU = BACnetWriter.concat(writerSimpleACKPDU, writerSubscribeCOV);
 
         // Generate NPDU writer
         const writerNPDU = npdu.writeNPDULayer({});
@@ -40,7 +40,7 @@ export class SimpleACKService {
         });
 
         // Concat messages
-        const writerBACnet = BACnetWriterUtil.concat(writerBLVC, writerNPDU, writerAPDU);
+        const writerBACnet = BACnetWriter.concat(writerBLVC, writerNPDU, writerAPDU);
 
         // Get and send BACnet message
         const msgBACnet = writerBACnet.getBuffer();
@@ -60,7 +60,7 @@ export class SimpleACKService {
         // Generate APDU writer
         const writerSimpleACKPDU = simpleACKPDU.writeReq(opts);
         const writerSubscribeCOV = simpleACKPDU.writeWriteProperty(opts);
-        const writerAPDU = BACnetWriterUtil.concat(writerSimpleACKPDU, writerSubscribeCOV);
+        const writerAPDU = BACnetWriter.concat(writerSimpleACKPDU, writerSubscribeCOV);
 
         // Generate NPDU writer
         const writerNPDU = npdu.writeNPDULayer({});
@@ -73,7 +73,7 @@ export class SimpleACKService {
         });
 
         // Concat messages
-        const writerBACnet = BACnetWriterUtil.concat(writerBLVC, writerNPDU, writerAPDU);
+        const writerBACnet = BACnetWriter.concat(writerBLVC, writerNPDU, writerAPDU);
 
         // Get and send BACnet message
         const msgBACnet = writerBACnet.getBuffer();

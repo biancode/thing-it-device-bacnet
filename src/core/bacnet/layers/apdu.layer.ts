@@ -2,11 +2,7 @@ import * as _ from 'lodash';
 
 import { BACnetError } from '../errors';
 
-import {
-    OffsetUtil,
-    TyperUtil,
-    BACnetReaderUtil,
-} from '../utils';
+import { BACnetReader } from '../io';
 
 import {
     ConfirmedReqPDU,
@@ -31,7 +27,7 @@ export class APDU {
      * @return {ILayerAPDU}
      */
     public getFromBuffer (buf: Buffer): ILayerAPDU {
-        const reader = new BACnetReaderUtil(buf);
+        const reader = new BACnetReader(buf);
 
         let APDUMessage: ILayerAPDU;
         try {

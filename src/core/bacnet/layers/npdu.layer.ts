@@ -2,12 +2,9 @@ import * as _ from 'lodash';
 
 import { BACnetError } from '../errors';
 
-import {
-    OffsetUtil,
-    TyperUtil,
-    BACnetReaderUtil,
-    BACnetWriterUtil,
-} from '../utils';
+import { TyperUtil } from '../utils';
+
+import { BACnetReader, BACnetWriter } from '../io';
 
 import { apdu, APDU } from './apdu.layer';
 
@@ -74,7 +71,7 @@ export class NPDU {
      * @return {ILayerNPDU}
      */
     public getFromBuffer (buf: Buffer): ILayerNPDU {
-        const readerUtil = new BACnetReaderUtil(buf);
+        const readerUtil = new BACnetReader(buf);
 
         let mVersion: number, mControl: ILayerNPDUControl;
         let destNetwork: ILayerNPDUNetworkDest,
@@ -147,17 +144,17 @@ export class NPDU {
      * writeNPDULayer - writes the "NPDU" layer message.
      *
      * @param  {IWriteNPDU} params - "NPDU" write params
-     * @return {BACnetWriterUtil} - instance of the writer utility
+     * @return {BACnetWriter} - instance of the writer utility
      */
-    public writeNPDULayer (params: IWriteNPDU): BACnetWriterUtil {
-        let writer = new BACnetWriterUtil();
+    public writeNPDULayer (params: IWriteNPDU): BACnetWriter {
+        let writer = new BACnetWriter();
 
         // Write NPDU version
         writer.writeUInt8(0x01);
 
         // Write control byte
         const writerControl = this.writeNPDULayerControl(params.control);
-        writer = BACnetWriterUtil.concat(writer, writerControl);
+        writer = BACnetWriter.concat(writer, writerControl);
 
         if (_.get(params, 'control.destSpecifier')) {
             // Write destination network address
@@ -199,10 +196,10 @@ export class NPDU {
      * writeNPDULayerControl - writes the "control byte" of "NPDU" layer.
      *
      * @param  {IWriteNPDUControl} params - "NPDU" write params for "control byte"
-     * @return {BACnetWriterUtil} - instance of the writer utility
+     * @return {BACnetWriter} - instance of the writer utility
      */
-    public writeNPDULayerControl (params: IWriteNPDUControl): BACnetWriterUtil {
-        const writer = new BACnetWriterUtil();
+    public writeNPDULayerControl (params: IWriteNPDUControl): BACnetWriter {
+        const writer = new BACnetWriter();
 
         // Write Service choice
         let control = 0x00;

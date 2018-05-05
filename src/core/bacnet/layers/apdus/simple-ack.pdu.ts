@@ -2,12 +2,9 @@ import * as _ from 'lodash';
 
 import { BACnetError } from '../../errors';
 
-import {
-    OffsetUtil,
-    TyperUtil,
-    BACnetReaderUtil,
-    BACnetWriterUtil,
-} from '../../utils';
+import { TyperUtil } from '../../utils';
+
+import { BACnetReader, BACnetWriter } from '../../io';
 
 import {
     ILayerSimpleACK,
@@ -41,7 +38,7 @@ export class SimpleACKPDU {
      * @return {ILayerSimpleACK}
      */
     public getFromBuffer (buf: Buffer): ILayerSimpleACK {
-        const reader = new BACnetReaderUtil(buf);
+        const reader = new BACnetReader(buf);
 
         let reqMap: ILayerSimpleACK;
         let serviceChoice: BACnetConfirmedService, serviceData: ILayerSimpleACKService;
@@ -83,10 +80,10 @@ export class SimpleACKPDU {
     /**
      * getSubscribeCOV - parses the "APDU Simple ACK Subscribe CoV" message.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "APDU Simple ACK Subscribe CoV" message
+     * @param  {BACnetReader} reader - BACnet reader with "APDU Simple ACK Subscribe CoV" message
      * @return {ILayerSimpleACKServiceSubscribeCOV}
      */
-    private getSubscribeCOV (reader: BACnetReaderUtil): ILayerSimpleACKServiceSubscribeCOV {
+    private getSubscribeCOV (reader: BACnetReader): ILayerSimpleACKServiceSubscribeCOV {
         const serviceMap: ILayerSimpleACKServiceSubscribeCOV = {};
 
         return serviceMap;
@@ -95,10 +92,10 @@ export class SimpleACKPDU {
     /**
      * getSubscribeCOV - parses the "APDU Simple ACK Write Property" message.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "APDU Simple ACK Subscribe CoV" message
+     * @param  {BACnetReader} reader - BACnet reader with "APDU Simple ACK Subscribe CoV" message
      * @return {ILayerSimpleACKServiceWriteProperty}
      */
-    private getWriteProperty (reader: BACnetReaderUtil): ILayerSimpleACKServiceWriteProperty {
+    private getWriteProperty (reader: BACnetReader): ILayerSimpleACKServiceWriteProperty {
         const serviceMap: ILayerSimpleACKServiceWriteProperty = {};
 
         return serviceMap;
@@ -108,10 +105,10 @@ export class SimpleACKPDU {
      * writeReq - writes the "APDU Simple ACK" header.
      *
      * @param  {IWriteSimpleACK} params - "APDU Simple ACK" write params
-     * @return {BACnetWriterUtil}
+     * @return {BACnetWriter}
      */
-    public writeReq (params: IWriteSimpleACK): BACnetWriterUtil {
-        const writer = new BACnetWriterUtil();
+    public writeReq (params: IWriteSimpleACK): BACnetWriter {
+        const writer = new BACnetWriter();
 
         // Write Service Type
         const mMeta = TyperUtil.setBitRange(0x00,
@@ -128,10 +125,10 @@ export class SimpleACKPDU {
      * writeSubscribeCOV - writes the "APDU Simple ACK Subscribe CoV" message.
      *
      * @param  {IWriteSimpleACKSubscribeCOV} params - "APDU Simple ACK Subscribe CoV" write params
-     * @return {BACnetWriterUtil}
+     * @return {BACnetWriter}
      */
-    public writeSubscribeCOV (params: IWriteSimpleACKSubscribeCOV): BACnetWriterUtil {
-        const writer = new BACnetWriterUtil();
+    public writeSubscribeCOV (params: IWriteSimpleACKSubscribeCOV): BACnetWriter {
+        const writer = new BACnetWriter();
 
         // Write Service choice
         writer.writeUInt8(BACnetConfirmedService.SubscribeCOV);
@@ -143,10 +140,10 @@ export class SimpleACKPDU {
      * writeWriteProperty - writes the "APDU Simple ACK Write Property" message.
      *
      * @param  {IWriteSimpleACKWriteProperty} params - "APDU Simple ACK Write Property" write params
-     * @return {BACnetWriterUtil}
+     * @return {BACnetWriter}
      */
-    public writeWriteProperty (params: IWriteSimpleACKWriteProperty): BACnetWriterUtil {
-        const writer = new BACnetWriterUtil();
+    public writeWriteProperty (params: IWriteSimpleACKWriteProperty): BACnetWriter {
+        const writer = new BACnetWriter();
 
         // Write Service choice
         writer.writeUInt8(BACnetConfirmedService.WriteProperty);

@@ -2,12 +2,7 @@ import * as _ from 'lodash';
 
 import { BACnetError } from '../errors';
 
-import {
-    OffsetUtil,
-    TyperUtil,
-    BACnetReaderUtil,
-    BACnetWriterUtil,
-} from '../utils';
+import { BACnetReader, BACnetWriter } from '../io';
 
 import { npdu, NPDU } from './npdu.layer';
 
@@ -32,7 +27,7 @@ export class BLVC {
      * @return {ILayerBLVC}
      */
     public getFromBuffer (buf: Buffer): ILayerBLVC {
-        const readerUtil = new BACnetReaderUtil(buf);
+        const readerUtil = new BACnetReader(buf);
 
         let mType: number, mFunction: number, mLenght: number;
         let NPDUMessage: ILayerNPDU;
@@ -64,10 +59,10 @@ export class BLVC {
      * writeBLVCLayer - writes the "BLVC" layer message.
      *
      * @param  {IWriteBLVC} params - "BLVC" write params
-     * @return {BACnetWriterUtil} - instance of the writer utility
+     * @return {BACnetWriter} - instance of the writer utility
      */
-    public writeBLVCLayer (params: IWriteBLVC): BACnetWriterUtil {
-        let writer = new BACnetWriterUtil();
+    public writeBLVCLayer (params: IWriteBLVC): BACnetWriter {
+        let writer = new BACnetWriter();
 
         // Write BLVC type
         writer.writeUInt8(0x81);
