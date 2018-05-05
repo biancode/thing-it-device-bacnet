@@ -142,7 +142,7 @@ export interface ILayerUnconfirmedReqServiceCOVNotification {
     // Remaining lifetime of the subscription in seconds. 00 - indefinite lifetime
     timeRemaining: BACnetTypes.BACnetUnsignedInteger;
     // List of one or more `notification` property values
-    listOfValues: BACnetTypes.BACnetTypeBase[];
+    listOfValues: IBACnetPropertyValue[];
 }
 
 /*

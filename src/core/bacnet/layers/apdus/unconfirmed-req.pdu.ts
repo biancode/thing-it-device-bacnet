@@ -7,6 +7,7 @@ import { TyperUtil, BACnetReaderUtil } from '../../utils';
 import { BACnetReader, BACnetWriter } from '../../io';
 
 import {
+    IBACnetPropertyValue,
     ILayerUnconfirmedReq,
     ILayerUnconfirmedReqService,
     ILayerUnconfirmedReqServiceIAm,
@@ -139,7 +140,7 @@ export class UnconfirmedReqPDU {
         let devId: BACnetTypes.BACnetObjectId;
         let objId: BACnetTypes.BACnetObjectId;
         let timeRemaining: BACnetTypes.BACnetUnsignedInteger;
-        let listOfValues: BACnetTypes.BACnetTypeBase[];
+        let listOfValues: IBACnetPropertyValue[];
 
         try {
             subProcessId = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
@@ -150,7 +151,7 @@ export class UnconfirmedReqPDU {
 
             timeRemaining = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
 
-            listOfValues = BACnetReaderUtil.readPropertyValues(reader);
+            listOfValues = BACnetReaderUtil.readProperties(reader);
         } catch (error) {
             throw new BACnetError(`${this.className} - getIAm: Parse - ${error}`);
         }
