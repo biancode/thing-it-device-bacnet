@@ -3,16 +3,16 @@ import { spy, SinonSpy } from 'sinon';
 
 import { BACnetStatusFlags } from './status-flags.type';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 describe('BACnetStatusFlags', () => {
     describe('readValue', () => {
         let bacnetStatusFlags: BACnetStatusFlags;
-        let bacnetReaderUtil: BACnetReaderUtil;
+        let bacnetReaderUtil: BACnetReader;
 
         beforeEach(() => {
             bacnetStatusFlags = new BACnetStatusFlags();
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([
+            bacnetReaderUtil = new BACnetReader(Buffer.from([
                 0x82, 0x04, 0x90,
             ]));
             bacnetStatusFlags.readValue(bacnetReaderUtil);
@@ -36,10 +36,10 @@ describe('BACnetStatusFlags', () => {
 
     describe('writeValue', () => {
         let bacnetStatusFlags: BACnetStatusFlags;
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should write correct buffer for "inAlarm: true, fault: false, overridden: false, outOfService: true" value', () => {

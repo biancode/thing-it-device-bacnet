@@ -9,11 +9,12 @@ import {
 
 import {
     IBACnetTag,
+    IBACnetReaderOptions,
 } from '../../interfaces';
 
 import { BACnetError } from '../../errors';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 export class BACnetReal extends BACnetTypeBase {
     public readonly className: string = 'BACnetReal';
@@ -29,32 +30,32 @@ export class BACnetReal extends BACnetTypeBase {
             ? 0 : this.checkAndGetValue(defValue);
     }
 
-    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetReal {
-        return super.readParam(reader, changeOffset);
+    static readParam (reader: BACnetReader, opts?: IBACnetReaderOptions): BACnetReal {
+        return super.readParam(reader, opts);
     }
 
     /**
      * readValue - parses the message with BACnet "real" value.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "real" BACnet value
-     * @param  {type} [changeOffset = true] - change offset in the buffer of reader
+     * @param  {BACnetReader} reader - BACnet reader with "real" BACnet value
+     * @param  {type} [opts = true] - change offset in the buffer of reader
      * @return {void}
      */
-    public readValue (reader: BACnetReaderUtil, changeOffset: boolean = true): void {
-        const tag = reader.readTag(changeOffset);
+    public readValue (reader: BACnetReader, opts?: IBACnetReaderOptions): void {
+        const tag = reader.readTag(opts);
         this.tag = tag;
 
-        let value: number = reader.readFloatBE(changeOffset);
+        let value: number = reader.readFloatBE(opts);
         this.data = this.toFixed(value);
     }
 
     /**
      * writeValue - writes the BACnet "real" value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @return {void}
      */
-    public writeValue (writer: BACnetWriterUtil): void {
+    public writeValue (writer: BACnetWriter): void {
         this.writeParam(writer, {
             num: BACnetPropTypes.real,
             type: BACnetTagTypes.application,
@@ -64,11 +65,11 @@ export class BACnetReal extends BACnetTypeBase {
     /**
      * writeParam - writes the BACnet Param as "real" value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @param  {IBACnetTag} tag - BACnet tag
      * @return {void}
      */
-    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+    public writeParam (writer: BACnetWriter, tag: IBACnetTag): void {
         const dataSize: number = 4;
         // Tag Number - Tag Type - Param Length (bytes)
         writer.writeTag(tag.num, tag.type, dataSize);

@@ -3,19 +3,19 @@ import { spy, SinonSpy } from 'sinon';
 
 import { BACnetNull } from './null.type';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 describe('BACnetNull', () => {
     describe('readValue', () => {
         let bacnetNull: BACnetNull;
-        let bacnetReaderUtil: BACnetReaderUtil;
+        let bacnetReaderUtil: BACnetReader;
 
         beforeEach(() => {
             bacnetNull = new BACnetNull();
         });
 
         it('should read correct tag', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([0x11]));
+            bacnetReaderUtil = new BACnetReader(Buffer.from([0x11]));
             bacnetNull.readValue(bacnetReaderUtil);
 
             const tag = bacnetNull.getTag();
@@ -23,7 +23,7 @@ describe('BACnetNull', () => {
         });
 
         it('should read "null" value', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([0x11]));
+            bacnetReaderUtil = new BACnetReader(Buffer.from([0x11]));
             bacnetNull.readValue(bacnetReaderUtil);
 
             const value = bacnetNull.getValue();
@@ -33,10 +33,10 @@ describe('BACnetNull', () => {
 
     describe('writeValue', () => {
         let bacnetNull: BACnetNull;
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should write correct buffer for "null" value', () => {

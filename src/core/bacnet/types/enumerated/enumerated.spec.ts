@@ -3,19 +3,19 @@ import { spy, SinonSpy } from 'sinon';
 
 import { BACnetEnumerated } from './enumerated.type';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 describe('BACnetEnumerated', () => {
     describe('readValue', () => {
         let bacnetEnumerated: BACnetEnumerated;
-        let bacnetReaderUtil: BACnetReaderUtil;
+        let bacnetReaderUtil: BACnetReader;
 
         beforeEach(() => {
             bacnetEnumerated = new BACnetEnumerated();
         });
 
         it('should read correct tag', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([0x91, 0x12]));
+            bacnetReaderUtil = new BACnetReader(Buffer.from([0x91, 0x12]));
             bacnetEnumerated.readValue(bacnetReaderUtil);
 
             const tag = bacnetEnumerated.getTag();
@@ -23,7 +23,7 @@ describe('BACnetEnumerated', () => {
         });
 
         it('should read "0x12" value', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([0x91, 0x12]));
+            bacnetReaderUtil = new BACnetReader(Buffer.from([0x91, 0x12]));
             bacnetEnumerated.readValue(bacnetReaderUtil);
 
             const value = bacnetEnumerated.getValue();
@@ -31,7 +31,7 @@ describe('BACnetEnumerated', () => {
         });
 
         it('should read "0x44" value', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([0x91, 0x44]));
+            bacnetReaderUtil = new BACnetReader(Buffer.from([0x91, 0x44]));
             bacnetEnumerated.readValue(bacnetReaderUtil);
 
             const value = bacnetEnumerated.getValue();
@@ -41,10 +41,10 @@ describe('BACnetEnumerated', () => {
 
     describe('writeValue', () => {
         let bacnetEnumerated: BACnetEnumerated;
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should write correct buffer for "true" value', () => {

@@ -10,11 +10,12 @@ import {
 
 import {
     IBACnetTag,
+    IBACnetReaderOptions,
 } from '../../interfaces';
 
 import { BACnetError } from '../../errors';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 export class BACnetUnsignedInteger extends BACnetTypeBase {
     public readonly className: string = 'BACnetUnsignedInteger';
@@ -30,31 +31,31 @@ export class BACnetUnsignedInteger extends BACnetTypeBase {
             ? 0 : this.checkAndGetValue(defValue);
     }
 
-    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetUnsignedInteger {
-        return super.readParam(reader, changeOffset);
+    static readParam (reader: BACnetReader, opts?: IBACnetReaderOptions): BACnetUnsignedInteger {
+        return super.readParam(reader, opts);
     }
 
     /**
      * readValue - parses the message with BACnet "unsigned integer" value.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "unsigned integer" BACnet value
-     * @param  {type} [changeOffset = true] - change offset in the buffer of reader
+     * @param  {BACnetReader} reader - BACnet reader with "unsigned integer" BACnet value
+     * @param  {type} [opts = true] - change offset in the buffer of reader
      * @return {void}
      */
-    public readValue (reader: BACnetReaderUtil, changeOffset: boolean = true): void {
-        const tag = reader.readTag(changeOffset);
+    public readValue (reader: BACnetReader, opts?: IBACnetReaderOptions): void {
+        const tag = reader.readTag(opts);
         this.tag = tag;
 
         let value: number;
         switch (tag.value) {
             case 1:
-                value = reader.readUInt8(changeOffset);
+                value = reader.readUInt8(opts);
                 break;
             case 2:
-                value = reader.readUInt16BE(changeOffset);
+                value = reader.readUInt16BE(opts);
                 break;
             case 4:
-                value = reader.readUInt32BE(changeOffset);
+                value = reader.readUInt32BE(opts);
                 break;
         }
 
@@ -64,10 +65,10 @@ export class BACnetUnsignedInteger extends BACnetTypeBase {
     /**
      * writeValue - writes the BACnet "unsigned integer" value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @return {void}
      */
-    public writeValue (writer: BACnetWriterUtil): void {
+    public writeValue (writer: BACnetWriter): void {
         this.writeParam(writer, {
             num: BACnetPropTypes.unsignedInt,
             type: BACnetTagTypes.application,
@@ -77,11 +78,11 @@ export class BACnetUnsignedInteger extends BACnetTypeBase {
     /**
      * writeParam - writes the BACnet Param as "unsigned integer" value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @param  {IBACnetTag} tag - BACnet tag
      * @return {void}
      */
-    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+    public writeParam (writer: BACnetWriter, tag: IBACnetTag): void {
         const dataSize = this.getUIntSize(this.data);
         // Tag Number - Tag Type - Param Length (bytes)
         writer.writeTag(tag.num, tag.type, dataSize);

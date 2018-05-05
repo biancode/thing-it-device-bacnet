@@ -1,38 +1,38 @@
 import { APIError } from '../errors';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../utils';
+import { BACnetReader, BACnetWriter } from '../io';
 
-import { IBACnetTag } from '../interfaces';
+import { IBACnetTag, IBACnetReaderOptions } from '../interfaces';
 
 export class BACnetTypeBase {
     public readonly className: string = 'BACnetTypeBase';
     protected tag: IBACnetTag;
     protected data: any;
 
-    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): any {
+    static readParam (reader: BACnetReader, opts?: IBACnetReaderOptions): any {
         const inst = new this();
-        inst.readValue(reader, changeOffset);
+        inst.readValue(reader, opts);
         return inst;
     }
 
     /**
      * readValue - parses the message with BACnet value.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "unsigned integer" BACnet value
-     * @param  {type} [changeOffset = true] - change offset in the buffer of reader
+     * @param  {BACnetReader} reader - BACnet reader with "unsigned integer" BACnet value
+     * @param  {type} [opts = true] - change offset in the buffer of reader
      * @return {void}
      */
-    public readValue (reader: BACnetReaderUtil, changeOffset?: boolean): void { ; }
+    public readValue (reader: BACnetReader, opts?: IBACnetReaderOptions): void { ; }
 
     /**
      * writeValue - writes the BACnet value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @return {void}
      */
-    public writeValue (writer: BACnetWriterUtil): void { ; }
+    public writeValue (writer: BACnetWriter): void { ; }
 
-    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+    public writeParam (writer: BACnetWriter, tag: IBACnetTag): void {
         throw new APIError(`${this.className} - writeParam: Not implemented yet`);
     }
 

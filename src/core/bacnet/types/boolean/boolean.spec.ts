@@ -3,19 +3,19 @@ import { spy, SinonSpy } from 'sinon';
 
 import { BACnetBoolean } from './boolean.type';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 describe('BACnetBoolean', () => {
     describe('readValue', () => {
         let bacnetBoolean: BACnetBoolean;
-        let bacnetReaderUtil: BACnetReaderUtil;
+        let bacnetReaderUtil: BACnetReader;
 
         beforeEach(() => {
             bacnetBoolean = new BACnetBoolean();
         });
 
         it('should read correct tag', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([0x11]));
+            bacnetReaderUtil = new BACnetReader(Buffer.from([0x11]));
             bacnetBoolean.readValue(bacnetReaderUtil);
 
             const tag = bacnetBoolean.getTag();
@@ -23,7 +23,7 @@ describe('BACnetBoolean', () => {
         });
 
         it('should read "true" value', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([0x11]));
+            bacnetReaderUtil = new BACnetReader(Buffer.from([0x11]));
             bacnetBoolean.readValue(bacnetReaderUtil);
 
             const value = bacnetBoolean.getValue();
@@ -31,7 +31,7 @@ describe('BACnetBoolean', () => {
         });
 
         it('should read "false" value', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([0x10]));
+            bacnetReaderUtil = new BACnetReader(Buffer.from([0x10]));
             bacnetBoolean.readValue(bacnetReaderUtil);
 
             const value = bacnetBoolean.getValue();
@@ -41,10 +41,10 @@ describe('BACnetBoolean', () => {
 
     describe('writeValue', () => {
         let bacnetBoolean: BACnetBoolean;
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should write correct buffer for "true" value', () => {

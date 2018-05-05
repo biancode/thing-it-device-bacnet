@@ -8,11 +8,12 @@ import {
 
 import {
     IBACnetTag,
+    IBACnetReaderOptions,
 } from '../../interfaces';
 
 import { BACnetError } from '../../errors';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 export class BACnetNull extends BACnetTypeBase {
     public readonly className: string = 'BACnetNull';
@@ -24,40 +25,40 @@ export class BACnetNull extends BACnetTypeBase {
         super();
     }
 
-    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetNull {
-        return super.readParam(reader, changeOffset);
+    static readParam (reader: BACnetReader, opts?: IBACnetReaderOptions): BACnetNull {
+        return super.readParam(reader, opts);
     }
 
     /**
      * readValue - parses the message with BACnet "null" value.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "null" BACnet value
-     * @param  {type} [changeOffset = true] - change offset in the buffer of reader
+     * @param  {BACnetReader} reader - BACnet reader with "null" BACnet value
+     * @param  {type} [opts = true] - change offset in the buffer of reader
      * @return {void}
      */
-    public readValue (reader: BACnetReaderUtil, changeOffset: boolean = true): void {
-        const tag = reader.readTag(changeOffset);
+    public readValue (reader: BACnetReader, opts?: IBACnetReaderOptions): void {
+        const tag = reader.readTag(opts);
         this.tag = tag;
     }
 
     /**
      * writeValue - writes the BACnet "null" value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @return {void}
      */
-    public writeValue (writer: BACnetWriterUtil): void {
+    public writeValue (writer: BACnetWriter): void {
         writer.writeTag(BACnetPropTypes.nullData, 0, 0);
     }
 
     /**
      * writeParam - writes the BACnet Param as "null" value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @param  {IBACnetTag} tag - BACnet tag
      * @return {void}
      */
-    public writeParam (writer: BACnetWriterUtil, tag: IBACnetTag): void {
+    public writeParam (writer: BACnetWriter, tag: IBACnetTag): void {
         const dataSize: number = 1;
         // Tag Number - Tag Type - Param Length (bytes)
         writer.writeTag(tag.num, tag.type, dataSize);

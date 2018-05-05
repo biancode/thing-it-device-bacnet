@@ -9,15 +9,16 @@ import {
 import {
     IBACnetTag,
     IBACnetTypeStatusFlags,
+    IBACnetReaderOptions,
 } from '../../interfaces';
 
 import { BACnetError } from '../../errors';
 
 import {
     TyperUtil,
-    BACnetReaderUtil,
-    BACnetWriterUtil,
 } from '../../utils';
+
+import { BACnetReader, BACnetWriter } from '../../io';
 
 export class BACnetStatusFlags extends BACnetTypeBase {
     public readonly className: string = 'BACnetBitString';
@@ -32,24 +33,24 @@ export class BACnetStatusFlags extends BACnetTypeBase {
         this.data = this.checkAndGetValue(defValue);
     }
 
-    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetStatusFlags {
-        return super.readParam(reader, changeOffset);
+    static readParam (reader: BACnetReader, opts?: IBACnetReaderOptions): BACnetStatusFlags {
+        return super.readParam(reader, opts);
     }
 
     /**
      * readValue - parses the message with BACnet "status flags" value.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "status flags" BACnet value
-     * @param  {type} [changeOffset = true] - change offset in the buffer of reader
+     * @param  {BACnetReader} reader - BACnet reader with "status flags" BACnet value
+     * @param  {type} [opts = true] - change offset in the buffer of reader
      * @return {void}
      */
-    public readValue (reader: BACnetReaderUtil, changeOffset: boolean = true) {
-        const tag = reader.readTag(changeOffset);
+    public readValue (reader: BACnetReader, opts?: IBACnetReaderOptions) {
+        const tag = reader.readTag(opts);
         this.tag = tag;
 
-        const unusedBits = reader.readUInt8(changeOffset);
+        const unusedBits = reader.readUInt8(opts);
         // Contains the status bits
-        const value = reader.readUInt8(changeOffset);
+        const value = reader.readUInt8(opts);
 
         const inAlarm = !!TyperUtil.getBit(value, 7);
         const fault = !!TyperUtil.getBit(value, 6);
@@ -67,10 +68,10 @@ export class BACnetStatusFlags extends BACnetTypeBase {
     /**
      * writeValue - writes the BACnet "status flags" value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @return {void}
      */
-    public writeValue (writer: BACnetWriterUtil) {
+    public writeValue (writer: BACnetWriter) {
         writer.writeTag(BACnetPropTypes.bitString, 0, 2);
 
         // Write unused bits

@@ -3,19 +3,19 @@ import { spy, SinonSpy } from 'sinon';
 
 import { BACnetReal } from './real.type';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 describe('BACnetReal', () => {
     describe('readValue', () => {
         let bacnetReal: BACnetReal;
-        let bacnetReaderUtil: BACnetReaderUtil;
+        let bacnetReaderUtil: BACnetReader;
 
         beforeEach(() => {
             bacnetReal = new BACnetReal();
         });
 
         it('should read correct tag', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([
+            bacnetReaderUtil = new BACnetReader(Buffer.from([
                 0x44, 0x41, 0xb4, 0x00, 0x00,
             ]));
             bacnetReal.readValue(bacnetReaderUtil);
@@ -25,7 +25,7 @@ describe('BACnetReal', () => {
         });
 
         it('should read "22.5" value', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([
+            bacnetReaderUtil = new BACnetReader(Buffer.from([
                 0x44, 0x41, 0xb4, 0x00, 0x00,
             ]));
             bacnetReal.readValue(bacnetReaderUtil);
@@ -35,7 +35,7 @@ describe('BACnetReal', () => {
         });
 
         it('should read "25.2" value', () => {
-            bacnetReaderUtil = new BACnetReaderUtil(Buffer.from([
+            bacnetReaderUtil = new BACnetReader(Buffer.from([
                 0x44, 0x41, 0xc9, 0x99, 0x9a,
             ]));
             bacnetReal.readValue(bacnetReaderUtil);
@@ -47,10 +47,10 @@ describe('BACnetReal', () => {
 
     describe('writeValue', () => {
         let bacnetReal: BACnetReal;
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should write correct buffer for "22.5" value', () => {

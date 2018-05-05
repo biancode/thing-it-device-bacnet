@@ -8,11 +8,12 @@ import {
 
 import {
     IBACnetTag,
+    IBACnetReaderOptions,
 } from '../../interfaces';
 
 import { BACnetError } from '../../errors';
 
-import { BACnetReaderUtil, BACnetWriterUtil } from '../../utils';
+import { BACnetReader, BACnetWriter } from '../../io';
 
 export class BACnetCharacterString extends BACnetTypeBase {
     public readonly className: string = 'BACnetCharacterString';
@@ -29,39 +30,39 @@ export class BACnetCharacterString extends BACnetTypeBase {
             ? '' : this.checkAndGetValue(defValue);
     }
 
-    static readParam (reader: BACnetReaderUtil, changeOffset?: boolean): BACnetCharacterString {
-        return super.readParam(reader, changeOffset);
+    static readParam (reader: BACnetReader, opts?: IBACnetReaderOptions): BACnetCharacterString {
+        return super.readParam(reader, opts);
     }
 
     /**
      * readValue - parses the message with BACnet "character string" value.
      *
-     * @param  {BACnetReaderUtil} reader - BACnet reader with "character string" BACnet value
-     * @param  {type} [changeOffset = true] - change offset in the buffer of reader
+     * @param  {BACnetReader} reader - BACnet reader with "character string" BACnet value
+     * @param  {type} [opts = true] - change offset in the buffer of reader
      * @return {void}
      */
-    public readValue (reader: BACnetReaderUtil, changeOffset: boolean = true): void {
-        const tag = reader.readTag(changeOffset);
+    public readValue (reader: BACnetReader, opts?: IBACnetReaderOptions): void {
+        const tag = reader.readTag(opts);
         this.tag = tag;
 
-        const strLen = reader.readUInt8(changeOffset);
-        const charSet = reader.readUInt8(changeOffset);
+        const strLen = reader.readUInt8(opts);
+        const charSet = reader.readUInt8(opts);
 
         // Get the character encoding
         const charEncode = this.getStringEncode(charSet);
         this.encoding = charEncode;
 
-        const value = reader.readString(charEncode, strLen - 1, changeOffset);
+        const value = reader.readString(charEncode, strLen - 1, opts);
         this.data = value;
     }
 
     /**
      * writeValue - writes the BACnet "character string" value.
      *
-     * @param  {BACnetWriterUtil} writer - BACnet writer
+     * @param  {BACnetWriter} writer - BACnet writer
      * @return {void}
      */
-    public writeValue (writer: BACnetWriterUtil): void {
+    public writeValue (writer: BACnetWriter): void {
         // DataType - Application tag - Extended value (5)
         writer.writeTag(BACnetPropTypes.characterString, 0, 5);
 
