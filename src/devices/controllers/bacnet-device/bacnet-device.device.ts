@@ -426,7 +426,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const respServiceData: ILayerComplexACKServiceReadProperty =
             _.get(resp, 'layer.apdu.service', null);
 
-        const bacnetProperty = respServiceData.propValues[0] as
+        const bacnetProperty = respServiceData.prop.values[0] as
             BACnetTypes.BACnetCharacterString;
         return bacnetProperty;
     }
