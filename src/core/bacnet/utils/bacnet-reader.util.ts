@@ -7,10 +7,6 @@ import {
     IBACnetReaderOptions,
 } from '../interfaces';
 
-import {
-    BACnetPropTypes,
-} from '../enums';
-
 import * as Enums from '../enums';
 
 import * as BACnetTypes from '../types';
@@ -19,7 +15,7 @@ import { BACnetReader } from '../io';
 
 export class BACnetReaderUtil {
     /**
-     * Reads BACnet property from reader buffer.
+     * Reads BACnet property from buffer of the reader.
      *
      * @return {Map<string, any>}
      */
@@ -38,13 +34,37 @@ export class BACnetReaderUtil {
     }
 
     /**
-     * Reads the list of BACnet param values from reader buffer.
+     * Reads BACnet properties from buffer of the reader.
+     *
+     * @return {Map<string, any>}
+     */
+    static readProperties (reader: BACnetReader, opts?: IBACnetReaderOptions): IBACnetPropertyValue[] {
+        // Context Number - Context tag - "Opening" Tag
+        const openTag = reader.readTag(opts);
+
+        const params: IBACnetPropertyValue[] = [];
+        while (true) {
+            const paramValueTag = reader.readTag({ silent: true });
+
+            if (reader.isClosingTag(paramValueTag)) {
+                // Context Number - Context tag - "Closing" Tag
+                break;
+            }
+
+            const param = this.readProperty(reader, opts);
+
+            params.push(param);
+        }
+
+        return params;
+    }
+
+    /**
+     * Reads the list of BACnet property values from buffer of the reader.
      *
      * @return {Map<string, any>}
      */
     static readPropertyValues (reader: BACnetReader, opts?: IBACnetReaderOptions): BACnetTypes.BACnetTypeBase[] {
-        const paramValuesMap: Map<string, any> = new Map();
-
         // Context Number - Context tag - "Opening" Tag
         const openTag = reader.readTag(opts);
 
@@ -56,29 +76,29 @@ export class BACnetReaderUtil {
                 // Context Number - Context tag - "Closing" Tag
                 break;
             }
-            const paramValueType: BACnetPropTypes = paramValueTag.num;
+            const paramValueType: Enums.BACnetPropTypes = paramValueTag.num;
 
             let inst: BACnetTypes.BACnetTypeBase;
             switch (paramValueType) {
-                case BACnetPropTypes.boolean:
+                case Enums.BACnetPropTypes.boolean:
                     inst = new BACnetTypes.BACnetBoolean();
                     break;
-                case BACnetPropTypes.unsignedInt:
+                case Enums.BACnetPropTypes.unsignedInt:
                     inst = new BACnetTypes.BACnetUnsignedInteger();
                     break;
-                case BACnetPropTypes.real:
+                case Enums.BACnetPropTypes.real:
                     inst = new BACnetTypes.BACnetReal();
                     break;
-                case BACnetPropTypes.characterString:
+                case Enums.BACnetPropTypes.characterString:
                     inst = new BACnetTypes.BACnetCharacterString();
                     break;
-                case BACnetPropTypes.bitString:
+                case Enums.BACnetPropTypes.bitString:
                     inst = new BACnetTypes.BACnetStatusFlags();
                     break;
-                case BACnetPropTypes.enumerated:
+                case Enums.BACnetPropTypes.enumerated:
                     inst = new BACnetTypes.BACnetEnumerated();
                     break;
-                case BACnetPropTypes.objectIdentifier:
+                case Enums.BACnetPropTypes.objectIdentifier:
                     inst = new BACnetTypes.BACnetObjectId();
                     break;
             }
