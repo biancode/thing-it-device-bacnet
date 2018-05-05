@@ -154,9 +154,9 @@ export class ConfirmedReqPDU {
 
             objId = BACnetTypes.BACnetObjectId.readParam(reader);
 
-            issConfNotif = BACnetTypes.BACnetBoolean.readParam(reader);
+            issConfNotif = BACnetTypes.BACnetBoolean.readParam(reader, { optional: true });
 
-            lifeTime = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
+            lifeTime = BACnetTypes.BACnetUnsignedInteger.readParam(reader, { optional: true });
         } catch (error) {
             throw new BACnetError(`${this.className} - getSubscribeCOV: Parse - ${error}`);
         }
