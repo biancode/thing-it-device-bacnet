@@ -6,17 +6,17 @@ import { spy, SinonSpy } from 'sinon';
 
 import { BACnetError } from '../errors';
 
-import { BACnetReaderUtil } from './bacnet-reader.util';
+import { BACnetReader } from './reader.io';
 
 /* Interfaces */
 
-describe('BACnetReaderUtil', () => {
+describe('BACnetReader', () => {
     describe('getRange', () => {
-        let readerUtil: BACnetReaderUtil;
+        let readerUtil: BACnetReader;
 
         beforeEach(() => {
             const buf = Buffer.from([0x81, 0x0a, 0x00, 0x11, 0x01, 0x04, 0x00, 0x05]);
-            readerUtil = new BACnetReaderUtil(buf);
+            readerUtil = new BACnetReader(buf);
         });
 
         it('should slice the buffer from 0 to 5 position', () => {

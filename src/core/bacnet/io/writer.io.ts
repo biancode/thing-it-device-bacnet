@@ -11,16 +11,16 @@ import {
     OpertionMaxValue,
 } from '../enums';
 
-import { OffsetUtil } from './offset.util';
+import { Offset } from './offset.io';
 
 import * as BACnetTypes from '../types';
 
-export class BACnetWriterUtil {
-    public offset: OffsetUtil;
+export class BACnetWriter {
+    public offset: Offset;
     private buffer: Buffer;
 
     constructor (resultBuf?: Buffer) {
-        this.offset = new OffsetUtil(0);
+        this.offset = new Offset(0);
 
         if (!resultBuf) {
             this.buffer = Buffer.alloc(0);
@@ -28,7 +28,7 @@ export class BACnetWriterUtil {
         }
         this.buffer = resultBuf;
         const offsetValue = resultBuf.length;
-        this.offset = new OffsetUtil(offsetValue);
+        this.offset = new Offset(offsetValue);
     }
 
     /**
@@ -44,15 +44,15 @@ export class BACnetWriterUtil {
      * concat - concatenates the writers and returns the writer with common buffer.
      *
      * @static
-     * @param  {BACnetWriterUtil[]} restsOfWriters - description
+     * @param  {BACnetWriter[]} restsOfWriters - description
      * @return {type}
      */
-    static concat (...restsOfWriters: BACnetWriterUtil[]) {
+    static concat (...restsOfWriters: BACnetWriter[]) {
         const resultBuf = _.reduce(restsOfWriters, (result, writer) => {
             const bufOfWriter = writer.getBuffer();
             return Buffer.concat([result, bufOfWriter]);
         }, Buffer.alloc(0));
-        return new BACnetWriterUtil(resultBuf);
+        return new BACnetWriter(resultBuf);
     }
 
     public getBuffer () {

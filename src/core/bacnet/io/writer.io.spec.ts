@@ -6,16 +6,16 @@ import { spy, SinonSpy } from 'sinon';
 
 import { BACnetError } from '../errors';
 
-import { BACnetWriterUtil } from './bacnet-writer.util';
+import { BACnetWriter } from './writer.io';
 
 /* Interfaces */
 
-describe('BACnetWriterUtil', () => {
+describe('BACnetWriter', () => {
     describe('writeUInt8', () => {
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should set the 0x2c value in position 0', () => {
@@ -31,10 +31,10 @@ describe('BACnetWriterUtil', () => {
     });
 
     describe('writeUInt16BE', () => {
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should set the 0x4f2c value in position 0-1', () => {
@@ -50,10 +50,10 @@ describe('BACnetWriterUtil', () => {
     });
 
     describe('writeUInt32BE', () => {
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should set the 0x120a4f2c value in position 0-3', () => {
@@ -69,10 +69,10 @@ describe('BACnetWriterUtil', () => {
     });
 
     describe('writeString', () => {
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should set the "L02" value in position 0-2', () => {
@@ -95,10 +95,10 @@ describe('BACnetWriterUtil', () => {
     });
 
     describe('writeTag', () => {
-        let bacnetWriterUtil: BACnetWriterUtil;
+        let bacnetWriterUtil: BACnetWriter;
 
         beforeEach(() => {
-            bacnetWriterUtil = new BACnetWriterUtil();
+            bacnetWriterUtil = new BACnetWriter();
         });
 
         it('should set tag 2/0/2', () => {
@@ -135,7 +135,7 @@ describe('BACnetWriterUtil', () => {
     });
 });
 
-function testBuffer (bacnetWriterUtil: BACnetWriterUtil, buffer: number[]) {
+function testBuffer (bacnetWriterUtil: BACnetWriter, buffer: number[]) {
     const writerBuffer = bacnetWriterUtil.getBuffer();
     const proposedBuffer = Buffer.from(buffer);
     expect(writerBuffer).to.deep.equal(proposedBuffer);

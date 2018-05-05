@@ -1,10 +1,12 @@
 import * as _ from 'lodash';
 
-import { BACnetError } from '../errors';
+import * as Errors from '../errors';
 
 import {
     IBACnetTag,
     IBACnetTypeObjectId,
+    IBACnetPropertyValue,
+    IBACnetReaderOptions,
 } from '../interfaces';
 
 import {
@@ -13,16 +15,20 @@ import {
     BACnetTagTypes,
 } from '../enums';
 
-import { OffsetUtil } from './offset.util';
-import { TyperUtil } from './typer.util';
+import * as Enums from '../enums';
+
+import { Offset } from './offset.io';
+import { TyperUtil } from '../utils';
 
 import * as BACnetTypes from '../types';
 
-export class BACnetReaderUtil {
-    public offset: OffsetUtil;
+type ReaderOperation <T> = () => T;
+
+export class BACnetReader {
+    public offset: Offset;
 
     constructor (private buffer: Buffer) {
-        this.offset = new OffsetUtil(0);
+        this.offset = new Offset(0);
     }
 
     /**
@@ -41,11 +47,10 @@ export class BACnetReaderUtil {
      *
      * @return {number}
      */
-    public readUInt8 (changeOffset: boolean = true): number {
-        const offset = this.offset.getVaule();
-        return changeOffset
-            ? this.buffer.readUInt8(this.offset.inc())
-            : this.buffer.readUInt8(offset);
+    public readUInt8 (opts?: IBACnetReaderOptions): number {
+        return this.handleReadOperation(() => {
+            return this.buffer.readUInt8(this.offset.inc());
+        }, opts);
     }
 
     /**
@@ -53,11 +58,10 @@ export class BACnetReaderUtil {
      *
      * @return {number}
      */
-    public readUInt16BE (changeOffset: boolean = true): number {
-        const offset = this.offset.getVaule();
-        return changeOffset
-            ? this.buffer.readUInt16BE(this.offset.inc(2))
-            : this.buffer.readUInt16BE(offset);
+    public readUInt16BE (opts?: IBACnetReaderOptions): number {
+        return this.handleReadOperation(() => {
+            return this.buffer.readUInt16BE(this.offset.inc(2));
+        }, opts);
     }
 
     /**
@@ -65,11 +69,10 @@ export class BACnetReaderUtil {
      *
      * @return {number}
      */
-    public readUInt32BE (changeOffset: boolean = true): number {
-        const offset = this.offset.getVaule();
-        return changeOffset
-            ? this.buffer.readUInt32BE(this.offset.inc(4))
-            : this.buffer.readUInt32BE(offset);
+    public readUInt32BE (opts?: IBACnetReaderOptions): number {
+        return this.handleReadOperation(() => {
+            return this.buffer.readUInt32BE(this.offset.inc(4));
+        }, opts);
     }
 
     /**
@@ -77,11 +80,10 @@ export class BACnetReaderUtil {
      *
      * @return {number}
      */
-    public readFloatBE (changeOffset: boolean = true): number {
-        const offset = this.offset.getVaule();
-        return changeOffset
-            ? this.buffer.readFloatBE(this.offset.inc(4))
-            : this.buffer.readFloatBE(offset);
+    public readFloatBE (opts?: IBACnetReaderOptions): number {
+        return this.handleReadOperation(() => {
+            return this.buffer.readFloatBE(this.offset.inc(4));
+        }, opts);
     }
 
     /**
@@ -92,16 +94,13 @@ export class BACnetReaderUtil {
      * @param  {number} len - lenght of string
      * @return {string}
      */
-    public readString (encoding: string, len: number, changeOffset: boolean = true): string {
-        let offStart: number, offEnd: number;
-        if (changeOffset) {
-            offStart = this.offset.inc(len);
-            offEnd = this.offset.getVaule();
-        } else {
-            offStart = this.offset.getVaule();
-            offEnd = offStart + len;
-        }
-        return this.buffer.toString(encoding, offStart, offEnd);
+    public readString (encoding: string, len: number, opts?: IBACnetReaderOptions): string {
+        return this.handleReadOperation(() => {
+            const offStart = this.offset.inc(len);
+            const offEnd = this.offset.getVaule();
+
+            return this.buffer.toString(encoding, offStart, offEnd);
+        }, opts);
     }
 
     /**
@@ -112,10 +111,14 @@ export class BACnetReaderUtil {
      *
      * @return {Map<string, number>}
      */
-    public readTag (changeOffset: boolean = true): IBACnetTag {
+    public readTag (opts?: IBACnetReaderOptions): IBACnetTag {
         let tagData: IBACnetTag;
 
-        const tag = this.readUInt8(changeOffset);
+        const tag = this.readUInt8(opts);
+
+        if (_.isNil(tag)) {
+            return null;
+        }
 
         const tagNumber = tag >> 4;
 
@@ -132,20 +135,34 @@ export class BACnetReaderUtil {
         return tagData;
     }
 
+    public readPropertyValue (opts?: IBACnetReaderOptions): IBACnetPropertyValue {
+        const propId = BACnetTypes.BACnetEnumerated.readParam(this);
+        const propIndex = BACnetTypes.BACnetUnsignedInteger.readParam(this, { optional: true });
+        const propValues = this.readPropertyValues();
+        const propPriority = BACnetTypes.BACnetUnsignedInteger.readParam(this, { optional: true });
+
+        return {
+            id: propId,
+            index: propIndex,
+            values: propValues,
+            priority: propPriority,
+        };
+    }
+
     /**
      * Reads the list of BACnet param values from internal buffer.
      *
      * @return {Map<string, any>}
      */
-    public readListOfValues (changeOffset: boolean = true): BACnetTypes.BACnetTypeBase[] {
+    public readPropertyValues (opts?: IBACnetReaderOptions): BACnetTypes.BACnetTypeBase[] {
         const paramValuesMap: Map<string, any> = new Map();
 
         // Context Number - Context tag - "Opening" Tag
-        const openTag = this.readTag(changeOffset);
+        const openTag = this.readTag(opts);
 
         const paramValues: BACnetTypes.BACnetTypeBase[] = [];
         while (true) {
-            const paramValueTag = this.readTag(false);
+            const paramValueTag = this.readTag({ silent: true });
 
             if (this.isClosingTag(paramValueTag)) {
                 // Context Number - Context tag - "Closing" Tag
@@ -177,12 +194,63 @@ export class BACnetReaderUtil {
                     inst = new BACnetTypes.BACnetObjectId();
                     break;
             }
-            inst.readValue(this, changeOffset);
+            inst.readValue(this, opts);
 
             paramValues.push(inst);
         }
 
         return paramValues;
+    }
+
+
+    /**
+     * Handles the reader operations using the `user` or `default` reader options.
+     *
+     * @param  {} operationFn
+     * @return {T}
+     */
+    private handleReadOperation <T> (operationFn: ReaderOperation<T>, opts: IBACnetReaderOptions): T {
+        const readerOpts = this.extractOpts(opts);
+
+        if (readerOpts.silent) {
+            this.offset.disable();
+        }
+
+        let result: T = null;
+        let error: Errors.ReaderError = null;
+        let oldOffset: number = this.offset.value;
+
+        try {
+            result = operationFn();
+        } catch (error) {
+            if (!readerOpts.optional) {
+                error = new Errors.ReaderError('BACnetReader - readUInt8',
+                    Enums.ReaderError.IsNotOptional);
+            }
+
+            if (!readerOpts.silent) {
+                this.offset.value = oldOffset;
+            }
+        }
+
+        if (readerOpts.silent) {
+            this.offset.enable();
+        }
+
+        if (_.isNil(error)) {
+            return result;
+        }
+
+        throw error;
+    }
+
+    private extractOpts (opts?: IBACnetReaderOptions): IBACnetReaderOptions {
+        const defOpts: IBACnetReaderOptions = {
+            optional: false,
+            silent: false,
+        };
+
+        return _.assign(defOpts, opts);
     }
 
     /**
