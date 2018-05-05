@@ -355,7 +355,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 this.publishStateChange();
             }, (error) => {
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Device properties were not received`);
+                    + `Device properties were not received ${error}`);
                 this.publishStateChange();
             });
     }
