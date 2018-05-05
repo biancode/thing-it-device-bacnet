@@ -133,11 +133,11 @@ export class BACnetReaderUtil {
     }
 
     /**
-     * readParamValue - reads the param value from internal buffer.
+     * Reads the list of BACnet param values from internal buffer.
      *
      * @return {Map<string, any>}
      */
-    public readParamValue (changeOffset: boolean = true): BACnetTypes.BACnetTypeBase[] {
+    public readListOfValues (changeOffset: boolean = true): BACnetTypes.BACnetTypeBase[] {
         const paramValuesMap: Map<string, any> = new Map();
 
         // Context Number - Context tag - "Opening" Tag

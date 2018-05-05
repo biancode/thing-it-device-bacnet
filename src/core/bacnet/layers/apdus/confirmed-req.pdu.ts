@@ -198,7 +198,7 @@ export class ConfirmedReqPDU {
                 propArrayIndex = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
             }
 
-            propValues = reader.readParamValue();
+            propValues = reader.readListOfValues();
 
             priority = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
         } catch (error) {

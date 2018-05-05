@@ -116,7 +116,7 @@ export class ComplexACKPDU {
                 propArrayIndex = BACnetTypes.BACnetUnsignedInteger.readParam(reader);
             }
 
-            propValues = reader.readParamValue();
+            propValues = reader.readListOfValues();
         } catch (error) {
             throw new BACnetError(`${this.className} - getReadProperty: Parse - ${error}`);
         }
