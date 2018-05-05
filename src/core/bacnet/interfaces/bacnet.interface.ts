@@ -5,6 +5,18 @@ import {
 
 import * as BACnetTypes from '../types';
 
+export interface IBACnetReaderOptions {
+    optional?: boolean;
+    silent?: boolean;
+}
+
+export interface IBACnetPropertyValue {
+    id: BACnetTypes.BACnetEnumerated;
+    index?: BACnetTypes.BACnetUnsignedInteger;
+    values?: BACnetTypes.BACnetTypeBase[];
+    priority?: BACnetTypes.BACnetUnsignedInteger;
+}
+
 export interface IBACnetObjectProperty {
     id: BACnetPropertyId;
     payload?: BACnetTypes.BACnetTypeBase | BACnetTypes.BACnetTypeBase[];
