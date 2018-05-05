@@ -19,13 +19,9 @@ import {
 
 import { store } from '../../../redux';
 
-import {
-    BACnetObjectType,
-    BACnetPropertyId,
-    BACnetServiceTypes,
-    BACnetUnconfirmedService,
-    BACnetConfirmedService,
-} from '../../../core/bacnet/enums';
+import { ILayerUnconfirmedReqServiceCOVNotification } from '../../../core/bacnet/interfaces';
+
+import * as Enums from '../../../core/bacnet/enums';
 
 import * as BACnetTypes from '../../../core/bacnet/types';
 
@@ -65,12 +61,12 @@ export class AnalogInputActorDevice extends ActorDevice {
 
         if (this.config.objectId === '' || !_.isFinite(objectId)) {
             throw new ApiError(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
-                + `Object ID must have the valid 'number'`);
+                + `Object ID must have the valid 'number' value`);
         }
 
         const objectType = this.config.objectType !== ''
-            ? BACnetObjectType[this.config.objectType]
-            : BACnetObjectType.AnalogInput;
+            ? Enums.BACnetObjectType[this.config.objectType]
+            : Enums.BACnetObjectType.AnalogInput;
 
         if (!_.isNumber(objectType)) {
             throw new ApiError(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
@@ -84,25 +80,41 @@ export class AnalogInputActorDevice extends ActorDevice {
     }
 
     /**
-     * Step 6. Creates `subscribtion` to the BACnet device properties.
+     * Creates `subscribtion` to the BACnet object properties.
      *
      * @return {void}
      */
     public subscribeToProperty (): void {
         const covNotification = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnetServiceTypes.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnetUnconfirmedService.covNotification))
+            .filter(this.flowManager.isServiceType(Enums.BACnetServiceTypes.UnconfirmedReqPDU))
+            .filter(this.flowManager.isServiceChoice(Enums.BACnetUnconfirmedService.covNotification))
             .filter(this.flowManager.isBACnetObject(this.objectId))
-            .subscribe(() => {
-                // this.logger.logDebug('BACnetDeviceControllerDevice - subscribeToProperty: '
-                //     + `Device properties were received`);
-                // this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                //     + `BACnet Device details: ${JSON.stringify(this.state)}`);
-                // this.publishStateChange();
+            .subscribe((resp) => {
+                this.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
+                    + `Received notification`);
+
+                const respServiceData: ILayerUnconfirmedReqServiceCOVNotification =
+                    _.get(resp, 'layer.apdu.service', null);
+
+                const covProps = respServiceData.listOfValues;
+
+                const presentValueProp = _.find(covProps, [ 'id', Enums.BACnetPropertyId.presentValue ]);
+                const statusFlagsProp = _.find(covProps, [ 'id', Enums.BACnetPropertyId.statusFlags ]);
+                const presentValue = presentValueProp.values[0] as BACnetTypes.BACnetEnumerated;
+                const statusFlags = presentValueProp.values[0] as BACnetTypes.BACnetStatusFlags;
+
+                this.state.presentValue = presentValue.value;
+                this.state.outOfService = statusFlags.value.outOfService;
+
+                this.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
+                    + `presentValue ${JSON.stringify(this.state.presentValue)}`);
+                this.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
+                    + `State ${JSON.stringify(this.state)}`);
+                this.publishStateChange();
             }, (error) => {
-                // this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                //     + `Device properties were not received`);
-                // this.publishStateChange();
+                this.logger.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
+                    + `Analog Input COV notification was not received ${error}`);
+                this.publishStateChange();
             });
     }
 
