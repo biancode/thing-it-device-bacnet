@@ -50,7 +50,7 @@ export class BACnetReader {
     public readUInt8 (opts?: IBACnetReaderOptions): number {
         return this.handleReadOperation(() => {
             return this.buffer.readUInt8(this.offset.inc());
-        }, opts);
+        }, opts, `readUInt8`);
     }
 
     /**
@@ -61,7 +61,7 @@ export class BACnetReader {
     public readUInt16BE (opts?: IBACnetReaderOptions): number {
         return this.handleReadOperation(() => {
             return this.buffer.readUInt16BE(this.offset.inc(2));
-        }, opts);
+        }, opts, `readUInt16BE`);
     }
 
     /**
@@ -72,7 +72,7 @@ export class BACnetReader {
     public readUInt32BE (opts?: IBACnetReaderOptions): number {
         return this.handleReadOperation(() => {
             return this.buffer.readUInt32BE(this.offset.inc(4));
-        }, opts);
+        }, opts, `readUInt32BE`);
     }
 
     /**
@@ -83,7 +83,7 @@ export class BACnetReader {
     public readFloatBE (opts?: IBACnetReaderOptions): number {
         return this.handleReadOperation(() => {
             return this.buffer.readFloatBE(this.offset.inc(4));
-        }, opts);
+        }, opts, `readFloatBE`);
     }
 
     /**
@@ -100,7 +100,7 @@ export class BACnetReader {
             const offEnd = this.offset.getVaule();
 
             return this.buffer.toString(encoding, offStart, offEnd);
-        }, opts);
+        }, opts, `readString`);
     }
 
     /**
@@ -141,7 +141,8 @@ export class BACnetReader {
      * @param  {} operationFn
      * @return {T}
      */
-    private handleReadOperation <T> (operationFn: ReaderOperation<T>, opts: IBACnetReaderOptions): T {
+    private handleReadOperation <T> (operationFn: ReaderOperation<T>,
+            opts: IBACnetReaderOptions, methodName: string): T {
         const readerOpts = this.extractOpts(opts);
 
         if (readerOpts.silent) {
@@ -156,7 +157,7 @@ export class BACnetReader {
             result = operationFn();
         } catch (error) {
             if (!readerOpts.optional) {
-                error = new Errors.ReaderError('BACnetReader - readUInt8',
+                error = new Errors.ReaderError(`BACnetReader - ${methodName}: ${error}`,
                     Enums.ReaderError.IsNotOptional);
             }
 
