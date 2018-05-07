@@ -81,36 +81,108 @@ export class AnalogInputActorDevice extends ActorDevice {
      * @return {void}
      */
     public subscribeToProperty (): void {
-        const covNotification = this.flowManager.getResponseFlow()
+        // Read Property Flow
+        this.subManager.subscribe = this.flowManager.getResponseFlow()
             .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.objectId))
             .subscribe((resp) => {
-                this.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
+                this.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `Received notification`);
 
                 const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
                     _.get(resp, 'layer.apdu.service', null);
 
+                // Get list of properties
                 const covProps = respServiceData.listOfValues;
 
+                // Get instances of properties
                 const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
                 const statusFlagsProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.statusFlags ]);
+                // Get instances of property values
                 const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetEnumerated;
                 const statusFlags = presentValueProp.values[0] as BACnet.Types.BACnetStatusFlags;
 
                 this.state.presentValue = presentValue.value;
                 this.state.outOfService = statusFlags.value.outOfService;
+                this.state.alarmValue = statusFlags.value.inAlarm;
 
-                this.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
+                this.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.presentValue)}`);
-                this.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
+                this.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `State ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             }, (error) => {
-                this.logger.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
+                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `Analog Input COV notification was not received ${error}`);
                 this.publishStateChange();
+            });
+
+        // Read Property Flow
+        const readPropertyFlow = this.flowManager.getResponseFlow()
+            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
+            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty))
+            .filter(this.flowManager.isBACnetObject(this.objectId));
+
+        // Gets the `maxPresValue` property
+        this.subManager.subscribe = readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.maxPresValue))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
+
+                this.state.max = bacnetProperty.value;
+
+                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                    + `Max value for 'Present Value' property retrieved: ${this.state.max}`);
+            });
+
+        // Gets the `minPresValue` property
+        this.subManager.subscribe = readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.minPresValue))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
+
+                this.state.min = bacnetProperty.value;
+
+                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                    + `Min value for 'Present Value' property retrieved: ${this.state.min}`);
+            });
+
+        // Gets the `objectName` property
+        this.subManager.subscribe = readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
+
+                this.state.objectName = bacnetProperty.value;
+
+                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                    + `Object Name retrieved: ${this.state.objectName}`);
+            });
+
+        // Gets the `description` property
+        this.subManager.subscribe = readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
+
+                this.state.description = bacnetProperty.value;
+
+                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                    + `Object Description retrieved: ${this.state.description}`);
+            });
+
+        // Gets the `units` property
+        this.subManager.subscribe = readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.units))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetEnumerated>(resp);
+
+                const unit: string = BACnet.Enums.EngineeringUnits[bacnetProperty.value];
+                this.state.unit = _.isNil(unit) ? 'none' : unit;
+
+                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                    + `Object Unit retrieved: ${this.state.unit}`);
             });
     }
 
