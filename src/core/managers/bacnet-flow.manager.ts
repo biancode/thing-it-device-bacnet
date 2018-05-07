@@ -162,7 +162,7 @@ export class BACnetFlowManager {
     public isBACnetProperty (propId: BACnet.Enums.PropertyId): BACnetFlowFilter {
         return (resp: IBACnetResponse): boolean => {
             const respPropId: BACnet.Types.BACnetEnumerated =
-                _.get(resp, 'layer.apdu.service.propId', null);
+                _.get(resp, 'layer.apdu.service.prop.id', null);
             return !_.isNil(respPropId) && respPropId.isEqual(propId);
         };
     }
