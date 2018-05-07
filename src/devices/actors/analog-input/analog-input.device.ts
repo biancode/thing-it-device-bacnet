@@ -9,11 +9,6 @@ import {
 } from '../../../core/interfaces';
 
 import {
-    BACnetFlowManager,
-    BACnetServiceManager,
-} from '../../../core/managers';
-
-import {
     ApiError,
 } from '../../../core/errors';
 
@@ -26,27 +21,29 @@ export class AnalogInputActorDevice extends ActorDevice {
     public state: IAnalogInputActorState;
     public config: IAnalogInputActorConfig;
 
-    public flowManager: BACnetFlowManager;
-    public serviceManager: BACnetServiceManager;
-
     private objectId: BACnet.Types.BACnetObjectId;
 
     public async initDevice (): Promise<any> {
         await super.initDevice();
 
+        // Creates and inits params of the BACnet Analog Input
         this.initDeviceParamsFromConfig();
 
-        this.flowManager = store.getState([ 'bacnet', 'flowManager' ]);
-        this.serviceManager = store.getState([ 'bacnet', 'serviceManager' ]);
+        // Creates instances of the plugin componets
+        await this.createPluginComponents();
 
+        // Creates `subscribtion` to the BACnet object properties
         this.subscribeToProperty();
+
+        // Inits the BACnet object properties
+        this.initProperties();
 
         this.state.initialized = true;
         this.publishStateChange();
     }
 
     /**
-     * Step 1. Creates and inits params of the BACnet Analog Input from plugin configuration.
+     * Creates and inits params of the BACnet Analog Input from plugin configuration.
      * Steps:
      * - creates and inits `objectId`.
      *
