@@ -1,10 +1,7 @@
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
-import { ILayer } from '../bacnet/interfaces';
-import { BACnetUtil } from '../bacnet/utils';
-import * as BACnetTypes from '../bacnet/types';
-import { BACnetServiceTypes, BACnetPropertyId } from '../bacnet/enums';
+import * as BACnet from 'bacnet-logic';
 
 import { ApiError } from '../errors';
 
@@ -82,9 +79,9 @@ export class BACnetFlowManager {
     public getResponseFlow (): Observable<IBACnetResponse> {
         return this.server.respFlow
             .map((resp) => {
-                let layer: ILayer;
+                let layer: BACnet.Interfaces.Layers;
                 try {
-                    layer = BACnetUtil.bufferToLayer(resp.message);
+                    layer = BACnet.Utils.BACnetUtil.bufferToLayer(resp.message);
                 } catch (error) {
                     this.errorFlow.next(error);
                 }
@@ -107,7 +104,7 @@ export class BACnetFlowManager {
      *
      * @return {BACnetFlowFilter}
      */
-    public isServiceType (serviceType: BACnetServiceTypes): BACnetFlowFilter {
+    public isServiceType (serviceType: BACnet.Enums.BACnet.ServiceType): BACnetFlowFilter {
         return (resp: IBACnetResponse): boolean => {
             const respServiceType = _.get(resp, 'layer.apdu.type', null);
             return !_.isNil(respServiceType) && respServiceType === serviceType;
@@ -143,9 +140,9 @@ export class BACnetFlowManager {
      *
      * @return {BACnetFlowFilter}
      */
-    public isBACnetObject (objId: BACnetTypes.BACnetObjectId): BACnetFlowFilter {
+    public isBACnetObject (objId: BACnet.Types.BACnetObjectId): BACnetFlowFilter {
         return (resp: IBACnetResponse): boolean => {
-            const respObjId: BACnetTypes.BACnetObjectId =
+            const respObjId: BACnet.Types.BACnetObjectId =
                 _.get(resp, 'layer.apdu.service.objId', null);
             return !_.isNil(respObjId) && respObjId.isEqual(objId);
         };
@@ -162,9 +159,9 @@ export class BACnetFlowManager {
      *
      * @return {BACnetFlowFilter}
      */
-    public isBACnetProperty (propId: BACnetPropertyId): BACnetFlowFilter {
+    public isBACnetProperty (propId: BACnet.Enums.BACnet.PropertyId): BACnetFlowFilter {
         return (resp: IBACnetResponse): boolean => {
-            const respPropId: BACnetTypes.BACnetEnumerated =
+            const respPropId: BACnet.Types.BACnetEnumerated =
                 _.get(resp, 'layer.apdu.service.propId', null);
             return !_.isNil(respPropId) && respPropId.isEqual(propId);
         };
@@ -183,7 +180,7 @@ export class BACnetFlowManager {
      */
     public isBACnetVendorId (vendorId: number): BACnetFlowFilter {
         return (resp: IBACnetResponse): boolean => {
-            const respVendorId: BACnetTypes.BACnetUnsignedInteger =
+            const respVendorId: BACnet.Types.BACnetUnsignedInteger =
                 _.get(resp, 'layer.apdu.service.vendorId', null);
             return !_.isNil(respVendorId) && respVendorId.isEqual(vendorId);
         };

@@ -2,14 +2,7 @@ import { OutputSocket } from '../../sockets';
 
 import { Logger } from '../../utils';
 
-import { ConfirmedReqService } from '../../bacnet/services';
-
-import {
-    IServiceConfirmedReqReadProperty,
-    IServiceConfirmedReqWriteProperty,
-    IServiceConfirmedReqSubscribeCOV,
-    IServiceConfirmedReqUnsubscribeCOV,
-} from '../../bacnet/interfaces';
+import * as BACnet from 'bacnet-logic';
 
 export class APIConfirmedReqService {
 
@@ -32,8 +25,8 @@ export class APIConfirmedReqService {
      * @param  {IServiceConfirmedReqReadPropertyype} opts - request options
      * @return {void}
      */
-    public readProperty (opts: IServiceConfirmedReqReadProperty): void {
-        const message = ConfirmedReqService.readProperty(opts);
+    public readProperty (opts: BACnet.Interfaces.ConfirmedRequest.Service.ReadProperty): void {
+        const message = BACnet.Services.ConfirmedReqService.readProperty(opts);
         this.socket.send(message, 'readProperty');
     }
 
@@ -43,8 +36,8 @@ export class APIConfirmedReqService {
      * @param  {IServiceConfirmedReqWriteProperty} opts - request options
      * @return {void}
      */
-    public writeProperty (opts: IServiceConfirmedReqWriteProperty): void {
-        const message = ConfirmedReqService.writeProperty(opts);
+    public writeProperty (opts: BACnet.Interfaces.ConfirmedRequest.Service.WriteProperty): void {
+        const message = BACnet.Services.ConfirmedReqService.writeProperty(opts);
         this.socket.sendBroadcast(message, 'writeProperty');
     }
 
@@ -55,8 +48,8 @@ export class APIConfirmedReqService {
      * @param  {IServiceConfirmedReqSubscribeCOV} opts - request options
      * @return {void}
      */
-    public subscribeCOV (opts: IServiceConfirmedReqSubscribeCOV): void {
-        const message = ConfirmedReqService.subscribeCOV(opts);
+    public subscribeCOV (opts: BACnet.Interfaces.ConfirmedRequest.Service.SubscribeCOV): void {
+        const message = BACnet.Services.ConfirmedReqService.subscribeCOV(opts);
         this.socket.sendBroadcast(message, 'subscribeCOV');
     }
 
@@ -67,8 +60,8 @@ export class APIConfirmedReqService {
      * @param  {IServiceConfirmedReqUnsubscribeCOV} opts - request options
      * @return {void}
      */
-    public unsubscribeCOV (opts: IServiceConfirmedReqUnsubscribeCOV): void {
-        const message = ConfirmedReqService.unsubscribeCOV(opts);
+    public unsubscribeCOV (opts: BACnet.Interfaces.ConfirmedRequest.Service.UnsubscribeCOV): void {
+        const message = BACnet.Services.ConfirmedReqService.unsubscribeCOV(opts);
         this.socket.sendBroadcast(message, 'unsubscribeCOV');
     }
 }

@@ -2,11 +2,7 @@ import { OutputSocket } from '../../sockets';
 
 import { Logger } from '../../utils';
 
-import { UnconfirmedReqService } from '../../bacnet/services';
-
-import {
-    IServiceUnconfirmedReqWhoIs,
-} from '../../bacnet/interfaces';
+import * as BACnet from 'bacnet-logic';
 
 export class APIUnconfirmedReqService {
     constructor (private logger: Logger,
@@ -28,8 +24,8 @@ export class APIUnconfirmedReqService {
      * @param  {IServiceUnconfirmedReqWhoIs} opts - request options
      * @return {void}
      */
-    public whoIsBroadcast (opts: IServiceUnconfirmedReqWhoIs): void {
-        const message = UnconfirmedReqService.whoIs(opts);
+    public whoIsBroadcast (opts: BACnet.Interfaces.UnconfirmedRequest.Service.WhoIs): void {
+        const message = BACnet.Services.UnconfirmedReqService.whoIs(opts);
         this.socket.sendBroadcast(message, 'whoIsBroadcast');
     }
 
@@ -39,8 +35,8 @@ export class APIUnconfirmedReqService {
      * @param  {IServiceUnconfirmedReqWhoIs} opts - request options
      * @return {void}
      */
-    public whoIsUnicast (opts: IServiceUnconfirmedReqWhoIs): void {
-        const message = UnconfirmedReqService.whoIs(opts);
+    public whoIsUnicast (opts: BACnet.Interfaces.UnconfirmedRequest.Service.WhoIs): void {
+        const message = BACnet.Services.UnconfirmedReqService.whoIs(opts);
         this.socket.send(message, 'whoIsUnicast');
     }
 }

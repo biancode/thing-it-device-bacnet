@@ -43,10 +43,10 @@ export interface IOutputSocketConfig {
 }
 
 /* BACnet Flow Manager */
-import { ILayer } from '../bacnet/interfaces';
+import { Interfaces } from 'bacnet-logic';
 
 export interface IBACnetResponse {
-    layer: ILayer;
+    layer: Interfaces.Layers;
     socket: OutputSocket;
 }
 

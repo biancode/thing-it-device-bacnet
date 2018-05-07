@@ -30,19 +30,7 @@ import {
     IAppConfig,
 } from '../../../core/interfaces';
 
-import {
-    BACnetObjectType,
-    BACnetPropertyId,
-    BACnetServiceTypes,
-    BACnetUnconfirmedService,
-    BACnetConfirmedService,
-} from '../../../core/bacnet/enums';
-
-import {
-    ILayerComplexACKServiceReadProperty,
-} from '../../../core/bacnet/interfaces';
-
-import * as BACnetTypes from '../../../core/bacnet/types';
+import * as BACnet from 'bacnet-logic';
 
 export class BACnetDeviceControllerDevice extends ControllerDevice {
     public state: IBACnetDeviceControllerState;
@@ -55,7 +43,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public serviceManager: BACnetServiceManager;
     public apiService: APIService;
 
-    private objectId: BACnetTypes.BACnetObjectId;
+    private objectId: BACnet.Types.BACnetObjectId;
 
     public start () {
         super.start();
@@ -159,8 +147,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      * @return {void}
      */
     public initDeviceParamsFromConfig (): void {
-        this.objectId = new BACnetTypes.BACnetObjectId({
-            type: BACnetObjectType.Device,
+        this.objectId = new BACnet.Types.BACnetObjectId({
+            type: BACnet.Enums.BACnet.ObjectType.Device,
             instance: this.config.deviceId,
         });
     }
@@ -223,8 +211,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const destAddrInfo = this.pluginConfig.manager.service.dest;
 
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnetServiceTypes.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnetUnconfirmedService.iAm))
+            .filter(this.flowManager.isServiceType(BACnet.Enums.BACnet.ServiceType.UnconfirmedReqPDU))
+            .filter(this.flowManager.isServiceChoice(BACnet.Enums.BACnet.UnconfirmedServiceChoice.iAm))
             .filter(this.flowManager.matchFilter(this.config.deviceIdMatchRequired,
                 this.flowManager.isBACnetObject(this.objectId), `device ID`))
             .filter(this.flowManager.matchFilter(this.config.vendorIdMatchRequired,
@@ -283,13 +271,13 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      */
     public subscribeToProperty (): void {
         const readPropertyFlow = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnetServiceTypes.ComplexACKPDU))
-            .filter(this.flowManager.isServiceChoice(BACnetConfirmedService.ReadProperty))
+            .filter(this.flowManager.isServiceType(BACnet.Enums.BACnet.ServiceType.ComplexACKPDU))
+            .filter(this.flowManager.isServiceChoice(BACnet.Enums.BACnet.ConfirmedServiceChoice.ReadProperty))
             .filter(this.flowManager.isBACnetObject(this.objectId));
 
         // Gets the `objectName` property
         const ovObjectName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.objectName))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.objectName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -300,7 +288,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         // Gets the `description` property
         const ovDescription = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.description))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.description))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -311,7 +299,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         // Gets the `vendorName` property
         const ovVendorName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.vendorName))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.vendorName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -322,7 +310,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         // Gets the `modelName` property
         const ovModelName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.modelName))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.modelName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -333,7 +321,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         // Gets the `applicationSoftwareVersion` property
         const ovSoftwareVersion = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnetPropertyId.applicationSoftwareVersion))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.applicationSoftwareVersion))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -369,45 +357,45 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         // Gets the `objectName` property
         this.apiService.confirmedReq.readProperty({
             invokeId: 1,
-            unitObjId: this.objectId,
-            unitProp: {
-                id: BACnetPropertyId.objectName,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.objectName),
             },
         });
 
         // Gets the `description` property
         this.apiService.confirmedReq.readProperty({
             invokeId: 1,
-            unitObjId: this.objectId,
-            unitProp: {
-                id: BACnetPropertyId.description,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.description),
             },
         });
 
         // Gets the `vendorName` property
         this.apiService.confirmedReq.readProperty({
             invokeId: 1,
-            unitObjId: this.objectId,
-            unitProp: {
-                id: BACnetPropertyId.vendorName,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.vendorName),
             },
         });
 
         // Gets the `modelName` property
         this.apiService.confirmedReq.readProperty({
             invokeId: 1,
-            unitObjId: this.objectId,
-            unitProp: {
-                id: BACnetPropertyId.modelName,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.modelName),
             },
         });
 
         // Gets the `applicationSoftwareVersion` property
         this.apiService.confirmedReq.readProperty({
             invokeId: 1,
-            unitObjId: this.objectId,
-            unitProp: {
-                id: BACnetPropertyId.applicationSoftwareVersion,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.applicationSoftwareVersion),
             },
         });
     }
@@ -422,12 +410,12 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      * @param  {IBACnetResponse} resp - response from BACnet Object (device)
      * @return {BACnetTypes.BACnetCharacterString}
      */
-    private getReadPropertyString (resp: IBACnetResponse): BACnetTypes.BACnetCharacterString {
-        const respServiceData: ILayerComplexACKServiceReadProperty =
+    private getReadPropertyString (resp: IBACnetResponse): BACnet.Types.BACnetCharacterString {
+        const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
             _.get(resp, 'layer.apdu.service', null);
 
         const bacnetProperty = respServiceData.prop.values[0] as
-            BACnetTypes.BACnetCharacterString;
+            BACnet.Types.BACnetCharacterString;
         return bacnetProperty;
     }
 

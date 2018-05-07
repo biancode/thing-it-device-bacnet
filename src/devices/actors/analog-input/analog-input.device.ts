@@ -19,11 +19,7 @@ import {
 
 import { store } from '../../../redux';
 
-import { ILayerUnconfirmedReqServiceCOVNotification } from '../../../core/bacnet/interfaces';
-
-import * as Enums from '../../../core/bacnet/enums';
-
-import * as BACnetTypes from '../../../core/bacnet/types';
+import * as BACnet from 'bacnet-logic';
 
 export class AnalogInputActorDevice extends ActorDevice {
     public readonly className: string = 'AnalogInputActorDevice';
@@ -33,7 +29,7 @@ export class AnalogInputActorDevice extends ActorDevice {
     public flowManager: BACnetFlowManager;
     public serviceManager: BACnetServiceManager;
 
-    private objectId: BACnetTypes.BACnetObjectId;
+    private objectId: BACnet.Types.BACnetObjectId;
 
     public async initDevice (): Promise<any> {
         await super.initDevice();
@@ -65,15 +61,15 @@ export class AnalogInputActorDevice extends ActorDevice {
         }
 
         const objectType = this.config.objectType !== ''
-            ? Enums.BACnetObjectType[this.config.objectType]
-            : Enums.BACnetObjectType.AnalogInput;
+            ? BACnet.Enums.BACnet.ObjectType[this.config.objectType]
+            : BACnet.Enums.BACnet.ObjectType.AnalogInput;
 
         if (!_.isNumber(objectType)) {
             throw new ApiError(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
                 + `Object Type must have the valid BACnet type`);
         }
 
-        this.objectId = new BACnetTypes.BACnetObjectId({
+        this.objectId = new BACnet.Types.BACnetObjectId({
             type: objectType,
             instance: objectId,
         });
@@ -86,22 +82,22 @@ export class AnalogInputActorDevice extends ActorDevice {
      */
     public subscribeToProperty (): void {
         const covNotification = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(Enums.BACnetServiceTypes.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(Enums.BACnetUnconfirmedService.covNotification))
+            .filter(this.flowManager.isServiceType(BACnet.Enums.BACnet.ServiceType.UnconfirmedReqPDU))
+            .filter(this.flowManager.isServiceChoice(BACnet.Enums.BACnet.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.objectId))
             .subscribe((resp) => {
                 this.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
                     + `Received notification`);
 
-                const respServiceData: ILayerUnconfirmedReqServiceCOVNotification =
+                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
                     _.get(resp, 'layer.apdu.service', null);
 
                 const covProps = respServiceData.listOfValues;
 
-                const presentValueProp = _.find(covProps, [ 'id', Enums.BACnetPropertyId.presentValue ]);
-                const statusFlagsProp = _.find(covProps, [ 'id', Enums.BACnetPropertyId.statusFlags ]);
-                const presentValue = presentValueProp.values[0] as BACnetTypes.BACnetEnumerated;
-                const statusFlags = presentValueProp.values[0] as BACnetTypes.BACnetStatusFlags;
+                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.BACnet.PropertyId.presentValue ]);
+                const statusFlagsProp = _.find(covProps, [ 'id', BACnet.Enums.BACnet.PropertyId.statusFlags ]);
+                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetEnumerated;
+                const statusFlags = presentValueProp.values[0] as BACnet.Types.BACnetStatusFlags;
 
                 this.state.presentValue = presentValue.value;
                 this.state.outOfService = statusFlags.value.outOfService;

@@ -45,6 +45,7 @@
     "typescript": "^2.7.2"
   },
   "dependencies": {
+    "bacnet-logic": "git+https://github.com/AndreyShuleiko/bacnet-logic.git",
     "bluebird": "^3.5.1",
     "lodash": "^4.17.5",
     "moment": "^2.20.1",
