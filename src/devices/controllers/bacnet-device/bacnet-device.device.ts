@@ -148,7 +148,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      */
     public initDeviceParamsFromConfig (): void {
         this.objectId = new BACnet.Types.BACnetObjectId({
-            type: BACnet.Enums.BACnet.ObjectType.Device,
+            type: BACnet.Enums.ObjectType.Device,
             instance: this.config.deviceId,
         });
     }
@@ -211,8 +211,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const destAddrInfo = this.pluginConfig.manager.service.dest;
 
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.BACnet.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.BACnet.UnconfirmedServiceChoice.iAm))
+            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
+            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.iAm))
             .filter(this.flowManager.matchFilter(this.config.deviceIdMatchRequired,
                 this.flowManager.isBACnetObject(this.objectId), `device ID`))
             .filter(this.flowManager.matchFilter(this.config.vendorIdMatchRequired,
@@ -271,13 +271,13 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      */
     public subscribeToProperty (): void {
         const readPropertyFlow = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.BACnet.ServiceType.ComplexACKPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.BACnet.ConfirmedServiceChoice.ReadProperty))
+            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
+            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty))
             .filter(this.flowManager.isBACnetObject(this.objectId));
 
         // Gets the `objectName` property
         const ovObjectName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.objectName))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -288,7 +288,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         // Gets the `description` property
         const ovDescription = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.description))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -299,7 +299,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         // Gets the `vendorName` property
         const ovVendorName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.vendorName))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.vendorName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -310,7 +310,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         // Gets the `modelName` property
         const ovModelName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.modelName))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.modelName))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -321,7 +321,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         // Gets the `applicationSoftwareVersion` property
         const ovSoftwareVersion = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.BACnet.PropertyId.applicationSoftwareVersion))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.applicationSoftwareVersion))
             .map((resp) => {
                 const bacnetProperty = this.getReadPropertyString(resp);
 
@@ -359,7 +359,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.objectName),
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.objectName),
             },
         });
 
@@ -368,7 +368,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.description),
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.description),
             },
         });
 
@@ -377,7 +377,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.vendorName),
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.vendorName),
             },
         });
 
@@ -386,7 +386,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.modelName),
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.modelName),
             },
         });
 
@@ -395,7 +395,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.BACnet.PropertyId.applicationSoftwareVersion),
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.applicationSoftwareVersion),
             },
         });
     }

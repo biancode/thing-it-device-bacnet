@@ -61,8 +61,8 @@ export class AnalogInputActorDevice extends ActorDevice {
         }
 
         const objectType = this.config.objectType !== ''
-            ? BACnet.Enums.BACnet.ObjectType[this.config.objectType]
-            : BACnet.Enums.BACnet.ObjectType.AnalogInput;
+            ? BACnet.Enums.ObjectType[this.config.objectType]
+            : BACnet.Enums.ObjectType.AnalogInput;
 
         if (!_.isNumber(objectType)) {
             throw new ApiError(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
@@ -82,8 +82,8 @@ export class AnalogInputActorDevice extends ActorDevice {
      */
     public subscribeToProperty (): void {
         const covNotification = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.BACnet.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.BACnet.UnconfirmedServiceChoice.covNotification))
+            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
+            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.objectId))
             .subscribe((resp) => {
                 this.logDebug(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
@@ -94,8 +94,8 @@ export class AnalogInputActorDevice extends ActorDevice {
 
                 const covProps = respServiceData.listOfValues;
 
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.BACnet.PropertyId.presentValue ]);
-                const statusFlagsProp = _.find(covProps, [ 'id', BACnet.Enums.BACnet.PropertyId.statusFlags ]);
+                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
+                const statusFlagsProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.statusFlags ]);
                 const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetEnumerated;
                 const statusFlags = presentValueProp.values[0] as BACnet.Types.BACnetStatusFlags;
 

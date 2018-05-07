@@ -104,7 +104,7 @@ export class BACnetFlowManager {
      *
      * @return {BACnetFlowFilter}
      */
-    public isServiceType (serviceType: BACnet.Enums.BACnet.ServiceType): BACnetFlowFilter {
+    public isServiceType (serviceType: BACnet.Enums.ServiceType): BACnetFlowFilter {
         return (resp: IBACnetResponse): boolean => {
             const respServiceType = _.get(resp, 'layer.apdu.type', null);
             return !_.isNil(respServiceType) && respServiceType === serviceType;
@@ -159,7 +159,7 @@ export class BACnetFlowManager {
      *
      * @return {BACnetFlowFilter}
      */
-    public isBACnetProperty (propId: BACnet.Enums.BACnet.PropertyId): BACnetFlowFilter {
+    public isBACnetProperty (propId: BACnet.Enums.PropertyId): BACnetFlowFilter {
         return (resp: IBACnetResponse): boolean => {
             const respPropId: BACnet.Types.BACnetEnumerated =
                 _.get(resp, 'layer.apdu.service.propId', null);
