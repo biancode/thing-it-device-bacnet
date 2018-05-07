@@ -187,6 +187,58 @@ export class AnalogInputActorDevice extends ActorDevice {
     }
 
     /**
+     * Inits the BACnet object properties.
+     *
+     * @return {Promise<void>}
+     */
+    public async initProperties (): Promise<void> {
+        // Gets the `maxPresValue` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.maxPresValue),
+            },
+        });
+
+        // Gets the `minPresValue` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.minPresValue),
+            },
+        });
+
+        // Gets the `objectName` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.objectName),
+            },
+        });
+
+        // Gets the `description` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.description),
+            },
+        });
+
+        // Gets the `units` property
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.units),
+            },
+        });
+    }
+
+    /**
      * TID API Methods
      */
 
