@@ -56,6 +56,9 @@ export interface IAnalogActorState extends IActorState {
     outOfService: boolean;
     min: number;
     max: number;
+    objectName: string;
+    description: string;
+    unit: string;
 }
 export interface IAnalogActorConfig extends IActorConfig {
     objectId: string;
