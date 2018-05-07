@@ -279,7 +279,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const ovObjectName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName))
             .map((resp) => {
-                const bacnetProperty = this.getReadPropertyString(resp);
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.name = bacnetProperty.value;
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
@@ -290,7 +290,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const ovDescription = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description))
             .map((resp) => {
-                const bacnetProperty = this.getReadPropertyString(resp);
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.description = bacnetProperty.value;
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
@@ -301,7 +301,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const ovVendorName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.vendorName))
             .map((resp) => {
-                const bacnetProperty = this.getReadPropertyString(resp);
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.vendor = bacnetProperty.value;
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
@@ -312,7 +312,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const ovModelName = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.modelName))
             .map((resp) => {
-                const bacnetProperty = this.getReadPropertyString(resp);
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.model = bacnetProperty.value;
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
@@ -323,7 +323,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const ovSoftwareVersion = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.applicationSoftwareVersion))
             .map((resp) => {
-                const bacnetProperty = this.getReadPropertyString(resp);
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.softwareVersion = bacnetProperty.value;
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
@@ -403,21 +403,6 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     /**
      * HELPERs
      */
-
-    /**
-     * Extracts the value of the property from BACnet `ReadProperty` service.
-     *
-     * @param  {IBACnetResponse} resp - response from BACnet Object (device)
-     * @return {BACnetTypes.BACnetCharacterString}
-     */
-    private getReadPropertyString (resp: IBACnetResponse): BACnet.Types.BACnetCharacterString {
-        const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
-            _.get(resp, 'layer.apdu.service', null);
-
-        const bacnetProperty = respServiceData.prop.values[0] as
-            BACnet.Types.BACnetCharacterString;
-        return bacnetProperty;
-    }
 
     /**
      * Calculates the `IP` address of the BACnet device.
