@@ -87,10 +87,6 @@ export namespace Actor {
         export interface Config
                 extends Device.Config {
             objectId: string;
-            objectType: string;
-            objectName: string;
-            description: string;
-            unit: string;
         }
     }
 
@@ -101,6 +97,7 @@ export namespace Actor {
 
         export interface Config
                 extends Analog.Config {
+            objectType: string;
         }
     }
 
