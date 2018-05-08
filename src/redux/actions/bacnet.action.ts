@@ -5,6 +5,8 @@ import { IAction } from '../core/redux.interface';
 import { BACnetFlowManager, BACnetServiceManager } from '../../core/managers';
 import { ServerSocket } from '../../core/sockets';
 
+import { COVTimer } from '../../core/entities';
+
 export class BACnetAction {
 
     /**
@@ -55,10 +57,10 @@ export class BACnetAction {
      * @static
      * @return {IAction}
      */
-    static updateCOVTimer (): IAction {
+    static tickCOVTimer (covTimer: COVTimer): IAction {
         return store.dispatch({
-            type: BACnetEvent.updateCOVTimer,
-            payload: { },
+            type: BACnetEvent.tickCOVTimer,
+            payload: { covTimer: covTimer },
         });
     }
 }
