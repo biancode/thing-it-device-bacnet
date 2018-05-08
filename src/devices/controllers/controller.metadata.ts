@@ -1,9 +1,9 @@
-import { commonState, commonConfig } from '../common.metadata';
+import { CommonStates, CommonConfigs } from '../common.metadata';
 
 export const controllerState = [
-    ...commonState,
+    ...CommonStates,
 ];
 
 export const controllerConfig = [
-    ...commonConfig,
+    ...CommonConfigs,
 ];

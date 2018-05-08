@@ -1,6 +1,6 @@
 import { ISlaveMetadata } from '../../../core/interfaces/metadata.interface';
 
-import { actorState, actorConfigs } from '../actor.metadata';
+import { ActorStates, ActorConfigs } from '../actor.metadata';
 
 export const AnalogActorServices = [
     {
@@ -69,7 +69,7 @@ export const AnalogActorStates = [
         },
         defaultValue: '',
     },
-    ...actorState,
+    ...ActorStates,
 ];
 
 export const AnalogActorConfigs = [
@@ -114,5 +114,5 @@ export const AnalogActorConfigs = [
         },
         defaultValue: '',
     },
-    ...actorConfigs,
+    ...ActorConfigs,
 ];

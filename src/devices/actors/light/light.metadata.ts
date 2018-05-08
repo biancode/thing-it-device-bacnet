@@ -1,6 +1,6 @@
 import { ISlaveMetadata } from '../../../core/interfaces/metadata.interface';
 
-import { actorState, actorConfigs } from '../actor.metadata';
+import { ActorStates, ActorConfigs } from '../actor.metadata';
 
 export const LightActorMetadata: ISlaveMetadata = {
     plugin: 'light.actor',
@@ -39,7 +39,7 @@ export const LightActorMetadata: ISlaveMetadata = {
                 id: 'decimal',
             },
         },
-        ...actorState,
+        ...ActorStates,
     ],
     configuration: [
         {
@@ -122,6 +122,6 @@ export const LightActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
-        ...actorConfigs,
+        ...ActorConfigs,
     ],
 };

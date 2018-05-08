@@ -1,6 +1,6 @@
 import { ISlaveMetadata } from '../../../core/interfaces/metadata.interface';
 
-import { actorState, actorConfigs } from '../actor.metadata';
+import { ActorStates, ActorConfigs } from '../actor.metadata';
 
 export const BinaryValueActorMetadata: ISlaveMetadata = {
     plugin: 'binary-value.actor',
@@ -50,7 +50,7 @@ export const BinaryValueActorMetadata: ISlaveMetadata = {
                 id: 'boolean',
             },
         },
-        ...actorState,
+        ...ActorStates,
     ],
     configuration: [
         {
@@ -85,6 +85,6 @@ export const BinaryValueActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
-        ...actorConfigs,
+        ...ActorConfigs,
     ],
 };

@@ -1,6 +1,6 @@
 import { ISlaveMetadata } from '../../../core/interfaces/metadata.interface';
 
-import { actorState, actorConfigs } from '../actor.metadata';
+import { ActorStates, ActorConfigs } from '../actor.metadata';
 
 export const RoomControlActorMetadata: ISlaveMetadata = {
     plugin: 'room-control.actor',
@@ -35,7 +35,7 @@ export const RoomControlActorMetadata: ISlaveMetadata = {
                 id: 'decimal',
             },
         },
-        ...actorState,
+        ...ActorStates,
     ],
     configuration: [
         {
@@ -86,6 +86,6 @@ export const RoomControlActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
-        ...actorConfigs,
+        ...ActorConfigs,
     ],
 };

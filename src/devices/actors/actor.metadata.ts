@@ -1,9 +1,9 @@
-import { commonState, commonConfig } from '../common.metadata';
+import { CommonStates, CommonConfigs } from '../common.metadata';
 
-export const actorState = [
-    ...commonState,
+export const ActorStates = [
+    ...CommonStates,
 ];
 
-export const actorConfigs = [
-    ...commonConfig,
+export const ActorConfigs = [
+    ...CommonConfigs,
 ];

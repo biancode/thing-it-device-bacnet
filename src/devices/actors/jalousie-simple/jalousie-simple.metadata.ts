@@ -1,6 +1,6 @@
 import { ISlaveMetadata } from '../../../core/interfaces/metadata.interface';
 
-import { actorState, actorConfigs } from '../actor.metadata';
+import { ActorStates, ActorConfigs } from '../actor.metadata';
 
 export const JalousieSimpleActorMetadata: ISlaveMetadata = {
     plugin: 'jalousie-simple.actor',
@@ -59,7 +59,7 @@ export const JalousieSimpleActorMetadata: ISlaveMetadata = {
                 id: 'boolean',
             },
         },
-        ...actorState,
+        ...ActorStates,
     ],
     configuration: [
         {
@@ -102,6 +102,6 @@ export const JalousieSimpleActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '5',
         },
-        ...actorConfigs,
+        ...ActorConfigs,
     ],
 };

@@ -1,4 +1,4 @@
-export const commonState = [
+export const CommonStates = [
     {
         id: 'initialized', label: 'Initialized',
         type: {
@@ -7,5 +7,5 @@ export const commonState = [
     },
 ];
 
-export const commonConfig = [
+export const CommonConfigs = [
 ];

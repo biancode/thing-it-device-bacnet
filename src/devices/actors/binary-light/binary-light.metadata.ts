@@ -1,6 +1,6 @@
 import { ISlaveMetadata } from '../../../core/interfaces/metadata.interface';
 
-import { actorState, actorConfigs } from '../actor.metadata';
+import { ActorStates, ActorConfigs } from '../actor.metadata';
 
 export const BinaryLightActorMetadata: ISlaveMetadata = {
     plugin: 'binary-light.actor',
@@ -36,7 +36,7 @@ export const BinaryLightActorMetadata: ISlaveMetadata = {
                 id: 'boolean',
             },
         },
-        ...actorState,
+        ...ActorStates,
     ],
     configuration: [
         {
@@ -55,6 +55,6 @@ export const BinaryLightActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
-        ...actorConfigs,
+        ...ActorConfigs,
     ],
 };

@@ -1,6 +1,6 @@
 import { ISlaveMetadata } from '../../../core/interfaces/metadata.interface';
 
-import { actorState, actorConfigs } from '../actor.metadata';
+import { ActorStates, ActorConfigs } from '../actor.metadata';
 
 export const MultiStateInputActorMetadata: ISlaveMetadata = {
     plugin: 'multi-state-input.actor',
@@ -52,7 +52,7 @@ export const MultiStateInputActorMetadata: ISlaveMetadata = {
                 id: 'boolean',
             },
         },
-        ...actorState,
+        ...ActorStates,
     ],
     configuration: [
         {
@@ -95,6 +95,6 @@ export const MultiStateInputActorMetadata: ISlaveMetadata = {
             },
             defaultValue: { zero: 0, one: 1 },
         },
-        ...actorConfigs,
+        ...ActorConfigs,
     ],
 };
