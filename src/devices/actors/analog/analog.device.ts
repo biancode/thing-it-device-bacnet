@@ -265,7 +265,9 @@ export class AnalogActorDevice extends ActorDevice {
      */
 
     /**
-     * Service Stub
+     * Sends the `readProperty` request to get the value of the `presentValue` property.
+     *
+     * @return {Bluebird<void>}
      */
     public update (): Bluebird<void> {
         this.logDebug('Called update()');
