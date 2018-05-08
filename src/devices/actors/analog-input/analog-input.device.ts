@@ -140,6 +140,7 @@ export class AnalogInputActorDevice extends ActorDevice {
 
                 this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `Max value for 'Present Value' property retrieved: ${this.state.max}`);
+                this.publishStateChange();
             });
 
         // Gets the `minPresValue` property
@@ -152,6 +153,7 @@ export class AnalogInputActorDevice extends ActorDevice {
 
                 this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `Min value for 'Present Value' property retrieved: ${this.state.min}`);
+                this.publishStateChange();
             });
 
         // Gets the `objectName` property
@@ -164,6 +166,7 @@ export class AnalogInputActorDevice extends ActorDevice {
 
                 this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `Object Name retrieved: ${this.state.objectName}`);
+                this.publishStateChange();
             });
 
         // Gets the `description` property
@@ -176,6 +179,7 @@ export class AnalogInputActorDevice extends ActorDevice {
 
                 this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `Object Description retrieved: ${this.state.description}`);
+                this.publishStateChange();
             });
 
         // Gets the `units` property
@@ -189,6 +193,7 @@ export class AnalogInputActorDevice extends ActorDevice {
 
                 this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `Object Unit retrieved: ${this.state.unit}`);
+                this.publishStateChange();
             });
 
         // Gets the `presentValue` property
