@@ -7,19 +7,16 @@ import { ApiError } from '../errors';
 
 import { ServerSocket } from '../sockets';
 
-import {
-    IBACnetResponse,
-    IBACnetFlowManagerConfig,
-} from '../interfaces';
+import * as Interfaces from '../interfaces';
 
 import { Logger } from '../utils';
 
 import { store } from '../../redux';
 
-type BACnetFlowFilter = (resp: IBACnetResponse) => boolean;
+type BACnetFlowFilter = (resp: Interfaces.FlowManager.Response) => boolean;
 
 export class BACnetFlowManager {
-    private config: IBACnetFlowManagerConfig;
+    private config: Interfaces.FlowManager.Config;
     private errorFlow: Subject<Error>;
     private server: ServerSocket;
 
@@ -52,9 +49,10 @@ export class BACnetFlowManager {
      * initManager - sets the manager configuration, inits the "error" flow and
      * gets the "response" flow from BACnet server.
      *
+     * @param {Interfaces.FlowManager.Config} config - manager configuration
      * @return {void}
      */
-    public initManager (config: IBACnetFlowManagerConfig): void {
+    public initManager (config: Interfaces.FlowManager.Config): void {
         this.config = config;
 
         this.errorFlow = new Subject();
@@ -74,9 +72,9 @@ export class BACnetFlowManager {
     /**
      * getResponseFlow - returns "observable" for "response" flow.
      *
-     * @return {Observable<IBACnetResponse>}
+     * @return {Observable<Interfaces.FlowManager.Response>}
      */
-    public getResponseFlow (): Observable<IBACnetResponse> {
+    public getResponseFlow (): Observable<Interfaces.FlowManager.Response> {
         return this.server.respFlow
             .map((resp) => {
                 let layer: BACnet.Interfaces.Layers;
@@ -105,7 +103,7 @@ export class BACnetFlowManager {
      * @return {BACnetFlowFilter}
      */
     public isServiceType (serviceType: BACnet.Enums.ServiceType): BACnetFlowFilter {
-        return (resp: IBACnetResponse): boolean => {
+        return (resp: Interfaces.FlowManager.Response): boolean => {
             const respServiceType = _.get(resp, 'layer.apdu.type', null);
             return !_.isNil(respServiceType) && respServiceType === serviceType;
         };
@@ -123,7 +121,7 @@ export class BACnetFlowManager {
      * @return {BACnetFlowFilter}
      */
     public isServiceChoice (serviceChoice: any): BACnetFlowFilter {
-        return (resp: IBACnetResponse): boolean => {
+        return (resp: Interfaces.FlowManager.Response): boolean => {
             const respServiceChoice = _.get(resp, 'layer.apdu.serviceChoice', null);
             return !_.isNil(respServiceChoice) && respServiceChoice === serviceChoice;
         };
@@ -141,7 +139,7 @@ export class BACnetFlowManager {
      * @return {BACnetFlowFilter}
      */
     public isBACnetObject (objId: BACnet.Types.BACnetObjectId): BACnetFlowFilter {
-        return (resp: IBACnetResponse): boolean => {
+        return (resp: Interfaces.FlowManager.Response): boolean => {
             const respObjId: BACnet.Types.BACnetObjectId =
                 _.get(resp, 'layer.apdu.service.objId', null);
             return !_.isNil(respObjId) && respObjId.isEqual(objId);
@@ -160,7 +158,7 @@ export class BACnetFlowManager {
      * @return {BACnetFlowFilter}
      */
     public isBACnetProperty (propId: BACnet.Enums.PropertyId): BACnetFlowFilter {
-        return (resp: IBACnetResponse): boolean => {
+        return (resp: Interfaces.FlowManager.Response): boolean => {
             const respPropId: BACnet.Types.BACnetEnumerated =
                 _.get(resp, 'layer.apdu.service.prop.id', null);
             return !_.isNil(respPropId) && respPropId.isEqual(propId);
@@ -179,7 +177,7 @@ export class BACnetFlowManager {
      * @return {BACnetFlowFilter}
      */
     public isBACnetVendorId (vendorId: number): BACnetFlowFilter {
-        return (resp: IBACnetResponse): boolean => {
+        return (resp: Interfaces.FlowManager.Response): boolean => {
             const respVendorId: BACnet.Types.BACnetUnsignedInteger =
                 _.get(resp, 'layer.apdu.service.vendorId', null);
             return !_.isNil(respVendorId) && respVendorId.isEqual(vendorId);
@@ -198,7 +196,7 @@ export class BACnetFlowManager {
      * @return {BACnetFlowFilter}
      */
     public isBACnetIPAddress (ipAddress: string): BACnetFlowFilter {
-        return (resp: IBACnetResponse): boolean => {
+        return (resp: Interfaces.FlowManager.Response): boolean => {
             const respAddrInfo = resp.socket.getAddressInfo();
             return respAddrInfo.address === ipAddress;
         };
@@ -217,7 +215,7 @@ export class BACnetFlowManager {
      */
     public matchFilter (isRequired: boolean, filterFn: BACnetFlowFilter,
             matchName: string = 'object'): BACnetFlowFilter {
-        return (resp: IBACnetResponse): boolean => {
+        return (resp: Interfaces.FlowManager.Response): boolean => {
             if (!isRequired || filterFn(resp)) {
                 return true;
             }

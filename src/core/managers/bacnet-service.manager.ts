@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { Observable } from 'rxjs';
 
 import { ApiError } from '../errors';
 
@@ -6,10 +7,7 @@ import * as APIBACnetServices from '../services/bacnet';
 
 import { APIService } from '../services';
 
-import {
-    IBACnetServiceManagerConfig,
-    IBACnetAddressInfo,
-} from '../interfaces';
+import * as Interfaces from '../interfaces';
 
 import { Logger } from '../utils';
 import { ServerSocket } from '../sockets';
@@ -17,7 +15,7 @@ import { ServerSocket } from '../sockets';
 import { store } from '../../redux';
 
 export class BACnetServiceManager {
-    private config: IBACnetServiceManagerConfig;
+    private config: Interfaces.ServiceManager.Config;
     private server: ServerSocket;
 
     constructor (private logger: Logger) {
@@ -39,13 +37,17 @@ export class BACnetServiceManager {
      * initService - sets service options, sets server socket, creates instance
      * of API service.
      *
-     * @param  {IBACnetServiceManagerConfig} conifg - manager configuration
+     * @param  {Interfaces.ServiceManager.Config} conifg - manager configuration
      * @return {void}
      */
-    public initManager (config: IBACnetServiceManagerConfig): void {
+    public initManager (config: Interfaces.ServiceManager.Config): void {
         this.config = config;
 
         this.server = store.getState([ 'bacnet', 'bacnetServer' ]);
+    }
+
+    public startCOVTimer () {
+        Observable.timer();
     }
 
     /**

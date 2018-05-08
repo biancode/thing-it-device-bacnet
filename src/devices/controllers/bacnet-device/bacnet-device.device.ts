@@ -26,9 +26,9 @@ import {
 import {
     IBACnetDeviceControllerState,
     IBACnetDeviceControllerConfig,
-    IBACnetResponse,
-    IAppConfig,
 } from '../../../core/interfaces';
+
+import * as Interfaces from '../../../core/interfaces';
 
 import * as BACnet from 'bacnet-logic';
 
@@ -36,7 +36,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public state: IBACnetDeviceControllerState;
     public config: IBACnetDeviceControllerConfig;
 
-    public pluginConfig: IAppConfig;
+    public pluginConfig: Interfaces.AppConfig;
 
     public socketServer: ServerSocket;
     public flowManager: BACnetFlowManager;
@@ -156,9 +156,9 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     /**
      * Step 2. Creates the configuration for the plugin components.
      *
-     * @return {Promise<IAppConfig>}
+     * @return {Promise<Interfaces.AppConfig>}
      */
-    public async createPluginConfig (): Promise<IAppConfig> {
+    public async createPluginConfig (): Promise<Interfaces.AppConfig> {
         // Gets device address information
         const ipAddress = await this.getDeviceIpAddress();
         const port = this.getDevicePort();

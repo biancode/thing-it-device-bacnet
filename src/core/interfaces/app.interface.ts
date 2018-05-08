@@ -1,68 +1,95 @@
-export interface IBACnetAddressInfo {
-    address: string;
-    port: number;
-}
+import { Moment } from 'moment';
 
+export namespace BACnetResponse {
+    export interface Config {
+        iAm: ResponseConfig;
+        readProperty: ResponseConfig;
+    }
 
-/* Application Config */
-export interface IAppConfig {
-    response: IBACnetResponseConfig;
-    server: IServerSocketConfig;
-    manager: IManagerConfig;
-}
-
-export interface IBACnetResponseConfig {
-    iAm: IResponseConfig;
-    readProperty: IResponseConfig;
-}
-
-export interface IResponseConfig {
-    timeout?: number;
-}
-
-export interface IManagerConfig {
-    service: IBACnetServiceManagerConfig;
-    flow: IBACnetFlowManagerConfig;
+    export interface ResponseConfig {
+        timeout?: number;
+    }
 }
 
 /* Socket Server */
 import { OutputSocket, ServerSocket } from '../sockets';
 
-export interface IServerSocketConfig {
-    port: number;
-    sequence: ISequenceConfig;
-}
+export namespace ServerSocket {
+    export interface Config {
+        port: number;
+        sequence: SequenceManager.Config;
+    }
 
-export interface IServerSocketResponse {
-    message: Buffer;
-    socket: OutputSocket;
-}
+    export interface AddressInfo {
+        address: string;
+        port: number;
+    }
 
-export interface IOutputSocketConfig {
-    rinfo: IBACnetAddressInfo;
+    export interface Response {
+        message: Buffer;
+        socket: OutputSocket;
+    }
+
+    export interface Request {
+        rinfo: AddressInfo;
+    }
 }
 
 /* BACnet Flow Manager */
 import { Interfaces } from 'bacnet-logic';
 
-export interface IBACnetResponse {
-    layer: Interfaces.Layers;
-    socket: OutputSocket;
+export interface AppConfig {
+    response: BACnetResponse.Config;
+    server: ServerSocket.Config;
+    manager: ManagerConfig;
 }
 
-/* Sequence Manager Config */
-export interface ISequenceConfig {
-    thread: number;
-    delay: number;
+export interface ManagerConfig {
+    service: ServiceManager.Config;
+    flow: FlowManager.Config;
 }
 
-/* BACnet Service Manager Config */
-export interface IBACnetServiceManagerConfig {
-    dest: IBACnetAddressInfo;
+export namespace SequenceManager {
+    export interface Config {
+        thread: number;
+        delay: number;
+    }
+
+    export interface Flow {
+        id: string;
+        object: any;
+        method: any;
+        params: any[];
+    }
 }
 
-/* BACnet Flow Manager Config */
-export interface IBACnetFlowManagerConfig {
+export namespace FlowManager {
+    export interface Config {
+    }
+
+    export interface Response {
+        layer: Interfaces.Layers;
+        socket: OutputSocket;
+    }
+}
+
+export namespace ServiceManager {
+    export interface Config {
+        covTimer: COVTimer.Config;
+        dest: ServerSocket.AddressInfo;
+    }
+}
+
+export namespace COVTimer {
+    export interface Config {
+        lifetime: number;
+        period: number;
+    }
+
+    export interface Data {
+        old: Moment;
+        new: Moment;
+    }
 }
 
 /**
@@ -72,26 +99,4 @@ export interface IBACnetFlowManagerConfig {
 export interface IAliasMapElement <T> {
     alias: string|string[];
     value?: T;
-}
-
-/**
- * Managers
- */
-
-/* Sequence Manager */
-export interface ISequenceFlow {
-    id: string;
-    object: any;
-    method: any;
-    params: any[];
-}
-
-/**
- * REDUX
- */
-import { Moment } from 'moment';
-
-export interface COVTimer {
-    old: Moment;
-    new: Moment;
 }

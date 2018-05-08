@@ -6,10 +6,7 @@ import {
     ApiError,
 } from '../errors';
 
-import {
-    ISequenceConfig,
-    ISequenceFlow,
-} from '../interfaces';
+import * as Interfaces from '../interfaces';
 
 import {
     logger,
@@ -18,11 +15,11 @@ import {
 type TObjectID = string;
 
 export class SequenceManager {
-    private config: ISequenceConfig;
-    private sjDataFlow: Subject<ISequenceFlow>;
+    private config: Interfaces.SequenceManager.Config;
+    private sjDataFlow: Subject<Interfaces.SequenceManager.Flow>;
     private subDataFlow: Subscription;
 
-    private freeFlows: Map<TObjectID, ISequenceFlow[]>;
+    private freeFlows: Map<TObjectID, Interfaces.SequenceManager.Flow[]>;
     private busyFlows: Map<TObjectID, number>;
 
     constructor () {
@@ -34,7 +31,7 @@ export class SequenceManager {
      *
      * @return {void}
      */
-    public initManager (config: ISequenceConfig): void {
+    public initManager (config: Interfaces.SequenceManager.Config): void {
         this.config = config;
 
         this.freeFlows = new Map();
@@ -61,7 +58,7 @@ export class SequenceManager {
      * @param  {ISequenceFlow} data - value for sequence data flow
      * @return {void}
      */
-    public next (data: ISequenceFlow): void {
+    public next (data: Interfaces.SequenceManager.Flow): void {
         return this.sjDataFlow.next(data);
     }
 
@@ -88,10 +85,10 @@ export class SequenceManager {
     /**
      * updateQueue - handles the changes of data flow.
      *
-     * @param  {ISequenceFlow} flow - data flow
+     * @param  {Interfaces.SequenceManager.Flow} flow - data flow
      * @return {void}
      */
-    private updateQueue (flow: ISequenceFlow): void {
+    private updateQueue (flow: Interfaces.SequenceManager.Flow): void {
         const busyFlows = this.busyFlows.get(flow.id);
         const freeFlows = this.freeFlows.get(flow.id);
 

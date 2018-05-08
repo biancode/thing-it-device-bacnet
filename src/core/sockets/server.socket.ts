@@ -5,11 +5,7 @@ import * as _ from 'lodash';
 
 import { Subject } from 'rxjs';
 
-import {
-    IServerSocketConfig,
-    IServerSocketResponse,
-    IBACnetAddressInfo,
-} from '../interfaces';
+import * as Interfaces from '../interfaces';
 
 import { ApiError } from '../errors';
 import { Logger } from '../utils';
@@ -23,26 +19,26 @@ export class ServerSocket {
 
     private sock: dgram.Socket;
 
-    private serverConfig: IServerSocketConfig;
+    private config: Interfaces.ServerSocket.Config;
 
     private sequenceManager: SequenceManager;
 
-    private _respFlow: Subject<IServerSocketResponse>;
-    public get respFlow (): Subject<IServerSocketResponse> {
+    private _respFlow: Subject<Interfaces.ServerSocket.Response>;
+    public get respFlow (): Subject<Interfaces.ServerSocket.Response> {
         return this._respFlow;
     }
 
     constructor (private logger: Logger) {
     }
 
-    public initServer (serverConfig: IServerSocketConfig): void {
+    public initServer (config: Interfaces.ServerSocket.Config): void {
         // Save configuration
-        this.serverConfig = serverConfig;
+        this.config = config;
         // Create response flow
         this._respFlow = new Subject();
         // Create sequence manager
         this.sequenceManager = new SequenceManager();
-        this.sequenceManager.initManager(this.serverConfig.sequence);
+        this.sequenceManager.initManager(this.config.sequence);
     }
 
     /**
@@ -89,11 +85,11 @@ export class ServerSocket {
             });
         })
 
-        if (!this.serverConfig.port) {
+        if (!this.config.port) {
             throw new ApiError(`${this.className} - startServer: Port is required!`);
         }
 
-        this.sock.bind(this.serverConfig.port);
+        this.sock.bind(this.config.port);
 
         return startPromise;
     }
@@ -105,7 +101,7 @@ export class ServerSocket {
      * @param  {Logger} [logger] - instance of the `Logger`
      * @return {OutputSocket}
      */
-    public getOutputSocket (rinfo: IBACnetAddressInfo, logger?: Logger): OutputSocket {
+    public getOutputSocket (rinfo: Interfaces.ServerSocket.AddressInfo, logger?: Logger): OutputSocket {
         const apiLogger = _.isNil(logger) ? this.logger : logger;
 
         const outputSocket = new OutputSocket(apiLogger, this.sock, this.sequenceManager);

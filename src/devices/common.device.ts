@@ -8,7 +8,8 @@ import { DeviceBase } from '../core/bases/device.base';
 import { SubscriptionManager } from '../core/managers';
 
 import { Logger } from '../core/utils';
-import { ICommonState, ICommonConfig, IBACnetResponse } from '../core/interfaces';
+import { ICommonState, ICommonConfig } from '../core/interfaces';
+import * as Interfaces from '../core/interfaces';
 
 import * as BACnet from 'bacnet-logic';
 
@@ -103,7 +104,7 @@ export class CommonDevice extends DeviceBase {
      * @return {T}
      */
     public getReadPropertyValue <T extends BACnet.Types.BACnetTypeBase> (
-            resp: IBACnetResponse): T {
+            resp: Interfaces.FlowManager.Response): T {
         const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
             _.get(resp, 'layer.apdu.service', null);
 

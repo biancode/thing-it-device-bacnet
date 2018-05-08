@@ -13,7 +13,7 @@ export interface IBACnetState {
     flowManager: Managers.BACnetFlowManager;
     serviceManager: Managers.BACnetServiceManager;
     bacnetServer: ServerSocket;
-    covTimer: Interfaces.COVTimer;
+    covTimer: Interfaces.COVTimer.Data;
 }
 
 export const BACnetInitialState: IBACnetState = {

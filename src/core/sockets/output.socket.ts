@@ -2,7 +2,7 @@ import { Socket } from 'dgram';
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 
-import { IBACnetAddressInfo, IOutputSocketConfig } from '../interfaces';
+import * as Interfaces from '../interfaces';
 
 import { SequenceManager } from '../managers';
 import { Logger } from '../utils';
@@ -11,7 +11,7 @@ const BroadcastAddress: string = `255.255.255.255`;
 
 export class OutputSocket {
     public readonly className: string = 'OutputSocket';
-    private config: IOutputSocketConfig;
+    private config: Interfaces.ServerSocket.Request;
 
     constructor (private logger: Logger,
         private socket: Socket,
@@ -22,10 +22,10 @@ export class OutputSocket {
      * Initializes the `output` socket.
      * - sets configuration
      *
-     * @param  {IOutputSocketConfig} config - configuration of the `output` socket
+     * @param  {Interfaces.ServerSocket.Request} config - configuration of the `output` socket
      * @return {Promise<void>}
      */
-    public initialize (config: IOutputSocketConfig): void {
+    public initialize (config: Interfaces.ServerSocket.Request): void {
         this.config = config;
     }
 
@@ -148,7 +148,7 @@ export class OutputSocket {
      *
      * @return {IBACnetAddressInfo}
      */
-    public getAddressInfo (): IBACnetAddressInfo {
+    public getAddressInfo (): Interfaces.ServerSocket.AddressInfo {
         return _.cloneDeep(this.config.rinfo);
     }
 }
