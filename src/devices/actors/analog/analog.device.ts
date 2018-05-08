@@ -268,6 +268,8 @@ export class AnalogActorDevice extends ActorDevice {
      * Service Stub
      */
     public update (): Bluebird<void> {
+        this.logDebug('Called update()');
+
         this.apiService.confirmedReq.readProperty({
             invokeId: 1,
             objId: this.objectId,

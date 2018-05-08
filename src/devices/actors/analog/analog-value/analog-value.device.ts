@@ -47,21 +47,6 @@ export class AnalogValueActorDevice extends AnalogActorDevice {
     /**
      * Service Stub
      */
-    public update (): Bluebird<void> {
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
-            },
-        });
-        return Bluebird.resolve();
-    }
-
-    /**
-     * Service Stub
-     */
     public setPresentValue (): Bluebird<void> {
         return Bluebird.resolve();
     }
