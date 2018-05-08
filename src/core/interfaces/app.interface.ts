@@ -87,8 +87,8 @@ export namespace COVTimer {
     }
 
     export interface Data {
-        old: Moment;
-        new: Moment;
+        prev: Moment;
+        next: Moment;
     }
 }
 
