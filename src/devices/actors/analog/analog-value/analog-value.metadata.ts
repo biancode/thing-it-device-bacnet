@@ -31,21 +31,24 @@ export const AnalogValueActorMetadata: ISlaveMetadata = {
     configuration: [
         ...AnalogActorConfigs,
         {
-            label: 'Readable',
-            id: 'readable',
+            label: 'Read-only',
+            id: 'readonly',
             type: {
                 id: 'boolean',
             },
             defaultValue: '',
         },
         {
-            label: 'Writable',
-            id: 'writable',
+            label: 'Write-only',
+            id: 'writeonly',
             type: {
                 id: 'boolean',
             },
             defaultValue: '',
         },
+        /**
+         * @deprecated
+         */
         {
             label: 'Object Type',
             id: 'objectType',

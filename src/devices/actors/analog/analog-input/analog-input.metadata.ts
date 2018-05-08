@@ -29,9 +29,6 @@ export const AnalogInputActorMetadata: ISlaveMetadata = {
     ],
     configuration: [
         ...AnalogActorConfigs,
-        /**
-         * @deprecated
-         */
         {
             label: 'Object Type',
             id: 'objectType',

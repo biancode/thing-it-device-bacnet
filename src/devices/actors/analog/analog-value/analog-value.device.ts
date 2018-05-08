@@ -18,7 +18,7 @@ export class AnalogValueActorDevice extends AnalogActorDevice {
     public config: Interfaces.Actor.AnalogValue.Config;
 
     /**
-     * Creates and inits params of the BACnet Analog Input from plugin configuration.
+     * Creates and inits params of the BACnet Analog Value from plugin configuration.
      * Steps:
      * - creates and inits `objectId`.
      *
