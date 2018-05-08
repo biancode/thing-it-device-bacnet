@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { ApiError } from '../errors';
 
@@ -13,10 +13,13 @@ import { Logger } from '../utils';
 import { ServerSocket } from '../sockets';
 
 import { store } from '../../redux';
+import { BACnetAction } from '../../redux/actions';
 
 export class BACnetServiceManager {
     private config: Interfaces.ServiceManager.Config;
     private server: ServerSocket;
+
+    private sbCOVTimer: Subscription;
 
     constructor (private logger: Logger) {
     }
@@ -31,6 +34,15 @@ export class BACnetServiceManager {
     public async destroy (): Promise<any> {
         this.config = null;
         this.server = null;
+
+        try {
+            this.sbCOVTimer.unsubscribe();
+        } catch (error) {
+            throw new ApiError(`BACnetServiceManager - destroy: ${error}`);
+        }
+        finally {
+            this.sbCOVTimer = null;
+        }
     }
 
     /**
@@ -44,10 +56,12 @@ export class BACnetServiceManager {
         this.config = config;
 
         this.server = store.getState([ 'bacnet', 'bacnetServer' ]);
-    }
 
-    public startCOVTimer () {
-        Observable.timer();
+        // Starts the COV Timer
+        this.sbCOVTimer = Observable.timer(this.config.covTimer.period, this.config.covTimer.period)
+            .subscribe(() => {
+                BACnetAction.updateCOVTimer();
+            });
     }
 
     /**
