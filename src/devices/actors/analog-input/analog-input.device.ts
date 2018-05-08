@@ -1,17 +1,18 @@
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
+import * as BACnet from 'bacnet-logic';
 
 import { ActorDevice } from '../actor.device';
 
 import * as Interfaces from '../../../core/interfaces';
+
+import * as Entities from '../../../core/entities';
 
 import {
     ApiError,
 } from '../../../core/errors';
 
 import { store } from '../../../redux';
-
-import * as BACnet from 'bacnet-logic';
 
 export class AnalogInputActorDevice extends ActorDevice {
     public readonly className: string = 'AnalogInputActorDevice';
@@ -191,7 +192,8 @@ export class AnalogInputActorDevice extends ActorDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.maxPresValue),
+                id: new BACnet.Types
+                    .BACnetEnumerated(BACnet.Enums.PropertyId.maxPresValue),
             },
         });
 
@@ -200,7 +202,8 @@ export class AnalogInputActorDevice extends ActorDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.minPresValue),
+                id: new BACnet.Types
+                    .BACnetEnumerated(BACnet.Enums.PropertyId.minPresValue),
             },
         });
 
@@ -209,7 +212,8 @@ export class AnalogInputActorDevice extends ActorDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.objectName),
+                id: new BACnet.Types
+                    .BACnetEnumerated(BACnet.Enums.PropertyId.objectName),
             },
         });
 
@@ -218,7 +222,8 @@ export class AnalogInputActorDevice extends ActorDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.description),
+                id: new BACnet.Types
+                    .BACnetEnumerated(BACnet.Enums.PropertyId.description),
             },
         });
 
@@ -227,9 +232,25 @@ export class AnalogInputActorDevice extends ActorDevice {
             invokeId: 1,
             objId: this.objectId,
             prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.units),
+                id: new BACnet.Types
+                    .BACnetEnumerated(BACnet.Enums.PropertyId.units),
             },
         });
+
+        store.select([ 'bacnet', 'covTimer' ])
+            .subscribe((covTimer: Entities.COVTimer) => {
+                // Gets the `units` property
+                this.apiService.confirmedReq.subscribeCOV({
+                    invokeId: 1,
+                    objId: this.objectId,
+                    subProcessId: new BACnet.Types
+                        .BACnetUnsignedInteger(0),
+                    issConfNotif: new BACnet.Types
+                        .BACnetBoolean(!!BACnet.Enums.COVNotificationType.Unconfirmed),
+                    lifetime: new BACnet.Types
+                        .BACnetUnsignedInteger(covTimer.config.lifetime),
+                });
+            });
     }
 
     /**
