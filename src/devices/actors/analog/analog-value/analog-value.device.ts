@@ -44,17 +44,45 @@ export class AnalogValueActorDevice extends AnalogActorDevice {
      * TID API Methods
      */
 
+
     /**
-     * Service Stub
+     * Sends the `writeProperty` request to set the value of the `presentValue` property.
+     *
+     * @param  {number} presentValue - value of the `presentValue` property.
+     * @return {Bluebird<void>}
      */
-    public setPresentValue (): Bluebird<void> {
+    public setPresentValue (presentValue: number): Bluebird<void> {
+        this.logDebug('AnalogValueActorDevice - setPresentValue: Called setPresentValue()');
+
+        this.apiService.confirmedReq.writeProperty({
+            invokeId: 1,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types
+                    .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
+                values: [ new BACnet.Types.BACnetEnumerated(presentValue) ]
+            },
+        });
         return Bluebird.resolve();
     }
 
     /**
-     * Service Stub
+     * Calls the `setPresentValue` method to set the value of the `presentValue` property.
+     *
+     * @param  {any} parameters
+     * @return {Bluebird<void>}
      */
-    public changeValue (): Bluebird<void> {
+    public changeValue (parameters): Bluebird<void> {
+        this.logDebug('Change value requested with parameters: ', parameters);
+
+        const presentValue = _.get(parameters, 'value');
+
+        if (!_.isNumber(presentValue)) {
+            throw new Errors.ApiError('AnalogValueActorDevice - changeValue: No value provided to change!');
+        }
+
+        this.setPresentValue(parameters.value);
+
         return Bluebird.resolve();
     }
 }
