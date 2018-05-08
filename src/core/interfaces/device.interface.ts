@@ -149,6 +149,8 @@ export namespace Actor {
 
         export interface Config
                 extends Binary.Config {
+            readonly: boolean;
+            writeonly: boolean;
         }
     }
 
