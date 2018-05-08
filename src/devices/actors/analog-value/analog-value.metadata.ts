@@ -60,6 +60,30 @@ export const AnalogValueActorMetadata: ISlaveMetadata = {
                 id: 'float',
             },
         },
+        {
+            label: 'Object Name',
+            id: 'objectName',
+            type: {
+                id: 'string',
+            },
+            defaultValue: 'AnalogInput',
+        },
+        {
+            label: 'Description',
+            id: 'description',
+            type: {
+                id: 'string',
+            },
+            defaultValue: '',
+        },
+        {
+            label: 'Unit',
+            id: 'unit',
+            type: {
+                id: 'string',
+            },
+            defaultValue: '',
+        },
         ...actorState,
     ],
     configuration: [
@@ -79,6 +103,9 @@ export const AnalogValueActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
+        /**
+         * @deprecated
+         */
         {
             label: 'Object Name',
             id: 'objectName',
@@ -87,6 +114,9 @@ export const AnalogValueActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
+        /**
+         * @deprecated
+         */
         {
             label: 'Description',
             id: 'description',
@@ -95,6 +125,9 @@ export const AnalogValueActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
+        /**
+         * @deprecated
+         */
         {
             label: 'Unit',
             id: 'unit',
@@ -103,6 +136,9 @@ export const AnalogValueActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
+        /**
+         * @deprecated
+         */
         {
             label: 'Minimum Value',
             id: 'minValue',
@@ -111,6 +147,9 @@ export const AnalogValueActorMetadata: ISlaveMetadata = {
             },
             defaultValue: 0,
         },
+        /**
+         * @deprecated
+         */
         {
             label: 'Maximum Value',
             id: 'maxValue',
@@ -118,6 +157,22 @@ export const AnalogValueActorMetadata: ISlaveMetadata = {
                 id: 'decimal',
             },
             defaultValue: 100,
+        },
+        {
+            label: 'Readable',
+            id: 'readable',
+            type: {
+                id: 'boolean',
+            },
+            defaultValue: '',
+        },
+        {
+            label: 'Writable',
+            id: 'writable',
+            type: {
+                id: 'boolean',
+            },
+            defaultValue: '',
         },
         ...actorConfigs,
     ],

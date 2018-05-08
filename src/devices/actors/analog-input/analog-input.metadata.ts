@@ -56,25 +56,6 @@ export const AnalogInputActorMetadata: ISlaveMetadata = {
                 id: 'float',
             },
         },
-        ...actorState,
-    ],
-    configuration: [
-        {
-            label: 'Object Identifier',
-            id: 'objectId',
-            type: {
-                id: 'string',
-            },
-            defaultValue: '',
-        },
-        {
-            label: 'Object Type',
-            id: 'objectType',
-            type: {
-                id: 'string',
-            },
-            defaultValue: '',
-        },
         {
             label: 'Object Name',
             id: 'objectName',
@@ -91,6 +72,61 @@ export const AnalogInputActorMetadata: ISlaveMetadata = {
             },
             defaultValue: '',
         },
+        {
+            label: 'Unit',
+            id: 'unit',
+            type: {
+                id: 'string',
+            },
+            defaultValue: '',
+        },
+        ...actorState,
+    ],
+    configuration: [
+        {
+            label: 'Object Identifier',
+            id: 'objectId',
+            type: {
+                id: 'string',
+            },
+            defaultValue: '',
+        },
+        /**
+         * @deprecated
+         */
+        {
+            label: 'Object Type',
+            id: 'objectType',
+            type: {
+                id: 'string',
+            },
+            defaultValue: '',
+        },
+        /**
+         * @deprecated
+         */
+        {
+            label: 'Object Name',
+            id: 'objectName',
+            type: {
+                id: 'string',
+            },
+            defaultValue: 'AnalogInput',
+        },
+        /**
+         * @deprecated
+         */
+        {
+            label: 'Description',
+            id: 'description',
+            type: {
+                id: 'string',
+            },
+            defaultValue: '',
+        },
+        /**
+         * @deprecated
+         */
         {
             label: 'Unit',
             id: 'unit',
