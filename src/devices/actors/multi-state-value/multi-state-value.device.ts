@@ -3,15 +3,12 @@ import * as Bluebird from 'bluebird';
 
 import { ActorDevice } from '../actor.device';
 
-import {
-    IMultiStateValueActorState,
-    IMultiStateValueActorConfig,
-} from '../../../core/interfaces';
+import * as Interfaces from '../../../core/interfaces';
 
 export class MultiStateValueActorDevice extends ActorDevice {
     public readonly className: string = 'MultiStateValueActorDevice';
-    public state: IMultiStateValueActorState;
-    public config: IMultiStateValueActorConfig;
+    public state: Interfaces.Actor.MultiStateValue.State;
+    public config: Interfaces.Actor.MultiStateValue.Config;
 
     public async initDevice (): Promise<any> {
         await super.initDevice();

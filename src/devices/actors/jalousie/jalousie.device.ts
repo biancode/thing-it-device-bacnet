@@ -3,15 +3,12 @@ import * as Bluebird from 'bluebird';
 
 import { ActorDevice } from '../actor.device';
 
-import {
-    IJalousieActorState,
-    IJalousieActorConfig,
-} from '../../../core/interfaces';
+import * as Interfaces from '../../../core/interfaces';
 
 export class JalousieActorDevice extends ActorDevice {
     public readonly className: string = 'JalousieActorDevice';
-    public state: IJalousieActorState;
-    public config: IJalousieActorConfig;
+    public state: Interfaces.Actor.Jalousie.State;
+    public config: Interfaces.Actor.Jalousie.Config;
 
     public async initDevice (): Promise<any> {
         await super.initDevice();

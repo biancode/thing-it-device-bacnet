@@ -8,16 +8,18 @@ import { DeviceBase } from '../core/bases/device.base';
 import { SubscriptionManager } from '../core/managers';
 
 import { Logger } from '../core/utils';
-import { ICommonState, ICommonConfig } from '../core/interfaces';
+
 import * as Interfaces from '../core/interfaces';
 
 import * as BACnet from 'bacnet-logic';
 
 export class CommonDevice extends DeviceBase {
-    public config: ICommonConfig;
-    public state: ICommonState;
+    public state: Interfaces.CommonDevice.State;
+    public config: Interfaces.CommonDevice.Config;
+
     public isDestroyed: boolean;
     public logger: Logger;
+
     public subManager: SubscriptionManager;
 
     constructor (options: any) {

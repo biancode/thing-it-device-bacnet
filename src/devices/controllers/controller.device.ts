@@ -4,11 +4,11 @@ import * as _ from 'lodash';
 import { CommonDevice } from '../common.device';
 
 /* Interfaces */
-import { IControllerState, IControllerConfig } from '../../core/interfaces/device.interface';
+import * as Interfaces from '../../core/interfaces/device.interface';
 
 export class ControllerDevice extends CommonDevice {
-    public configuration: IControllerConfig;
-    public state: IControllerState;
+    public state: Interfaces.Controller.Device.State;
+    public config: Interfaces.Controller.Device.Config;
 
     public async initDevice (): Promise<any> {
         super.initDevice();

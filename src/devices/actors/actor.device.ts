@@ -14,13 +14,13 @@ import {
 } from '../../core/services';
 
 /* Interfaces */
-import { IActorState, IActorConfig } from '../../core/interfaces';
+import * as Interfaces from '../../core/interfaces';
 
 import { store } from '../../redux';
 
 export class ActorDevice extends CommonDevice {
-    public config: IActorConfig;
-    public state: IActorState;
+    public state: Interfaces.Actor.Device.State;
+    public config: Interfaces.Actor.Device.Config;
 
     public flowManager: BACnetFlowManager;
     public serviceManager: BACnetServiceManager;

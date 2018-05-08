@@ -23,18 +23,13 @@ import {
     APIService,
 } from '../../../core/services';
 
-import {
-    IBACnetDeviceControllerState,
-    IBACnetDeviceControllerConfig,
-} from '../../../core/interfaces';
-
 import * as Interfaces from '../../../core/interfaces';
 
 import * as BACnet from 'bacnet-logic';
 
 export class BACnetDeviceControllerDevice extends ControllerDevice {
-    public state: IBACnetDeviceControllerState;
-    public config: IBACnetDeviceControllerConfig;
+    public state: Interfaces.Controller.BACnetDevice.State;
+    public config: Interfaces.Controller.BACnetDevice.Config;
 
     public pluginConfig: Interfaces.AppConfig;
 

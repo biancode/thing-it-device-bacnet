@@ -3,15 +3,12 @@ import * as Bluebird from 'bluebird';
 
 import { ActorDevice } from '../actor.device';
 
-import {
-    IBinaryValueActorState,
-    IBinaryValueActorConfig,
-} from '../../../core/interfaces';
+import * as Interfaces from '../../../core/interfaces';
 
 export class BinaryValueActorDevice extends ActorDevice {
     public readonly className: string = 'BinaryValueActorDevice';
-    public state: IBinaryValueActorState;
-    public config: IBinaryValueActorConfig;
+    public state: Interfaces.Actor.BinaryValue.State;
+    public config: Interfaces.Actor.BinaryValue.Config;
 
     public async initDevice (): Promise<any> {
         await super.initDevice();

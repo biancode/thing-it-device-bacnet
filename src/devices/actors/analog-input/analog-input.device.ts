@@ -3,10 +3,7 @@ import * as Bluebird from 'bluebird';
 
 import { ActorDevice } from '../actor.device';
 
-import {
-    IAnalogInputActorState,
-    IAnalogInputActorConfig,
-} from '../../../core/interfaces';
+import * as Interfaces from '../../../core/interfaces';
 
 import {
     ApiError,
@@ -18,8 +15,8 @@ import * as BACnet from 'bacnet-logic';
 
 export class AnalogInputActorDevice extends ActorDevice {
     public readonly className: string = 'AnalogInputActorDevice';
-    public state: IAnalogInputActorState;
-    public config: IAnalogInputActorConfig;
+    public state: Interfaces.Actor.AnalogInput.State;
+    public config: Interfaces.Actor.AnalogInput.Config;
 
     private objectId: BACnet.Types.BACnetObjectId;
 

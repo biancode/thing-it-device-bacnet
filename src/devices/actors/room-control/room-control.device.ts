@@ -3,15 +3,12 @@ import * as Bluebird from 'bluebird';
 
 import { ActorDevice } from '../actor.device';
 
-import {
-    IRoomControlActorState,
-    IRoomControlActorConfig,
-} from '../../../core/interfaces';
+import * as Interfaces from '../../../core/interfaces';
 
 export class RoomControlActorDevice extends ActorDevice {
     public readonly className: string = 'RoomControlActorDevice';
-    public state: IRoomControlActorState;
-    public config: IRoomControlActorConfig;
+    public state: Interfaces.Actor.RoomControl.State;
+    public config: Interfaces.Actor.RoomControl.Config;
 
     public async initDevice (): Promise<any> {
         await super.initDevice();
