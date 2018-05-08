@@ -8,18 +8,16 @@ import * as Interfaces from '../../../core/interfaces';
 
 import * as Entities from '../../../core/entities';
 
-import {
-    ApiError,
-} from '../../../core/errors';
+import * as Errors from '../../../core/errors';
 
 import { store } from '../../../redux';
 
-export class AnalogInputActorDevice extends ActorDevice {
-    public readonly className: string = 'AnalogInputActorDevice';
-    public state: Interfaces.Actor.AnalogInput.State;
-    public config: Interfaces.Actor.AnalogInput.Config;
+export class AnalogActorDevice extends ActorDevice {
+    public readonly className: string = 'AnalogActorDevice';
+    public state: Interfaces.Actor.Analog.State;
+    public config: Interfaces.Actor.Analog.Config;
 
-    private objectId: BACnet.Types.BACnetObjectId;
+    public objectId: BACnet.Types.BACnetObjectId;
 
     public stop (): void {
         this.apiService.confirmedReq.unsubscribeCOV({
@@ -59,26 +57,6 @@ export class AnalogInputActorDevice extends ActorDevice {
      * @return {void}
      */
     public initDeviceParamsFromConfig (): void {
-        const objectId = +this.config.objectId;
-
-        if (this.config.objectId === '' || !_.isFinite(objectId)) {
-            throw new ApiError(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
-                + `Object ID must have the valid 'number' value`);
-        }
-
-        const objectType = this.config.objectType !== ''
-            ? BACnet.Enums.ObjectType[this.config.objectType]
-            : BACnet.Enums.ObjectType.AnalogInput;
-
-        if (!_.isNumber(objectType)) {
-            throw new ApiError(`AnalogInputActorDevice - initDeviceParamsFromConfig: `
-                + `Object Type must have the valid BACnet type`);
-        }
-
-        this.objectId = new BACnet.Types.BACnetObjectId({
-            type: objectType,
-            instance: objectId,
-        });
     }
 
     /**
