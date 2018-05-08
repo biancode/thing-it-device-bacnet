@@ -190,6 +190,19 @@ export class AnalogInputActorDevice extends ActorDevice {
                 this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `Object Unit retrieved: ${this.state.unit}`);
             });
+
+        // Gets the `presentValue` property
+        this.subManager.subscribe = readPropertyFlow
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
+
+                this.state.presentValue = bacnetProperty.value;
+
+                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                    + `Object Present Value retrieved: ${this.state.presentValue}`);
+                this.publishStateChange();
+            });
     }
 
     /**
