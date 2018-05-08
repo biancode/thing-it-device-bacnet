@@ -21,6 +21,17 @@ export class AnalogInputActorDevice extends ActorDevice {
 
     private objectId: BACnet.Types.BACnetObjectId;
 
+    public stop (): void {
+        this.apiService.confirmedReq.unsubscribeCOV({
+            invokeId: 1,
+            objId: this.objectId,
+            subProcessId: new BACnet.Types
+                .BACnetUnsignedInteger(0),
+        });
+
+        super.stop();
+    }
+
     public async initDevice (): Promise<any> {
         await super.initDevice();
 
@@ -237,9 +248,9 @@ export class AnalogInputActorDevice extends ActorDevice {
             },
         });
 
-        store.select([ 'bacnet', 'covTimer' ])
+        // Gets the `presentValue|statusFlags` property
+        this.subManager.subscribe = store.select([ 'bacnet', 'covTimer' ])
             .subscribe((covTimer: Entities.COVTimer) => {
-                // Gets the `units` property
                 this.apiService.confirmedReq.subscribeCOV({
                     invokeId: 1,
                     objId: this.objectId,
