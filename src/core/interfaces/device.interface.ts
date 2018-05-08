@@ -108,6 +108,8 @@ export namespace Actor {
 
         export interface Config
                 extends Analog.Config {
+            readonly: boolean;
+            writeonly: boolean;
             minValue: number;
             maxValue: number;
         }
@@ -119,14 +121,13 @@ export namespace Actor {
             presentValue: boolean;
             alarmValue: boolean;
             outOfService: boolean;
+            objectName: string;
+            description: string;
         }
 
         export interface Config
                 extends Device.Config {
             objectId: string;
-            objectType: string;
-            objectName: string;
-            description: string;
         }
     }
 
@@ -137,6 +138,7 @@ export namespace Actor {
 
         export interface Config
                 extends Binary.Config {
+            objectType: string;
         }
     }
 
