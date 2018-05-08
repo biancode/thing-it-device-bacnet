@@ -85,3 +85,13 @@ export interface ISequenceFlow {
     method: any;
     params: any[];
 }
+
+/**
+ * REDUX
+ */
+import { Moment } from 'moment';
+
+export interface COVTimer {
+    old: Moment;
+    new: Moment;
+}
