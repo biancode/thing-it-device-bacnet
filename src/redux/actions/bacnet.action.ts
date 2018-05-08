@@ -1,5 +1,5 @@
 import { store } from '../index';
-import { BACnetEvent } from '../events/bacnet.event';
+import * as BACnetEvent from '../events/bacnet.event';
 import { IAction } from '../core/redux.interface';
 
 import { BACnetFlowManager, BACnetServiceManager } from '../../core/managers';
@@ -46,6 +46,19 @@ export class BACnetAction {
         return store.dispatch({
             type: BACnetEvent.setBACnetServer,
             payload: { server: server },
+        });
+    }
+
+    /**
+     *  Sets the instance of the BACnet Server to `redux` store.
+     *
+     * @static
+     * @return {IAction}
+     */
+    static updateCOVTimer (): IAction {
+        return store.dispatch({
+            type: BACnetEvent.updateCOVTimer,
+            payload: { },
         });
     }
 }
