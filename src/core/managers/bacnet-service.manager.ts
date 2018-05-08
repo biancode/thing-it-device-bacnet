@@ -15,6 +15,8 @@ import { ServerSocket } from '../sockets';
 import { store } from '../../redux';
 import { BACnetAction } from '../../redux/actions';
 
+import { COVTimer } from '../entities';
+
 export class BACnetServiceManager {
     private config: Interfaces.ServiceManager.Config;
     private server: ServerSocket;
@@ -57,10 +59,13 @@ export class BACnetServiceManager {
 
         this.server = store.getState([ 'bacnet', 'bacnetServer' ]);
 
+        const covTimerConfig = _.clone(this.config.covTimer);
         // Starts the COV Timer
-        this.sbCOVTimer = Observable.timer(this.config.covTimer.period, this.config.covTimer.period)
+        this.sbCOVTimer = Observable.timer(covTimerConfig.period, covTimerConfig.period)
             .subscribe(() => {
-                BACnetAction.updateCOVTimer();
+                const covTimer = new COVTimer();
+                covTimer.init(covTimerConfig);
+                BACnetAction.tickCOVTimer(covTimer);
             });
     }
 
