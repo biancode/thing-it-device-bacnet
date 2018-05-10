@@ -203,7 +203,7 @@ export class JalousieSimpleActorDevice extends ActorDevice {
     }
 
     /**
-     * Toggles the stop value state.
+     * Toggles the `stopValue` state.
      *
      * @return {Bluebird<void>}
      */
@@ -219,7 +219,7 @@ export class JalousieSimpleActorDevice extends ActorDevice {
     }
 
     /**
-     * Sets the stop value state.
+     * Sets the `stopValue` state.
      *
      * @param  {boolean} targetState - new stop value
      * @return {Bluebird<void>}
