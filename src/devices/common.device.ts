@@ -2,7 +2,7 @@ import { Subscription } from 'rxjs';
 
 import * as _ from 'lodash';
 
-import { ApiError } from '../core/errors';
+import * as Errors from '../core/errors';
 
 import { DeviceBase } from '../core/bases/device.base';
 import { SubscriptionManager } from '../core/managers';
@@ -60,7 +60,7 @@ export class CommonDevice extends DeviceBase {
         this.config = this.configuration;
 
         if (!this.config) {
-            throw new ApiError('initDevice - Configuration is not defined!');
+            throw new Errors.ApiError('initDevice - Configuration is not defined!');
         }
 
         this.logger = this.createLogger();
@@ -112,5 +112,42 @@ export class CommonDevice extends DeviceBase {
 
         const bacnetProperty = respServiceData.prop.values[0] as T;
         return bacnetProperty;
+    }
+
+
+    /**
+     * Returns the BACnet Object Identifier.
+     *
+     * @param  {string|number} objectType - instance of the BACnet object
+     * @param  {string|BACnet.Enums.ObjectType} objectType - type of the BACnet object
+     * @return {BACnet.Types.BACnetObjectId}
+     */
+    public getBACnetObjectId (objectId: string|number, objectType?: string|BACnet.Enums.ObjectType,
+            defObjectType?: BACnet.Enums.ObjectType): BACnet.Types.BACnetObjectId {
+        const bacnetObjectId = +objectId;
+
+        if ((_.isString(objectId) && objectId === '') || !_.isFinite(bacnetObjectId)) {
+            throw new Errors.ApiError(`JalousieActorDevice - getObjectId: `
+                + `Object ID must have the valid 'number' value`);
+        }
+
+        let bacnetObjectType: BACnet.Enums.ObjectType;
+        if (_.isNumber(objectType)) {
+            bacnetObjectType = objectType;
+        } else {
+            bacnetObjectType = objectType !== ''
+                ? BACnet.Enums.ObjectType[objectType]
+                : defObjectType;
+        }
+
+        if (!_.isNumber(objectType)) {
+            throw new Errors.ApiError(`JalousieActorDevice - getObjectId: `
+                + `Object Type must have the valid BACnet type`);
+        }
+
+        return new BACnet.Types.BACnetObjectId({
+            type: bacnetObjectType,
+            instance: bacnetObjectId,
+        });
     }
 }
