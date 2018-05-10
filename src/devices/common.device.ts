@@ -5,13 +5,20 @@ import * as _ from 'lodash';
 import * as Errors from '../core/errors';
 
 import { DeviceBase } from '../core/bases/device.base';
-import { SubscriptionManager } from '../core/managers';
+
+import * as Managers from '../core/managers';
+
+import { APIService } from '../core/services';
 
 import { Logger } from '../core/utils';
+
+import * as Entities from '../core/entities';
 
 import * as Interfaces from '../core/interfaces';
 
 import * as BACnet from 'bacnet-logic';
+
+import { store } from '../redux';
 
 export class CommonDevice extends DeviceBase {
     public state: Interfaces.CommonDevice.State;
@@ -20,7 +27,12 @@ export class CommonDevice extends DeviceBase {
     public isDestroyed: boolean;
     public logger: Logger;
 
-    public subManager: SubscriptionManager;
+    public covObjectIds: BACnet.Types.BACnetObjectId[];
+    public subManager: Managers.SubscriptionManager;
+
+    public flowManager: Managers.BACnetFlowManager;
+    public serviceManager: Managers.BACnetServiceManager;
+    public apiService: APIService;
 
     constructor (options: any) {
         super();
@@ -33,7 +45,9 @@ export class CommonDevice extends DeviceBase {
     public async start (): Promise<any> {
         this.isDestroyed = false;
 
-        this.subManager = new SubscriptionManager();
+        this.covObjectIds = [];
+
+        this.subManager = new Managers.SubscriptionManager();
         await this.subManager.initManager();
     }
 
@@ -44,7 +58,17 @@ export class CommonDevice extends DeviceBase {
     public stop (): void {
         this.isDestroyed = true;
 
+        _.map(this.covObjectIds, (objectId) => {
+            this.apiService.confirmedReq.unsubscribeCOV({
+                invokeId: 1,
+                objId: objectId,
+                subProcessId: new BACnet.Types
+                    .BACnetUnsignedInteger(0),
+            });
+        });
+
         this.subManager.destroy();
+        this.subManager = null;
     }
 
     /**
@@ -99,6 +123,10 @@ export class CommonDevice extends DeviceBase {
     }
 
     /**
+     * BACnet HELPERs
+     */
+
+    /**
      * Extracts the value of the property from BACnet `ReadProperty` service.
      *
      * @template T {extends BACnet.Types.BACnetTypeBase}
@@ -113,7 +141,6 @@ export class CommonDevice extends DeviceBase {
         const bacnetProperty = respServiceData.prop.values[0] as T;
         return bacnetProperty;
     }
-
 
     /**
      * Returns the BACnet Object Identifier.
@@ -149,5 +176,29 @@ export class CommonDevice extends DeviceBase {
             type: bacnetObjectType,
             instance: bacnetObjectId,
         });
+    }
+
+    /**
+     * Sends the `SubscribeCOV` confirmed request.
+     *
+     * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
+     * @return {void}
+     */
+    public sendSubscribeCOV (objectId: BACnet.Types.BACnetObjectId): void {
+        this.subManager.subscribe = store.select([ 'bacnet', 'covTimer' ])
+            .subscribe((covTimer: Entities.COVTimer) => {
+                this.apiService.confirmedReq.subscribeCOV({
+                    invokeId: 1,
+                    objId: objectId,
+                    subProcessId: new BACnet.Types
+                        .BACnetUnsignedInteger(0),
+                    issConfNotif: new BACnet.Types
+                        .BACnetBoolean(!!BACnet.Enums.COVNotificationType.Unconfirmed),
+                    lifetime: new BACnet.Types
+                        .BACnetUnsignedInteger(covTimer.config.lifetime),
+                });
+            });
+
+        this.covObjectIds.push(objectId);
     }
 }
