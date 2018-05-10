@@ -60,7 +60,7 @@ export class AnalogValueActorDevice extends AnalogActorDevice {
             prop: {
                 id: new BACnet.Types
                     .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
-                values: [ new BACnet.Types.BACnetEnumerated(presentValue) ]
+                values: [ new BACnet.Types.BACnetReal(presentValue) ]
             },
         });
         return Bluebird.resolve();
