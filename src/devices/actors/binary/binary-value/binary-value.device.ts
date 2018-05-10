@@ -65,7 +65,6 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
      * TID API Methods
      */
 
-
     /**
      * Switches the value of the `presentValue` property.
      *
@@ -84,7 +83,7 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
     }
 
     /**
-     * Sends the `writeProperty` request to set `1` (true) value to the `presentValue` property.
+     * Sets `1` (true) value of the `presentValue` property.
      *
      * @return {Bluebird<void>}
      */
@@ -96,7 +95,7 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
     }
 
     /**
-     * Sends the `writeProperty` request to set `0` (false) value to the `presentValue` property.
+     * Sets `0` (false) value of the `presentValue` property.
      *
      * @return {Bluebird<void>}
      */

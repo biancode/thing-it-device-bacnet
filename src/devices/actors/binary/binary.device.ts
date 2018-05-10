@@ -200,7 +200,7 @@ export class BinaryActorDevice extends ActorDevice {
      * @return {Bluebird<void>}
      */
     public update (): Bluebird<void> {
-        this.logger.logDebug('Called update()');
+        this.logger.logDebug('BinaryActorDevice - update: Called update()');
 
         this.apiService.confirmedReq.readProperty({
             invokeId: 1,
