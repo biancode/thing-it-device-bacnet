@@ -19,17 +19,6 @@ export class AnalogActorDevice extends ActorDevice {
 
     public objectId: BACnet.Types.BACnetObjectId;
 
-    public stop (): void {
-        this.apiService.confirmedReq.unsubscribeCOV({
-            invokeId: 1,
-            objId: this.objectId,
-            subProcessId: new BACnet.Types
-                .BACnetUnsignedInteger(0),
-        });
-
-        super.stop();
-    }
-
     public async initDevice (): Promise<any> {
         await super.initDevice();
 
@@ -245,19 +234,7 @@ export class AnalogActorDevice extends ActorDevice {
         });
 
         // Gets the `presentValue|statusFlags` property
-        this.subManager.subscribe = store.select([ 'bacnet', 'covTimer' ])
-            .subscribe((covTimer: Entities.COVTimer) => {
-                this.apiService.confirmedReq.subscribeCOV({
-                    invokeId: 1,
-                    objId: this.objectId,
-                    subProcessId: new BACnet.Types
-                        .BACnetUnsignedInteger(0),
-                    issConfNotif: new BACnet.Types
-                        .BACnetBoolean(!!BACnet.Enums.COVNotificationType.Unconfirmed),
-                    lifetime: new BACnet.Types
-                        .BACnetUnsignedInteger(covTimer.config.lifetime),
-                });
-            });
+        this.sendSubscribeCOV(this.objectId);
     }
 
     /**
