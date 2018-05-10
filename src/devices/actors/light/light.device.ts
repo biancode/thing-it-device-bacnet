@@ -130,7 +130,7 @@ export class LightActorDevice extends ActorDevice {
                 const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
                 // Get instances of property values
                 const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetUnsignedInteger;
-                this.setLightMode(presentValue);
+                this.setLightActive(presentValue);
 
                 this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
                     + `Light Active ${JSON.stringify(this.state.lightActive)}`);
@@ -172,7 +172,7 @@ export class LightActorDevice extends ActorDevice {
             .subscribe((resp) => {
                 const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetUnsignedInteger>(resp);
 
-                this.setLightMode(bacnetProperty);
+                this.setLightActive(bacnetProperty);
 
                 this.publishStateChange();
                 this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
@@ -296,7 +296,13 @@ export class LightActorDevice extends ActorDevice {
      * HELPERs
      */
 
-    public setLightMode (presentValue: BACnet.Types.BACnetUnsignedInteger) {
+    /**
+     * Sets the `lightActive` state.
+     *
+     * @param  {BACnet.Types.BACnetUnsignedInteger} presentValue - BACnet present value
+     * @return {void}
+     */
+    public setLightActive (presentValue: BACnet.Types.BACnetUnsignedInteger): void {
         const lightStateIndex = presentValue.value - 1;
         const lightStateProp = this.lightStates[lightStateIndex];
 
