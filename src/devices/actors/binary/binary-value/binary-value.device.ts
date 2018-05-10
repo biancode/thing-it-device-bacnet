@@ -41,23 +41,69 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
     }
 
     /**
-     * Service Stub
+     * Sends the `writeProperty` request to set the value of the `presentValue` property.
+     *
+     * @param  {number} presentValue - value of the `presentValue` property.
+     * @return {Bluebird<void>}
+     */
+    public setPresentValue (presentValue: boolean): Bluebird<void> {
+        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called setPresentValue()');
+
+        this.apiService.confirmedReq.writeProperty({
+            invokeId: 1,
+            objId: this.objectId,
+            prop: {
+                id: new BACnet.Types
+                    .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
+                values: [ new BACnet.Types.BACnetEnumerated(+presentValue) ]
+            },
+        });
+        return Bluebird.resolve();
+    }
+
+    /**
+     * TID API Methods
+     */
+
+
+    /**
+     * Switches the value of the `presentValue` property.
+     *
+     * @return {Bluebird<void>}
      */
     public toggle (): Bluebird<void> {
+        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called toggle()');
+
+        if (this.state.presentValue) {
+            this.off();
+        } else {
+            this.on();
+        }
+
         return Bluebird.resolve();
     }
 
     /**
-     * Service Stub
+     * Sends the `writeProperty` request to set `1` (true) value to the `presentValue` property.
+     *
+     * @return {Bluebird<void>}
      */
     public on (): Bluebird<void> {
+        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called on()');
+
+        this.setPresentValue(true);
         return Bluebird.resolve();
     }
 
     /**
-     * Service Stub
+     * Sends the `writeProperty` request to set `0` (false) value to the `presentValue` property.
+     *
+     * @return {Bluebird<void>}
      */
     public off (): Bluebird<void> {
+        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called off()');
+
+        this.setPresentValue(false);
         return Bluebird.resolve();
     }
 }
