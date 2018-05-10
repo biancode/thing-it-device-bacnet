@@ -147,41 +147,6 @@ export class JalousieActorDevice extends ActorDevice {
                     + `Rotation COV notification was not received ${error}`);
                 this.publishStateChange();
             });
-
-        // Read Property Flow
-        const readPropertyFlow = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty));
-
-        // Gets the `presentValue` (position) property
-        this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.positionModificationObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
-            .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
-                this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
-                    + `Modified Position: ${bacnetProperty.value}`);
-            });
-
-        // Gets the `presentValue` (rotation) property
-        this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.rotationModificationObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
-            .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
-                this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
-                    + `Modified Rotation: ${bacnetProperty.value}`);
-            });
-
-        // Gets the `presentValue` (action) property
-        this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.rotationModificationObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
-            .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
-                this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
-                    + `Modified Action: ${bacnetProperty.value}`);
-            });
     }
 
     /**
