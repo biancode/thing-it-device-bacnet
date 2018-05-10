@@ -52,7 +52,7 @@ export class AnalogValueActorDevice extends AnalogActorDevice {
      * @return {Bluebird<void>}
      */
     public setPresentValue (presentValue: number): Bluebird<void> {
-        this.logDebug('AnalogValueActorDevice - setPresentValue: Called setPresentValue()');
+        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called setPresentValue()');
 
         this.apiService.confirmedReq.writeProperty({
             invokeId: 1,
@@ -73,7 +73,7 @@ export class AnalogValueActorDevice extends AnalogActorDevice {
      * @return {Bluebird<void>}
      */
     public changeValue (parameters): Bluebird<void> {
-        this.logDebug('Change value requested with parameters: ', parameters);
+        this.logger.logDebug('Change value requested with parameters: ', parameters);
 
         const presentValue = _.get(parameters, 'value');
 

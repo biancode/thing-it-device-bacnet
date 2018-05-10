@@ -71,7 +71,7 @@ export class BinaryActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.objectId))
             .subscribe((resp) => {
-                this.logDebug(`BinaryActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`BinaryActorDevice - subscribeToProperty: `
                     + `Received notification`);
 
                 const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
@@ -91,9 +91,9 @@ export class BinaryActorDevice extends ActorDevice {
                 this.state.outOfService = statusFlags.value.outOfService;
                 this.state.alarmValue = statusFlags.value.inAlarm;
 
-                this.logDebug(`BinaryActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`BinaryActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.presentValue)}`);
-                this.logDebug(`BinaryActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`BinaryActorDevice - subscribeToProperty: `
                     + `State ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             }, (error) => {
@@ -200,7 +200,7 @@ export class BinaryActorDevice extends ActorDevice {
      * @return {Bluebird<void>}
      */
     public update (): Bluebird<void> {
-        this.logDebug('Called update()');
+        this.logger.logDebug('Called update()');
 
         this.apiService.confirmedReq.readProperty({
             invokeId: 1,
