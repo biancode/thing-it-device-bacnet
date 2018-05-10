@@ -168,14 +168,8 @@ export class BinaryLightActorDevice extends ActorDevice {
     public update (): Bluebird<void> {
         this.logger.logDebug('BinaryLightActorDevice - update: Called update()');
 
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.presentValue);
+
         return Bluebird.resolve();
     }
 

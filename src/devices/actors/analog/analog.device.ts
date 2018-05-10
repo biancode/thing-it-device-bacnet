@@ -184,54 +184,19 @@ export class AnalogActorDevice extends ActorDevice {
      */
     public async initProperties (): Promise<void> {
         // Gets the `maxPresValue` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.maxPresValue),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.maxPresValue);
 
         // Gets the `minPresValue` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.minPresValue),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.minPresValue);
 
         // Gets the `objectName` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.objectName),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.objectName);
 
         // Gets the `description` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.description),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.description);
 
         // Gets the `units` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.units),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.units);
 
         // Gets the `presentValue|statusFlags` property
         this.sendSubscribeCOV(this.objectId);
@@ -249,14 +214,8 @@ export class AnalogActorDevice extends ActorDevice {
     public update (): Bluebird<void> {
         this.logger.logDebug('Called update()');
 
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.presentValue);
+
         return Bluebird.resolve();
     }
 }
