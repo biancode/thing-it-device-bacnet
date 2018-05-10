@@ -179,6 +179,27 @@ export class CommonDevice extends DeviceBase {
     }
 
     /**
+     * Sends the `WriteProperty` confirmed request.
+     *
+     * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
+     * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
+     * @param  {BACnet.Types.BACnetTypeBase[]} values - BACnet property values
+     * @return {void}
+     */
+    public sendWriteProperty (objectId: BACnet.Types.BACnetObjectId,
+            propId: BACnet.Enums.PropertyId, values: BACnet.Types.BACnetTypeBase[]): void {
+        this.apiService.confirmedReq.writeProperty({
+            invokeId: 1,
+            objId: objectId,
+            prop: {
+                id: new BACnet.Types
+                    .BACnetEnumerated(propId),
+                values: values,
+            },
+        });
+    }
+
+    /**
      * Sends the `ReadProperty` confirmed request.
      *
      * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
