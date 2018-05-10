@@ -54,15 +54,9 @@ export class AnalogValueActorDevice extends AnalogActorDevice {
     public setPresentValue (presentValue: number): Bluebird<void> {
         this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called setPresentValue()');
 
-        this.apiService.confirmedReq.writeProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
-                values: [ new BACnet.Types.BACnetReal(presentValue) ]
-            },
-        });
+        this.sendWriteProperty(this.objectId, BACnet.Enums.PropertyId.presentValue,
+            [ new BACnet.Types.BACnetReal(presentValue) ]);
+
         return Bluebird.resolve();
     }
 

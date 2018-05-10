@@ -144,15 +144,9 @@ export class BinaryLightActorDevice extends ActorDevice {
     public setLightActive (targetState: boolean): Bluebird<void> {
         this.logger.logDebug('BinaryLightActorDevice - setLightActive: Called setLightActive()');
 
-        this.apiService.confirmedReq.writeProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
-                values: [ new BACnet.Types.BACnetEnumerated(+targetState) ]
-            },
-        });
+        this.sendWriteProperty(this.objectId, BACnet.Enums.PropertyId.presentValue,
+            [ new BACnet.Types.BACnetEnumerated(+targetState) ]);
+
         return Bluebird.resolve();
     }
 

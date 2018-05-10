@@ -49,15 +49,9 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
     public setPresentValue (presentValue: boolean): Bluebird<void> {
         this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called setPresentValue()');
 
-        this.apiService.confirmedReq.writeProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types
-                    .BACnetEnumerated(BACnet.Enums.PropertyId.presentValue),
-                values: [ new BACnet.Types.BACnetEnumerated(+presentValue) ]
-            },
-        });
+        this.sendWriteProperty(this.objectId, BACnet.Enums.PropertyId.presentValue,
+            [ new BACnet.Types.BACnetEnumerated(+presentValue) ]);
+
         return Bluebird.resolve();
     }
 
