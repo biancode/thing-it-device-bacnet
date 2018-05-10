@@ -217,6 +217,7 @@ export namespace Actor {
                 extends Device.State {
             lightActive: boolean;
             dimmerLevel: number;
+            lightState: string;
         }
 
         export interface Config

@@ -39,6 +39,13 @@ export const LightActorMetadata: ISlaveMetadata = {
                 id: 'decimal',
             },
         },
+        {
+            id: 'lightState',
+            label: 'Light State',
+            type: {
+                id: 'string',
+            },
+        },
         ...ActorStates,
     ],
     configuration: [
