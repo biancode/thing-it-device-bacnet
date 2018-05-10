@@ -179,6 +179,24 @@ export class CommonDevice extends DeviceBase {
     }
 
     /**
+     * Sends the `ReadProperty` confirmed request.
+     *
+     * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
+     * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
+     * @return {void}
+     */
+    public sendReadProperty (objectId: BACnet.Types.BACnetObjectId,
+            propId: BACnet.Enums.PropertyId): void {
+        this.apiService.confirmedReq.readProperty({
+            invokeId: 1,
+            objId: objectId,
+            prop: {
+                id: new BACnet.Types.BACnetEnumerated(propId),
+            },
+        });
+    }
+
+    /**
      * Sends the `SubscribeCOV` confirmed request.
      *
      * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
