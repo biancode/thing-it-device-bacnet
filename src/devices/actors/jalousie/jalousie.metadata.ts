@@ -180,7 +180,7 @@ export const JalousieActorMetadata: ISlaveMetadata = {
         },
         {
             label: 'Action Stop Value',
-                id: 'actionStopValue',
+            id: 'actionStopValue',
             type: {
                 id: 'integer',
             },
