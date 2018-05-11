@@ -12,10 +12,12 @@ import * as Errors from '../../../core/errors';
 
 import { store } from '../../../redux';
 
-export class RoomControlActorDevice extends ActorDevice {
-    public readonly className: string = 'RoomControlActorDevice';
-    public state: Interfaces.Actor.RoomControl.State;
-    public config: Interfaces.Actor.RoomControl.Config;
+export class HVACActorDevice extends ActorDevice {
+    public readonly className: string = 'HVACActorDevice';
+    public state: Interfaces.Actor.HVAC.State;
+    public config: Interfaces.Actor.HVAC.Config;
+
+    public objectId: BACnet.Types.BACnetObjectId;
 
     public setpointFeedbackObjectId: BACnet.Types.BACnetObjectId;
     public temperatureObjectId: BACnet.Types.BACnetObjectId;
@@ -76,7 +78,7 @@ export class RoomControlActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.setpointFeedbackObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`RoomControlActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Received notification`);
 
                 const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
@@ -92,13 +94,13 @@ export class RoomControlActorDevice extends ActorDevice {
 
                 this.state.setpoint = presentValue.value;
 
-                this.logger.logDebug(`RoomControlActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Setpoint ${JSON.stringify(this.state.setpoint)}`);
-                this.logger.logDebug(`RoomControlActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `State ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             }, (error) => {
-                this.logger.logDebug(`RoomControlActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Setpoint COV notification was not received ${error}`);
                 this.publishStateChange();
             });
@@ -109,7 +111,7 @@ export class RoomControlActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.temperatureObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`RoomControlActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Received notification`);
 
                 const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
@@ -125,13 +127,13 @@ export class RoomControlActorDevice extends ActorDevice {
 
                 this.state.temperature = presentValue.value;
 
-                this.logger.logDebug(`RoomControlActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Temperature ${JSON.stringify(this.state.temperature)}`);
-                this.logger.logDebug(`RoomControlActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `State ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             }, (error) => {
-                this.logger.logDebug(`RoomControlActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Temperature COV notification was not received ${error}`);
                 this.publishStateChange();
             });
@@ -150,7 +152,7 @@ export class RoomControlActorDevice extends ActorDevice {
 
                 this.state.setpoint = bacnetProperty.value;
 
-                this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Setpoint: ${this.state.setpoint}`);
                 this.publishStateChange();
             });
@@ -164,7 +166,7 @@ export class RoomControlActorDevice extends ActorDevice {
 
                 this.state.temperature = bacnetProperty.value;
 
-                this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Temperature: ${this.state.setpoint}`);
                 this.publishStateChange();
             });
@@ -184,58 +186,63 @@ export class RoomControlActorDevice extends ActorDevice {
     }
 
     /**
-     * Inits the BACnet object properties.
-     *
-     * @return {Promise<void>}
+     * TID API Methods
      */
-    public setSetpointModification (newSetpoint: number): Bluebird<void> {
-        this.logger.logDebug('RoomControlActorDevice - setSetpointModification: '
-            + `Setting setpoint modification: ${newSetpoint}`);
 
-        // Gets the `presentValue|statusFlags` property for `setpoint`
-        this.sendWriteProperty(this.setpointModificationObjectId, BACnet.Enums.PropertyId.presentValue,
-            [ new BACnet.Types.BACnetReal(newSetpoint) ]);
+     /**
+      * Sends the `writeProperty` request to set the setpoint of the `presentValue` property.
+      *
+      * @return {Promise<void>}
+      */
+     public setSetpointModification (newSetpoint: number): Bluebird<void> {
+         this.logger.logDebug('HVACActorDevice - setSetpointModification: '
+             + `Setting setpoint modification: ${newSetpoint}`);
 
-        return Bluebird.resolve();
-    }
+         // Gets the `presentValue|statusFlags` property for `setpoint`
+         this.sendWriteProperty(this.setpointModificationObjectId, BACnet.Enums.PropertyId.presentValue,
+             [ new BACnet.Types.BACnetReal(newSetpoint) ]);
 
-    /**
-     * Sends the `readProperty` request to get the value of the `presentValue` property.
-     *
-     * @return {Bluebird<void>}
-     */
-    public update (): Bluebird<void> {
-        this.logger.logDebug('RoomControlActorDevice - update: '
-            + `Called update()`);
+         return Bluebird.resolve();
+     }
 
-        this.sendReadProperty(this.setpointFeedbackObjectId, BACnet.Enums.PropertyId.presentValue);
+     /**
+      * Sends the `readProperty` requests to get the values (temperature, setpoint)
+      * of the `presentValue` property.
+      *
+      * @return {Bluebird<void>}
+      */
+     public update (): Bluebird<void> {
+         this.logger.logDebug('HVACActorDevice - update: '
+             + `Called update()`);
 
-        this.sendReadProperty(this.temperatureObjectId, BACnet.Enums.PropertyId.presentValue);
+         this.sendReadProperty(this.setpointFeedbackObjectId, BACnet.Enums.PropertyId.presentValue);
 
-        return Bluebird.resolve();
-    }
+         this.sendReadProperty(this.temperatureObjectId, BACnet.Enums.PropertyId.presentValue);
 
-    /**
-     * Increments the `setpoint` value.
-     *
-     * @return {Bluebird<void>}
-     */
-    public incrementSetpoint (): Bluebird<void> {
-        this.logger.logDebug('RoomControlActorDevice - incrementSetpoint: '
-            + `Increments the setpoint value...`);
+         return Bluebird.resolve();
+     }
 
-        return this.setSetpointModification(1);
-    }
+     /**
+      * Increments the `setpoint` value.
+      *
+      * @return {Bluebird<void>}
+      */
+     public incrementSetpoint (): Bluebird<void> {
+         this.logger.logDebug('HVACActorDevice - incrementSetpoint: '
+             + `Increments the setpoint value...`);
 
-    /**
-     * Decrements the `setpoint` value.
-     *
-     * @return {Bluebird<void>}
-     */
-    public decrementSetpoint (presentValue: any): Bluebird<void> {
-        this.logger.logDebug('RoomControlActorDevice - decrementSetpoint: '
-            + `Decrements the setpoint value...`);
+         return this.setSetpointModification(1);
+     }
 
-        return this.setSetpointModification(-1);
-    }
+     /**
+      * Decrements the `setpoint` value.
+      *
+      * @return {Bluebird<void>}
+      */
+     public decrementSetpoint (): Bluebird<void> {
+         this.logger.logDebug('HVACActorDevice - decrementSetpoint: '
+             + `Decrements the setpoint value...`);
+
+         return this.setSetpointModification(-1);
+     }
 }
