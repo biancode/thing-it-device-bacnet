@@ -243,14 +243,14 @@ export namespace Actor {
             stateText: string[];
             alarmValue: boolean;
             outOfService: boolean;
+            objectName: string;
+            description: string;
         }
 
         export interface Config
                 extends Device.Config {
             objectId: string;
             objectType: string;
-            objectName: string;
-            description: string;
         }
     }
 
