@@ -127,7 +127,7 @@ export class CommonDevice extends DeviceBase {
      */
 
     /**
-     * Extracts the value of the property from BACnet `ReadProperty` service.
+     * Extracts the value of the property from the BACnet `ReadProperty` service.
      *
      * @template T {extends BACnet.Types.BACnetTypeBase}
      * @param  {IBACnetResponse} resp - response from BACnet Object (device)
@@ -140,6 +140,22 @@ export class CommonDevice extends DeviceBase {
 
         const bacnetProperty = respServiceData.prop.values[0] as T;
         return bacnetProperty;
+    }
+
+    /**
+     * Extracts the values of the property from the BACnet `ReadProperty` service.
+     *
+     * @template T {extends BACnet.Types.BACnetTypeBase}
+     * @param  {IBACnetResponse} resp - response from BACnet Object (device)
+     * @return {T}
+     */
+    public getReadPropertyValues <T extends BACnet.Types.BACnetTypeBase> (
+            resp: Interfaces.FlowManager.Response): T[] {
+        const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
+            _.get(resp, 'layer.apdu.service', null);
+
+        const bacnetProperties = respServiceData.prop.values as T[];
+        return bacnetProperties;
     }
 
     /**
