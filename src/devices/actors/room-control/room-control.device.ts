@@ -135,6 +135,39 @@ export class RoomControlActorDevice extends ActorDevice {
                     + `Temperature COV notification was not received ${error}`);
                 this.publishStateChange();
             });
+
+        // Read Property Flow
+        const readPropertyFlow = this.flowManager.getResponseFlow()
+            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
+            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty));
+
+        // Gets the `presentValue` (setpoint) property
+        this.subManager.subscribe = readPropertyFlow
+            .filter(this.flowManager.isBACnetObject(this.setpointFeedbackObjectId))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
+
+                this.state.setpoint = bacnetProperty.value;
+
+                this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
+                    + `Setpoint: ${this.state.setpoint}`);
+                this.publishStateChange();
+            });
+
+        // Gets the `presentValue` (temperature) property
+        this.subManager.subscribe = readPropertyFlow
+            .filter(this.flowManager.isBACnetObject(this.temperatureObjectId))
+            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .subscribe((resp) => {
+                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
+
+                this.state.temperature = bacnetProperty.value;
+
+                this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
+                    + `Temperature: ${this.state.setpoint}`);
+                this.publishStateChange();
+            });
     }
 
     /**
