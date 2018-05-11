@@ -31,29 +31,16 @@ export class MultiStateActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.objectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetUnsignedInteger>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
+                this.state.presentValue = bacnetProperties[0].value;
 
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                const statusFlagsProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.statusFlags ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetUnsignedInteger;
-                const statusFlags = presentValueProp.values[0] as BACnet.Types.BACnetStatusFlags;
-
-                this.state.presentValue = presentValue.value;
-
-                const lightStateIndex = presentValue.value - 1;
+                const lightStateIndex = bacnetProperties[0].value - 1;
                 this.state.presentValueText = this.state.stateText[lightStateIndex];
 
-                this.state.outOfService = statusFlags.value.outOfService;
-                this.state.alarmValue = statusFlags.value.inAlarm;
+                this.state.outOfService = bacnetProperties[1].value.outOfService;
+                this.state.alarmValue = bacnetProperties[1].value.inAlarm;
 
                 this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.presentValue)}`);
@@ -102,13 +89,10 @@ export class MultiStateActorDevice extends ActorDevice {
         this.subManager.subscribe = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.stateText))
             .subscribe((resp) => {
-                const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
-                    _.get(resp, 'layer.apdu.service', null);
+                const bacnetProperties = this.getReadPropertyValues<BACnet.Types.BACnetCharacterString>(resp);
 
-                const stateText = respServiceData.prop.values as BACnet.Types.BACnetCharacterString[];
-
-                this.state.stateText = _.map(stateText, (valueStateText) => {
-                    return valueStateText.value;
+                this.state.stateText = _.map(bacnetProperties, (stateTextItem) => {
+                    return stateTextItem.value;
                 });
 
                 this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `

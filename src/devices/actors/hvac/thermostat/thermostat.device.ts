@@ -51,21 +51,10 @@ export class ThermostatActorDevice extends HVACActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.modeObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetUnsignedInteger>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetReal;
-
-                const modeStateIndex = presentValue.value - 1;
+                const modeStateIndex = bacnetProperties[0].value - 1;
                 this.state.mode = this.stateText[modeStateIndex];
 
                 switch (this.state.mode) {

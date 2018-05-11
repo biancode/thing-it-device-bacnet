@@ -31,25 +31,12 @@ export class AnalogActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.objectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                const statusFlagsProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.statusFlags ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetEnumerated;
-                const statusFlags = presentValueProp.values[0] as BACnet.Types.BACnetStatusFlags;
-
-                this.state.presentValue = presentValue.value;
-                this.state.outOfService = statusFlags.value.outOfService;
-                this.state.alarmValue = statusFlags.value.inAlarm;
+                this.state.presentValue = bacnetProperties[0].value;
+                this.state.outOfService = bacnetProperties[1].value.outOfService;
+                this.state.alarmValue = bacnetProperties[1].value.inAlarm;
 
                 this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.presentValue)}`);

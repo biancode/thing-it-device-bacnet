@@ -53,21 +53,10 @@ export class JalousieSimpleActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.motionDirectionObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`JalousieSimpleActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetEnumerated;
-
-                this.state.motionDirection = presentValue.value;
+                this.state.motionDirection = bacnetProperties[0].value;
 
                 this.logger.logDebug(`JalousieSimpleActorDevice - subscribeToProperty: `
                     + `Motion Direction ${JSON.stringify(this.state.motionDirection)}`);
@@ -86,21 +75,10 @@ export class JalousieSimpleActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.stopValueObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`JalousieSimpleActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetEnumerated;
-
-                this.state.stopValue = presentValue.value === 1;
+                this.state.stopValue = bacnetProperties[0].value === 1;
 
                 this.logger.logDebug(`JalousieSimpleActorDevice - subscribeToProperty: `
                     + `Stop value ${JSON.stringify(this.state.stopValue)}`);

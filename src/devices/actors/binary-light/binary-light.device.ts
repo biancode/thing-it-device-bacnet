@@ -45,21 +45,10 @@ export class BinaryLightActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.objectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`BinaryLightActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetEnumerated;
-
-                this.state.lightActive = presentValue.value === 1;
+                this.state.lightActive = bacnetProperties[0].value === 1;
 
                 this.logger.logDebug(`BinaryLightActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.lightActive)}`);

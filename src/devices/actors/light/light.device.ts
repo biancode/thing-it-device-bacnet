@@ -22,7 +22,7 @@ export class LightActorDevice extends ActorDevice {
     public lightActiveFeedbackObjectId: BACnet.Types.BACnetObjectId;
     public lightActiveModificationObjectId: BACnet.Types.BACnetObjectId;
 
-    public lightStates: BACnet.Types.BACnetCharacterString[];
+    public stateText: string[];
 
     /**
      * Creates and inits params of the BACnet Analog Input from plugin configuration.
@@ -65,21 +65,10 @@ export class LightActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.levelFeedbackObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetReal;
-
-                this.state.dimmerLevel = presentValue.value;
+                this.state.dimmerLevel = bacnetProperties[0].value;
 
                 this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
                     + `Dimmer Level ${JSON.stringify(this.state.dimmerLevel)}`);
@@ -98,20 +87,10 @@ export class LightActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetUnsignedInteger>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetUnsignedInteger;
-                this.setLightActive(presentValue);
+                this.setLightActive(bacnetProperties[0]);
 
                 this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
                     + `Light Active ${JSON.stringify(this.state.lightActive)}`);
@@ -134,14 +113,16 @@ export class LightActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId))
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.stateText))
             .subscribe((resp) => {
-                const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
-                    _.get(resp, 'layer.apdu.service', null);
+                const bacnetProperties = this
+                    .getReadPropertyValues<BACnet.Types.BACnetCharacterString>(resp);
 
-                this.lightStates = respServiceData.prop.values as BACnet.Types.BACnetCharacterString[];
+                this.stateText = _.map(bacnetProperties, (stateTextItem) => {
+                    return stateTextItem.value;
+                });
 
                 this.publishStateChange();
                 this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
-                    + `Light States: ${JSON.stringify(this.lightStates)}`);
+                    + `Light States: ${JSON.stringify(this.stateText)}`);
 
                 this.sendSubscribeCOV(this.lightActiveFeedbackObjectId);
             });
@@ -285,9 +266,9 @@ export class LightActorDevice extends ActorDevice {
      */
     public setLightActive (presentValue: BACnet.Types.BACnetUnsignedInteger): void {
         const lightStateIndex = presentValue.value - 1;
-        const lightStateProp = this.lightStates[lightStateIndex];
+        const lightState = this.stateText[lightStateIndex];
 
-        this.state.lightState = lightStateProp.value;
+        this.state.lightState = lightState;
 
         switch (this.state.lightState) {
             case 'ON':

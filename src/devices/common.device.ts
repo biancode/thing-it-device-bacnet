@@ -134,7 +134,7 @@ export class CommonDevice extends DeviceBase {
      * @param  {IBACnetResponse} resp - response from BACnet Object (device)
      * @return {[T,BACnet.Types.BACnetStatusFlags]}
      */
-    public getCOVNotificationValue <T extends BACnet.Types.BACnetTypeBase> (
+    public getCOVNotificationValues <T extends BACnet.Types.BACnetTypeBase> (
             resp: Interfaces.FlowManager.Response): [ T, BACnet.Types.BACnetStatusFlags ] {
         this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
             + `Received notification`);

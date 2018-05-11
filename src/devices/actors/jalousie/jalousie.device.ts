@@ -69,21 +69,10 @@ export class JalousieActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.positionFeedbackObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetReal;
-
-                this.state.position = presentValue.value;
+                this.state.position = bacnetProperties[0].value;
 
                 this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
                     + `Position ${JSON.stringify(this.state.position)}`);
@@ -102,21 +91,10 @@ export class JalousieActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.rotationFeedbackObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetReal;
-
-                this.state.rotation = presentValue.value;
+                this.state.rotation = bacnetProperties[0].value;
 
                 this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
                     + `Rotation ${JSON.stringify(this.state.rotation)}`);

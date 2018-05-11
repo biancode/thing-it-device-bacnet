@@ -59,21 +59,10 @@ export class HVACActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.setpointFeedbackObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetReal;
-
-                this.state.setpoint = presentValue.value;
+                this.state.setpoint = bacnetProperties[0].value;
 
                 this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Setpoint ${JSON.stringify(this.state.setpoint)}`);
@@ -92,21 +81,10 @@ export class HVACActorDevice extends ActorDevice {
             .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
             .filter(this.flowManager.isBACnetObject(this.temperatureObjectId))
             .subscribe((resp) => {
-                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
-                    + `Received notification`);
+                const bacnetProperties = this
+                    .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
-                    _.get(resp, 'layer.apdu.service', null);
-
-                // Get list of properties
-                const covProps = respServiceData.listOfValues;
-
-                // Get instances of properties
-                const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-                // Get instances of property values
-                const presentValue = presentValueProp.values[0] as BACnet.Types.BACnetReal;
-
-                this.state.temperature = presentValue.value;
+                this.state.temperature = bacnetProperties[0].value;
 
                 this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Temperature ${JSON.stringify(this.state.temperature)}`);
