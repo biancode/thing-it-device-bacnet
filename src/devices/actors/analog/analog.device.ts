@@ -19,35 +19,6 @@ export class AnalogActorDevice extends ActorDevice {
 
     public objectId: BACnet.Types.BACnetObjectId;
 
-    public async initDevice (): Promise<any> {
-        await super.initDevice();
-
-        // Creates and inits params of the BACnet Analog Input
-        this.initDeviceParamsFromConfig();
-
-        // Creates instances of the plugin componets
-        await this.createPluginComponents();
-
-        // Creates `subscribtion` to the BACnet object properties
-        this.subscribeToProperty();
-
-        // Inits the BACnet object properties
-        this.initProperties();
-
-        this.state.initialized = true;
-        this.publishStateChange();
-    }
-
-    /**
-     * Creates and inits params of the BACnet Analog Input from plugin configuration.
-     * Steps:
-     * - creates and inits `objectId`.
-     *
-     * @return {void}
-     */
-    public initDeviceParamsFromConfig (): void {
-    }
-
     /**
      * Creates `subscribtion` to the BACnet object properties.
      *

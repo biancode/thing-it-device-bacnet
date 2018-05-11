@@ -24,7 +24,7 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
      *
      * @return {void}
      */
-    public initDeviceParamsFromConfig (): void {
+    public initParamsFromConfig (): void {
         this.objectId = this.getBACnetObjectId(
             this.config.objectId,
             BACnet.Enums.ObjectType.BinaryValue,

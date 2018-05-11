@@ -24,7 +24,7 @@ export class MultiStateValueActorDevice extends MultiStateActorDevice {
      *
      * @return {void}
      */
-    public initDeviceParamsFromConfig (): void {
+    public initParamsFromConfig (): void {
         this.objectId = this.getBACnetObjectId(
             this.config.objectId,
             BACnet.Enums.ObjectType.MultiStateValue,

@@ -24,7 +24,7 @@ export class AnalogInputActorDevice extends AnalogActorDevice {
      *
      * @return {void}
      */
-    public initDeviceParamsFromConfig (): void {
+    public initParamsFromConfig (): void {
         this.objectId = this.getBACnetObjectId(
             this.config.objectId,
             this.config.objectType,

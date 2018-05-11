@@ -30,8 +30,8 @@ export class ThermostatActorDevice extends HVACActorDevice {
      *
      * @return {void}
      */
-    public initDeviceParamsFromConfig (): void {
-        super.initDeviceParamsFromConfig();
+    public initParamsFromConfig (): void {
+        super.initParamsFromConfig();
 
         this.modeObjectId = this.getBACnetObjectId(
             this.config.modeObjectId,

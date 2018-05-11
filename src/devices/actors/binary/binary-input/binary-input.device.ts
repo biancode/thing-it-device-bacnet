@@ -24,7 +24,7 @@ export class BinaryInputActorDevice extends BinaryActorDevice {
      *
      * @return {void}
      */
-    public initDeviceParamsFromConfig (): void {
+    public initParamsFromConfig (): void {
         this.objectId = this.getBACnetObjectId(
             this.config.objectId,
             this.config.objectType,
