@@ -37,7 +37,6 @@ export const BinaryActorStates = [
         type: {
             id: 'string',
         },
-        defaultValue: 'AnalogInput',
     },
     {
         label: 'Description',
@@ -45,7 +44,6 @@ export const BinaryActorStates = [
         type: {
             id: 'string',
         },
-        defaultValue: '',
     },
     ...ActorStates,
 ];
