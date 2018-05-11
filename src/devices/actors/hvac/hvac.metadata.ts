@@ -4,45 +4,28 @@ import { ActorStates, ActorConfigs } from '../actor.metadata';
 
 export const HVACActorServices = [
     {
-        id: 'update',
-        label: 'Update',
+        id: 'incrementSetpoint',
+        label: 'Increment Setpoint',
+    },
+    {
+        id: 'decrementSetpoint',
+        label: 'Decrement Setpoint',
     },
 ];
 
 export const HVACActorStates = [
     {
-        id: 'presentValue',
-        label: 'Present Value',
+        id: 'setpoint',
+        label: 'Setpoint',
         type: {
-            id: 'boolean',
+            id: 'decimal',
         },
     },
     {
-        id: 'alarmValue',
-        label: 'Alarm Value',
+        id: 'temperature',
+        label: 'Temperature',
         type: {
-            id: 'boolean',
-        },
-    },
-    {
-        id: 'outOfService',
-        label: 'Out of Service',
-        type: {
-            id: 'boolean',
-        },
-    },
-    {
-        label: 'Object Name',
-        id: 'objectName',
-        type: {
-            id: 'string',
-        },
-    },
-    {
-        label: 'Description',
-        id: 'description',
-        type: {
-            id: 'string',
+            id: 'decimal',
         },
     },
     ...ActorStates,
@@ -50,30 +33,48 @@ export const HVACActorStates = [
 
 export const HVACActorConfigs = [
     {
-        label: 'Object Identifier',
-        id: 'objectId',
+        label: 'Setpoint Feedback Object Id',
+        id: 'setpointFeedbackObjectId',
+        type: {
+            id: 'integer',
+        },
+        defaultValue: '',
+    },
+    {
+        label: 'Setpoint Feedback Object Type',
+        id: 'setpointFeedbackObjectType',
         type: {
             id: 'string',
         },
         defaultValue: '',
     },
-    /**
-     * @deprecated
-     */
     {
-        label: 'Object Name',
-        id: 'objectName',
+        label: 'Temperature Object Id',
+        id: 'temperatureObjectId',
+        type: {
+            id: 'integer',
+        },
+        defaultValue: '',
+    },
+    {
+        label: 'Temperature Object Type',
+        id: 'temperatureObjectType',
         type: {
             id: 'string',
         },
-        defaultValue: 'AnalogInput',
+        defaultValue: '',
     },
-    /**
-     * @deprecated
-     */
     {
-        label: 'Description',
-        id: 'description',
+        label: 'Setpoint Modification Object Id',
+        id: 'setpointModificationObjectId',
+        type: {
+            id: 'integer',
+        },
+        defaultValue: '',
+    },
+    {
+        label: 'Setpoint Modification Object Type',
+        id: 'setpointModificationObjectType',
         type: {
             id: 'string',
         },
