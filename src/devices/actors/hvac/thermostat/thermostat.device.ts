@@ -54,7 +54,7 @@ export class ThermostatActorDevice extends HVACActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetUnsignedInteger>(resp);
 
-                const modeStateIndex = bacnetProperties[0].value - 1;
+                const modeStateIndex = bacnetProperties.presentValue.value - 1;
                 this.state.mode = this.stateText[modeStateIndex];
 
                 switch (this.state.mode) {

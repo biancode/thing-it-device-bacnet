@@ -1,4 +1,5 @@
 import { Moment } from 'moment';
+import { Interfaces, Types } from 'bacnet-logic';
 
 export namespace BACnetResponse {
     export interface Config {
@@ -36,7 +37,6 @@ export namespace ServerSocket {
 }
 
 /* BACnet Flow Manager */
-import { Interfaces } from 'bacnet-logic';
 
 export interface AppConfig {
     response: BACnetResponse.Config;
@@ -89,6 +89,13 @@ export namespace COVTimer {
     export interface Data {
         prev: Moment;
         next: Moment;
+    }
+}
+
+export namespace BACnet {
+    export interface COVNotificationResponse <T> {
+        presentValue: T;
+        statusFlags: Types.BACnetStatusFlags;
     }
 }
 

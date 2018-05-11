@@ -34,9 +34,9 @@ export class BinaryActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
 
-                this.state.presentValue = bacnetProperties[0].value === 1;
-                this.state.outOfService = bacnetProperties[1].value.outOfService;
-                this.state.alarmValue = bacnetProperties[1].value.inAlarm;
+                this.state.presentValue = bacnetProperties.presentValue.value === 1;
+                this.state.outOfService = bacnetProperties.statusFlags.value.outOfService;
+                this.state.alarmValue = bacnetProperties.statusFlags.value.inAlarm;
 
                 this.logger.logDebug(`BinaryActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.presentValue)}`);

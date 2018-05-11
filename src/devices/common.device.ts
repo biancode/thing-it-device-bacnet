@@ -135,7 +135,7 @@ export class CommonDevice extends DeviceBase {
      * @return {[T,BACnet.Types.BACnetStatusFlags]}
      */
     public getCOVNotificationValues <T extends BACnet.Types.BACnetTypeBase> (
-            resp: Interfaces.FlowManager.Response): [ T, BACnet.Types.BACnetStatusFlags ] {
+            resp: Interfaces.FlowManager.Response): Interfaces.BACnet.COVNotificationResponse<T> {
         this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
             + `Received notification`);
 
@@ -153,7 +153,7 @@ export class CommonDevice extends DeviceBase {
         const presentValue = presentValueProp.values[0] as T;
         const statusFlags = presentValueProp.values[0] as BACnet.Types.BACnetStatusFlags;
 
-        return [ presentValue, statusFlags ];
+        return { presentValue, statusFlags };
     }
 
     /**

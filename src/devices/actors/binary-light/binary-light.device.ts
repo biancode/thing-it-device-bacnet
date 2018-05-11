@@ -48,7 +48,7 @@ export class BinaryLightActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
 
-                this.state.lightActive = bacnetProperties[0].value === 1;
+                this.state.lightActive = bacnetProperties.presentValue.value === 1;
 
                 this.logger.logDebug(`BinaryLightActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.lightActive)}`);

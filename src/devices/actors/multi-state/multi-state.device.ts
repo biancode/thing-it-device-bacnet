@@ -34,13 +34,13 @@ export class MultiStateActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetUnsignedInteger>(resp);
 
-                this.state.presentValue = bacnetProperties[0].value;
+                this.state.presentValue = bacnetProperties.presentValue.value;
 
-                const lightStateIndex = bacnetProperties[0].value - 1;
+                const lightStateIndex = bacnetProperties.presentValue.value - 1;
                 this.state.presentValueText = this.state.stateText[lightStateIndex];
 
-                this.state.outOfService = bacnetProperties[1].value.outOfService;
-                this.state.alarmValue = bacnetProperties[1].value.inAlarm;
+                this.state.outOfService = bacnetProperties.statusFlags.value.outOfService;
+                this.state.alarmValue = bacnetProperties.statusFlags.value.inAlarm;
 
                 this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.presentValue)}`);

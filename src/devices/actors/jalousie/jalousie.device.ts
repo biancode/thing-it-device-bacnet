@@ -72,7 +72,7 @@ export class JalousieActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                this.state.position = bacnetProperties[0].value;
+                this.state.position = bacnetProperties.presentValue.value;
 
                 this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
                     + `Position ${JSON.stringify(this.state.position)}`);
@@ -94,7 +94,7 @@ export class JalousieActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                this.state.rotation = bacnetProperties[0].value;
+                this.state.rotation = bacnetProperties.presentValue.value;
 
                 this.logger.logDebug(`JalousieActorDevice - subscribeToProperty: `
                     + `Rotation ${JSON.stringify(this.state.rotation)}`);

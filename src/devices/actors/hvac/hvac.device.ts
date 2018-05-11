@@ -62,7 +62,7 @@ export class HVACActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                this.state.setpoint = bacnetProperties[0].value;
+                this.state.setpoint = bacnetProperties.presentValue.value;
 
                 this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Setpoint ${JSON.stringify(this.state.setpoint)}`);
@@ -84,7 +84,7 @@ export class HVACActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                this.state.temperature = bacnetProperties[0].value;
+                this.state.temperature = bacnetProperties.presentValue.value;
 
                 this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
                     + `Temperature ${JSON.stringify(this.state.temperature)}`);

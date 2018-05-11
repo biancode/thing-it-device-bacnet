@@ -68,7 +68,7 @@ export class LightActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
-                this.state.dimmerLevel = bacnetProperties[0].value;
+                this.state.dimmerLevel = bacnetProperties.presentValue.value;
 
                 this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
                     + `Dimmer Level ${JSON.stringify(this.state.dimmerLevel)}`);
@@ -90,7 +90,7 @@ export class LightActorDevice extends ActorDevice {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetUnsignedInteger>(resp);
 
-                this.setLightActive(bacnetProperties[0]);
+                this.setLightActive(bacnetProperties.presentValue);
 
                 this.logger.logDebug(`LightActorDevice - subscribeToProperty: `
                     + `Light Active ${JSON.stringify(this.state.lightActive)}`);
