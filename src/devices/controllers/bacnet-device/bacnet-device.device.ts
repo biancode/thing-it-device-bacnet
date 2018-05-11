@@ -277,8 +277,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.name = bacnetProperty.value;
+
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Name retrieved: ${this.state.name}`);
+                    + `Object Name: ${this.state.name}`);
+                this.publishStateChange();
             });
 
         // Gets the `description` property
@@ -288,8 +290,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.description = bacnetProperty.value;
+
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Description retrieved: ${this.state.description}`);
+                    + `Description: ${this.state.description}`);
+                this.publishStateChange();
             });
 
         // Gets the `vendorName` property
@@ -299,8 +303,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.vendor = bacnetProperty.value;
+
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Vendor retrieved: ${this.state.vendor}`);
+                    + `Vendor ID: ${this.state.vendor}`);
+                this.publishStateChange();
             });
 
         // Gets the `modelName` property
@@ -310,8 +316,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.model = bacnetProperty.value;
+
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Model retrieved: ${this.state.model}`);
+                    + `Model Name: ${this.state.model}`);
+                this.publishStateChange();
             });
 
         // Gets the `applicationSoftwareVersion` property
@@ -321,8 +329,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
 
                 this.state.softwareVersion = bacnetProperty.value;
+
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Software retrieved: ${this.state.softwareVersion}`);
+                    + `Software Version: ${this.state.softwareVersion}`);
+                this.publishStateChange();
             });
 
         // Gets the summary `readProperty` response
@@ -335,11 +345,9 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                     + `Device properties were received`);
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
                     + `BACnet Device details: ${JSON.stringify(this.state)}`);
-                this.publishStateChange();
             }, (error) => {
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
                     + `Device properties were not received ${error}`);
-                this.publishStateChange();
             });
     }
 
