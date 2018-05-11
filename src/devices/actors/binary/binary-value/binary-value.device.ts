@@ -25,19 +25,10 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
      * @return {void}
      */
     public initDeviceParamsFromConfig (): void {
-        const objectId = +this.config.objectId;
-
-        if (this.config.objectId === '' || !_.isFinite(objectId)) {
-            throw new Errors.ApiError(`BinaryValueActorDevice - initDeviceParamsFromConfig: `
-                + `Object ID must have the valid 'number' value`);
-        }
-
-        const objectType = BACnet.Enums.ObjectType.BinaryValue;
-
-        this.objectId = new BACnet.Types.BACnetObjectId({
-            type: objectType,
-            instance: objectId,
-        });
+        this.objectId = this.getBACnetObjectId(
+            this.config.objectId,
+            BACnet.Enums.ObjectType.BinaryValue,
+        );
     }
 
     /**

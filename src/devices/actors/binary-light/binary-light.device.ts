@@ -46,24 +46,10 @@ export class BinaryLightActorDevice extends ActorDevice {
      * @return {void}
      */
     public initDeviceParamsFromConfig (): void {
-        const objectId = +this.config.lightActiveObjectId;
-
-        if (!_.isFinite(objectId)) {
-            throw new Errors.ApiError(`BinaryLightActorDevice - initDeviceParamsFromConfig: `
-                + `Object ID must have the valid 'number' value`);
-        }
-
-        const objectType = BACnet.Enums.ObjectType[this.config.lightActiveObjectType];
-
-        if (!_.isNumber(objectType)) {
-            throw new Errors.ApiError(`BinaryLightActorDevice - initDeviceParamsFromConfig: `
-                + `Object Type must have the valid BACnet type`);
-        }
-
-        this.objectId = new BACnet.Types.BACnetObjectId({
-            type: objectType,
-            instance: objectId,
-        });
+        this.objectId = this.getBACnetObjectId(
+            this.config.lightActiveObjectId,
+            this.config.lightActiveObjectType,
+        );
     }
 
     /**

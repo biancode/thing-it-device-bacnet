@@ -25,25 +25,10 @@ export class BinaryInputActorDevice extends BinaryActorDevice {
      * @return {void}
      */
     public initDeviceParamsFromConfig (): void {
-        const objectId = +this.config.objectId;
-
-        if (this.config.objectId === '' || !_.isFinite(objectId)) {
-            throw new Errors.ApiError(`BinaryInputActorDevice - initDeviceParamsFromConfig: `
-                + `Object ID must have the valid 'number' value`);
-        }
-
-        const objectType = this.config.objectType !== ''
-            ? BACnet.Enums.ObjectType[this.config.objectType]
-            : BACnet.Enums.ObjectType.BinaryInput;
-
-        if (!_.isNumber(objectType)) {
-            throw new Errors.ApiError(`BinaryInputActorDevice - initDeviceParamsFromConfig: `
-                + `Object Type must have the valid BACnet type`);
-        }
-
-        this.objectId = new BACnet.Types.BACnetObjectId({
-            type: objectType,
-            instance: objectId,
-        });
+        this.objectId = this.getBACnetObjectId(
+            this.config.objectId,
+            this.config.objectType,
+            BACnet.Enums.ObjectType.BinaryInput,
+        );
     }
 }
