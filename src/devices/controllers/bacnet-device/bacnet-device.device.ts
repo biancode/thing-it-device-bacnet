@@ -350,49 +350,19 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      */
     public async initProperties (): Promise<void> {
         // Gets the `objectName` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.objectName),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.objectName);
 
         // Gets the `description` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.description),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.description);
 
         // Gets the `vendorName` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.vendorName),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.vendorName);
 
         // Gets the `modelName` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.modelName),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.modelName);
 
         // Gets the `applicationSoftwareVersion` property
-        this.apiService.confirmedReq.readProperty({
-            invokeId: 1,
-            objId: this.objectId,
-            prop: {
-                id: new BACnet.Types.BACnetEnumerated(BACnet.Enums.PropertyId.applicationSoftwareVersion),
-            },
-        });
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.applicationSoftwareVersion);
     }
 
     /**
