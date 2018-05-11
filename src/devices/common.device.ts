@@ -127,6 +127,36 @@ export class CommonDevice extends DeviceBase {
      */
 
     /**
+     * Extracts the `presentValue` and `statusFlags` of the BACnet Object from
+     * the BACnet `COVNotification` service.
+     *
+     * @template T {extends BACnet.Types.BACnetTypeBase}
+     * @param  {IBACnetResponse} resp - response from BACnet Object (device)
+     * @return {[T,BACnet.Types.BACnetStatusFlags]}
+     */
+    public getCOVNotificationValue <T extends BACnet.Types.BACnetTypeBase> (
+            resp: Interfaces.FlowManager.Response): [ T, BACnet.Types.BACnetStatusFlags ] {
+        this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
+            + `Received notification`);
+
+        const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
+            _.get(resp, 'layer.apdu.service', null);
+
+        // Get list of properties
+        const covProps = respServiceData.listOfValues;
+
+        // Get instances of properties
+        const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
+        const statusFlagsProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.statusFlags ]);
+
+        // Get instances of property values
+        const presentValue = presentValueProp.values[0] as T;
+        const statusFlags = presentValueProp.values[0] as BACnet.Types.BACnetStatusFlags;
+
+        return [ presentValue, statusFlags ];
+    }
+
+    /**
      * Extracts the value of the property from the BACnet `ReadProperty` service.
      *
      * @template T {extends BACnet.Types.BACnetTypeBase}
