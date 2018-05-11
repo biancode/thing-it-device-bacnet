@@ -275,7 +275,7 @@ export namespace Actor {
         }
     }
 
-    export namespace RoomControl {
+    export namespace HVAC {
         export interface State
                 extends Device.State {
             setpoint: number;
@@ -293,24 +293,26 @@ export namespace Actor {
         }
     }
 
+    export namespace RoomControl {
+        export interface State
+                extends HVAC.State {
+        }
+
+        export interface Config
+                extends HVAC.Config {
+        }
+    }
+
     export namespace Thermostat {
         export interface State
-                extends Device.State {
-            setpoint: number;
-            temperature: number;
+                extends HVAC.State {
             mode: string;
             heatActive: boolean;
             coolActive: boolean;
         }
 
         export interface Config
-                extends Device.Config {
-            setpointFeedbackObjectId: number;
-            setpointFeedbackObjectType: string;
-            setpointModificationObjectId: number;
-            setpointModificationObjectType: string;
-            temperatureObjectId: number;
-            temperatureObjectType: string;
+                extends HVAC.Config {
             modeObjectId: number;
             modeObjectType: string;
         }
