@@ -247,13 +247,13 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 this.state.initialized = true;
                 this.logger.logDebug(`State: ${this.state}`);
 
-                // Step 9. Call `init` method each actor
+                // Step 9. Inits the BACnet properties
+                this.initProperties();
+
+                // Step 10. Call `init` method each actor
                 Bluebird.map(this.actors, (actor) => {
                     return actor.initDevice();
                 }, { concurrency: 1 });
-
-                // Step 10. Inits the BACnet properties
-                this.initProperties();
             }, (error) => {
                 this.logError(`BACnetDeviceControllerDevice - subscribeToObject: ${error}`);
             });
@@ -352,7 +352,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 10. Inits the BACnet properties.
+     * Step 9. Inits the BACnet properties.
      *
      * @return {Promise<void>}
      */
