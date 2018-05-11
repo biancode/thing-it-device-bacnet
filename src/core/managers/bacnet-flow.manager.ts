@@ -3,7 +3,7 @@ import { Observable, Subject } from 'rxjs';
 
 import * as BACnet from 'bacnet-logic';
 
-import { ApiError } from '../errors';
+import { APIError } from '../errors';
 
 import { ServerSocket } from '../sockets';
 
@@ -38,7 +38,7 @@ export class BACnetFlowManager {
         try {
             this.errorFlow.unsubscribe();
         } catch (error) {
-            throw new ApiError(`BACnetFlowManager - destroy: ${error}`);
+            throw new APIError(`BACnetFlowManager - destroy: ${error}`);
         }
         finally {
             this.errorFlow = null;

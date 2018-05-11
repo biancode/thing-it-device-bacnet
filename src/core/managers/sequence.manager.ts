@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 
 import {
-    ApiError,
+    APIError,
 } from '../errors';
 
 import * as Interfaces from '../interfaces';

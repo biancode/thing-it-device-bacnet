@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 
-import { ApiError } from '../../core/errors';
+import { APIError } from '../../core/errors';
 import { CommonDevice } from '../common.device';
 
 import {

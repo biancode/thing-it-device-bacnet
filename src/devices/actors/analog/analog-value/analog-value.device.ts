@@ -63,7 +63,7 @@ export class AnalogValueActorDevice extends AnalogActorDevice {
         const presentValue = _.get(parameters, 'value');
 
         if (!_.isNumber(presentValue)) {
-            throw new Errors.ApiError('AnalogValueActorDevice - changeValue: No value provided to change!');
+            throw new Errors.APIError('AnalogValueActorDevice - changeValue: No value provided to change!');
         }
 
         this.setPresentValue(parameters.value);

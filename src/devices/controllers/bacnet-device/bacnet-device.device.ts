@@ -8,7 +8,7 @@ import { ControllerDevice } from '../controller.device';
 /* Plugin devices */
 import { BACnetAction } from '../../../redux/actions';
 
-import { ApiError } from '../../../core/errors';
+import { APIError } from '../../../core/errors';
 
 import { AppConfig } from '../../../core/configs';
 
@@ -59,7 +59,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         try {
             this.socketServer.destroy();
         } catch (error) {
-            throw new ApiError(`BACnetDeviceControllerDevice - stop: Socket Server - ${error}`);
+            throw new APIError(`BACnetDeviceControllerDevice - stop: Socket Server - ${error}`);
         }
         finally {
             this.socketServer = null;
@@ -68,7 +68,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         try {
             this.serviceManager.destroy();
         } catch (error) {
-            throw new ApiError(`BACnetDeviceControllerDevice - stop: Service Manager - ${error}`);
+            throw new APIError(`BACnetDeviceControllerDevice - stop: Service Manager - ${error}`);
         }
         finally {
             this.serviceManager = null;
@@ -77,7 +77,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         try {
             this.flowManager.destroy();
         } catch (error) {
-            throw new ApiError(`BACnetDeviceControllerDevice - stop: Flow Manager - ${error}`);
+            throw new APIError(`BACnetDeviceControllerDevice - stop: Flow Manager - ${error}`);
         }
         finally {
             this.flowManager = null;

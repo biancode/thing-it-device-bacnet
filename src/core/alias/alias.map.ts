@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import { Alias } from './alias';
-import { ApiError } from '../errors';
+import { APIError } from '../errors';
 
 import { IAliasMapElement } from '../interfaces';
 
@@ -15,7 +15,7 @@ export class AliasMap <T> {
 
         _.map(entries, (entry) => {
             if (_.isNil(entry.alias)) {
-                throw new ApiError('AliasMap - constructor: Alias name is required!');
+                throw new APIError('AliasMap - constructor: Alias name is required!');
             }
 
             // Create alias and add it to array with aliases

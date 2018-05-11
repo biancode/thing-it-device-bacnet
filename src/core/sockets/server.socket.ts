@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 
 import * as Interfaces from '../interfaces';
 
-import { ApiError } from '../errors';
+import { APIError } from '../errors';
 import { Logger } from '../utils';
 
 import { OutputSocket } from './output.socket';
@@ -86,7 +86,7 @@ export class ServerSocket {
         })
 
         if (!this.config.port) {
-            throw new ApiError(`${this.className} - startServer: Port is required!`);
+            throw new APIError(`${this.className} - startServer: Port is required!`);
         }
 
         this.sock.bind(this.config.port);

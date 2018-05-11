@@ -2,7 +2,7 @@ import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import * as fs from 'fs';
 
-import { ApiError } from '../errors';
+import { APIError } from '../errors';
 
 export class AsyncUtil {
 
@@ -34,7 +34,7 @@ export class AsyncUtil {
         return new Bluebird((resolve, reject) => {
             fs.readFile(filePath, (error, data) => {
                 if (error) {
-                    throw new ApiError(`EDEStorageManager - readFile: ${error}`);
+                    throw new APIError(`EDEStorageManager - readFile: ${error}`);
                 }
                 resolve(data);
             });
@@ -59,7 +59,7 @@ export class AsyncUtil {
                 if (error.code === 'EXDEV') {
                     AsyncUtil.copyFile(oldPath, newPath);
                 }
-                throw new ApiError(`AsyncUtil - moveFile: ${error}`);
+                throw new APIError(`AsyncUtil - moveFile: ${error}`);
             });
         });
     }
@@ -79,10 +79,10 @@ export class AsyncUtil {
             const writeStream = fs.createWriteStream(newPath);
 
             readStream.on('error', (error) => {
-                throw new ApiError(`AsyncUtil - copyFile: ${error}`);
+                throw new APIError(`AsyncUtil - copyFile: ${error}`);
             });
             writeStream.on('error', (error) => {
-                throw new ApiError(`AsyncUtil - copyFile: ${error}`);
+                throw new APIError(`AsyncUtil - copyFile: ${error}`);
             });
 
             readStream.on('close', () => {

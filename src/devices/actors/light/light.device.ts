@@ -231,7 +231,7 @@ export class LightActorDevice extends ActorDevice {
             + `Dimmer Level: ${paramValue}`);
 
         if (!_.isNil(paramValue)) {
-            throw new Errors.ApiError('LightActorDevice - changeDimmer: No value provided to change!');
+            throw new Errors.APIError('LightActorDevice - changeDimmer: No value provided to change!');
         }
 
         this.setDimmerLevelModification(paramValue);

@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Observable, Subscription } from 'rxjs';
 
-import { ApiError } from '../errors';
+import { APIError } from '../errors';
 
 import * as APIBACnetServices from '../services/bacnet';
 
@@ -40,7 +40,7 @@ export class BACnetServiceManager {
         try {
             this.sbCOVTimer.unsubscribe();
         } catch (error) {
-            throw new ApiError(`BACnetServiceManager - destroy: ${error}`);
+            throw new APIError(`BACnetServiceManager - destroy: ${error}`);
         }
         finally {
             this.sbCOVTimer = null;

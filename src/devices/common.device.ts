@@ -84,7 +84,7 @@ export class CommonDevice extends DeviceBase {
         this.config = this.configuration;
 
         if (!this.config) {
-            throw new Errors.ApiError('initDevice - Configuration is not defined!');
+            throw new Errors.APIError('initDevice - Configuration is not defined!');
         }
 
         this.logger = this.createLogger();
@@ -200,7 +200,7 @@ export class CommonDevice extends DeviceBase {
         const bacnetObjectId = +objectId;
 
         if ((_.isString(objectId) && objectId === '') || !_.isFinite(bacnetObjectId)) {
-            throw new Errors.ApiError(`JalousieActorDevice - getObjectId: `
+            throw new Errors.APIError(`JalousieActorDevice - getObjectId: `
                 + `Object ID must have the valid 'number' value`);
         }
 
@@ -214,7 +214,7 @@ export class CommonDevice extends DeviceBase {
         }
 
         if (!_.isNumber(objectType)) {
-            throw new Errors.ApiError(`JalousieActorDevice - getObjectId: `
+            throw new Errors.APIError(`JalousieActorDevice - getObjectId: `
                 + `Object Type must have the valid BACnet type`);
         }
 
