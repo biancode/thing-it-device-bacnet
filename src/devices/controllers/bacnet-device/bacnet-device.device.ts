@@ -92,37 +92,32 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public async initDevice (): Promise<any> {
         await super.initDevice();
 
-        // Step 1. Inits specific internal properties
+        // Inits specific internal properties
         this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
             + `Inits specific internal properties`);
         this.initDeviceParamsFromConfig();
 
-        // Step 2. Creates the config for the plugin components
+        // Creates the config for the plugin components
         this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
             + `Creates the config for the plugin components`);
         this.pluginConfig = await this.createPluginConfig();
 
-        // Step 3. Creates instances of the plugin componets
+        // Creates instances of the plugin componets
         this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
             + `Creates instances of the plugin componets`);
         await this.createPluginComponents();
 
-        // Step 4. Creates instance of the API Service
+        // Creates instance of the API Service
         this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
             + `Creates the instance of the API Service`);
         this.apiService = this.serviceManager.createAPIService();
 
-        // Step 5. Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow
+        // Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow
         this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
             + `Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow`);
         this.subscribeToObject();
 
-        // Step 6. Creates `subscribtion` to the BACnet device properties
-        this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
-            + `Creates "subscribtion" to the BACnet device properties`);
-        this.subscribeToProperty();
-
-        // Step 7. Send `WhoIs` request
+        // Send `WhoIs` request
         this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
             + `Send "WhoIs" request`);
         if (this.config.unicastWhoIsConfirmation) {
@@ -135,7 +130,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 1. Creates and inits params of the BACnet Device from plugin configuration.
+     * Creates and inits params of the BACnet Device from plugin configuration.
      * Steps:
      * - creates and inits `objectId`.
      *
@@ -149,7 +144,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 2. Creates the configuration for the plugin components.
+     * Creates the configuration for the plugin components.
      *
      * @return {Promise<Interfaces.AppConfig>}
      */
@@ -175,7 +170,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 3. Creates instances of the plugin componets.
+     * Creates instances of the plugin componets.
      *
      * @return {Promise<void>}
      */
@@ -198,7 +193,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 5. Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow.
+     * Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow.
      *
      * @return {void}
      */
@@ -217,8 +212,17 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
             .timeout(AppConfig.response.iAm.timeout)
             .first()
             .subscribe((resp) => {
-                // Step 8. Handles `iAm` response
+                // Handles `iAm` response
                 this.logger.logInfo('Initialized BACnet device successfully.');
+
+                const iAmService = resp.layer.apdu.service as BACnet.Interfaces.UnconfirmedRequest.Read.IAm;
+                this.objectId = iAmService.objId;
+
+                // Creates `subscribtion` to the BACnet device properties
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToObject: `
+                    + `Creates "subscribtion" to the BACnet device properties`);
+                this.subscribeToProperty();
+
                 const curAddrInfo = this.pluginConfig.manager.service.dest;
                 const respAddrInfo = resp.socket.getAddressInfo();
 
@@ -248,10 +252,14 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToObject: `
                     + `State - ${JSON.stringify(this.state)}`);
 
-                // Step 9. Inits the BACnet properties
+                // Inits the BACnet properties
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToObject: `
+                    + `Inits the BACnet properties`);
                 this.initProperties();
 
-                // Step 10. Call `init` method each actor
+                // Call `init` method each actor
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToObject: `
+                    + `Inits the TID units`);
                 Bluebird.map(this.actors, (actor) => {
                     return actor.initDevice();
                 }, { concurrency: 1 });
@@ -261,7 +269,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 6. Creates `subscribtion` to the BACnet device properties.
+     * Creates `subscribtion` to the BACnet device properties.
      *
      * @return {void}
      */
@@ -353,7 +361,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     }
 
     /**
-     * Step 9. Inits the BACnet properties.
+     * Inits the BACnet properties.
      *
      * @return {Promise<void>}
      */
