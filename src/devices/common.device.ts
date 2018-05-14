@@ -146,8 +146,10 @@ export class CommonDevice extends DeviceBase {
         const covProps = respServiceData.listOfValues;
 
         // Get instances of properties
-        const presentValueProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.presentValue ]);
-        const statusFlagsProp = _.find(covProps, [ 'id', BACnet.Enums.PropertyId.statusFlags ]);
+        const presentValueProp = BACnet.Utils.BACnetUtil.findPropById(covProps,
+            BACnet.Enums.PropertyId.presentValue);
+        const statusFlagsProp = BACnet.Utils.BACnetUtil.findPropById(covProps,
+            BACnet.Enums.PropertyId.statusFlags);
 
         // Get instances of property values
         const presentValue = presentValueProp.values[0] as T;
