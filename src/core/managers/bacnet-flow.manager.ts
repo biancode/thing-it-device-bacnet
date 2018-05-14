@@ -244,8 +244,8 @@ export class BACnetFlowManager {
             }
 
             const respAddrInfo = resp.socket.getAddressInfo();
-            this.logger.logDebug(`BACnetFlowManager - matchFilter(${respAddrInfo.address}:${respAddrInfo.port}):`,
-                `Responding ${matchName} is not a match to configured ${matchName}.`);
+            this.logger.logDebug(`BACnetFlowManager - matchFilter(${respAddrInfo.address}:${respAddrInfo.port}):`
+                + `Responding ${matchName} is not a match to configured ${matchName}.`);
             return false;
         };
     }
