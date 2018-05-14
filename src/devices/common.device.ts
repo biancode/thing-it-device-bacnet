@@ -200,8 +200,8 @@ export class CommonDevice extends DeviceBase {
         const bacnetObjectId = +objectId;
 
         if ((_.isString(objectId) && objectId === '') || !_.isFinite(bacnetObjectId)) {
-            throw new Errors.APIError(`JalousieActorDevice - getObjectId: `
-                + `Object ID must have the valid 'number' value`);
+            throw new Errors.APIError(`CommonDevice - getObjectId: `
+                + `Object ID must have the valid 'number' value. Current value: ${objectId}`);
         }
 
         let bacnetObjectType: BACnet.Enums.ObjectType;
@@ -213,9 +213,9 @@ export class CommonDevice extends DeviceBase {
                 : defObjectType;
         }
 
-        if (!_.isNumber(objectType)) {
-            throw new Errors.APIError(`JalousieActorDevice - getObjectId: `
-                + `Object Type must have the valid BACnet type`);
+        if (!_.isNumber(bacnetObjectType)) {
+            throw new Errors.APIError(`CommonDevice - getObjectId: `
+                + `Object Type must have the valid BACnet type. Current type: ${objectType}`);
         }
 
         return new BACnet.Types.BACnetObjectId({
