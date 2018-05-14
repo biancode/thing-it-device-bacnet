@@ -14,7 +14,7 @@ describe('[thing-it] Disruptive Technologies Device', () => {
     let testDriver;
 
     const time = {
-        test1: 8000,
+        test1: 15000,
     }
 
     before(() => {
