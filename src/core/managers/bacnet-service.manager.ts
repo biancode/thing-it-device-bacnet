@@ -80,7 +80,7 @@ export class BACnetServiceManager {
         const apiLogger = _.isNil(logger) ? this.logger : logger;
 
         // Creates output socket
-        const socket = this.server.getOutputSocket(this.config.dest);
+        const socket = this.server.getOutputSocket(this.config.dest, apiLogger);
 
         // Create API Service
         const apiService = new APIService();

@@ -69,7 +69,7 @@ export class ActorDevice extends CommonDevice {
         /* Create and init BACnet Service Manager */
         this.serviceManager = store.getState([ 'bacnet', 'serviceManager' ]);
         // Creates instance of the API Service
-        this.apiService = this.serviceManager.createAPIService();
+        this.apiService = this.serviceManager.createAPIService(this.logger);
     }
 
     /**
