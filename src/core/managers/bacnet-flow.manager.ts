@@ -78,10 +78,16 @@ export class BACnetFlowManager {
         return this.server.respFlow
             .map((resp) => {
                 let layer: BACnet.Interfaces.Layers;
+                this.logger.logDebug(`BACnetFlowManager - getResponseFlow: `
+                    + `Response Message: ${resp.message.toString('hex')}`);
                 try {
                     layer = BACnet.Utils.BACnetUtil.bufferToLayer(resp.message);
+                    // this.logger.logDebug(`BACnetFlowManager - getResponseFlow: `
+                    //     + `Response Layer: ${JSON.stringify(layer)}`);
                 } catch (error) {
                     this.errorFlow.next(error);
+                    this.logger.logError(`BACnetFlowManager - getResponseFlow: `
+                        + `Response Error: ${error}`);
                 }
                 return { layer: layer, socket: resp.socket };
             });
