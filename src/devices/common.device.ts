@@ -208,7 +208,7 @@ export class CommonDevice extends DeviceBase {
         if (_.isNumber(objectType)) {
             bacnetObjectType = objectType;
         } else {
-            bacnetObjectType = objectType !== ''
+            bacnetObjectType = !_.isNil(objectType) && objectType !== ''
                 ? BACnet.Enums.ObjectType[objectType]
                 : defObjectType;
         }
