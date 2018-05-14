@@ -2,15 +2,9 @@ import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 
-import {
-    APIError,
-} from '../errors';
+import * as Errors from '../errors';
 
 import * as Interfaces from '../interfaces';
-
-import {
-    logger,
-} from '../utils';
 
 type TObjectID = string;
 
@@ -103,7 +97,7 @@ export class SequenceManager {
         try {
             endPromise = freeFlow.method.apply(freeFlow.object, freeFlow.params);
         } catch (error) {
-            logger.error(`SequenceManager - updateQueue: ${error}`);
+            throw new Errors.APIError(`SequenceManager - updateQueue: ${error}`);
         }
 
         Bluebird.resolve(endPromise).delay(this.config.delay).then(() => {

@@ -1,10 +1,3 @@
-import * as winston from 'winston';
-
-import { LoggerConfig } from '../configs';
-
-winston.configure(LoggerConfig);
-
-export const logger = winston;
 
 export abstract class Logger {
     abstract logInfo(...messages: any[]): void;
