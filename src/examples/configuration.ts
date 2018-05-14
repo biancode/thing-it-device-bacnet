@@ -16,10 +16,11 @@ export = {
             actors: [
                 {
                     id: 'asdfg123',
-                    label: 'Binary Imput Actor 1',
+                    label: 'Binary Input Actor 1',
                     type: 'binary-input.actor',
                     logLevel: 'debug',
                     configuration: {
+                        objectId: 0,
                     },
                 },
             ],
