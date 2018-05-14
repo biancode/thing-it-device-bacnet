@@ -21,6 +21,17 @@ describe('[thing-it] Disruptive Technologies Device', () => {
         testDriver = TestDriver.createTestDriver({ logLevel: 'debug' });
         testDriver.registerDevicePlugin('bacnet', __dirname + '/../bacnet-device.controller');
         testDriver.registerUnitPlugin(__dirname + '/../default-units/binary-input.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/binary-value.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/binary-light.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/analog-input.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/analog-value.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/jalousie.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/jalousie-simple.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/light.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/multi-state-input.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/multi-state-value.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/room-control.actor');
+        testDriver.registerUnitPlugin(__dirname + '/../default-units/thermostat.actor');
         testDriver.start({
             configuration: require('../examples/configuration.js'),
             heartbeat: 10,
