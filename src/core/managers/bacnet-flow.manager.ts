@@ -18,6 +18,7 @@ type BACnetFlowFilter = (resp: Interfaces.FlowManager.Response) => boolean;
 export class BACnetFlowManager {
     private config: Interfaces.FlowManager.Config;
     private errorFlow: Subject<Error>;
+    private respFlow: Subject<Interfaces.FlowManager.Response>;
     private server: ServerSocket;
 
     constructor (private logger: Logger) {
@@ -36,9 +37,18 @@ export class BACnetFlowManager {
         this.server = null;
 
         try {
+            this.respFlow.unsubscribe();
+        } catch (error) {
+            throw new APIError(`BACnetFlowManager - destroy: Response Flow - ${error}`);
+        }
+        finally {
+            this.respFlow = null;
+        }
+
+        try {
             this.errorFlow.unsubscribe();
         } catch (error) {
-            throw new APIError(`BACnetFlowManager - destroy: ${error}`);
+            throw new APIError(`BACnetFlowManager - destroy: Error Flow - ${error}`);
         }
         finally {
             this.errorFlow = null;
@@ -55,9 +65,31 @@ export class BACnetFlowManager {
     public initManager (config: Interfaces.FlowManager.Config): void {
         this.config = config;
 
+        this.respFlow = new Subject();
         this.errorFlow = new Subject();
 
         this.server = store.getState([ 'bacnet', 'bacnetServer' ]);
+
+        this.server.respFlow
+            .subscribe((resp) => {
+                let layer: BACnet.Interfaces.Layers;
+
+                this.logger.logDebug(`BACnetFlowManager - getResponseFlow: `
+                    + `Response Message: ${resp.message.toString('hex')}`);
+
+                try {
+                    layer = BACnet.Utils.BACnetUtil.bufferToLayer(resp.message);
+                    this.respFlow.next({ layer: layer, socket: resp.socket });
+
+                    // this.logger.logDebug(`BACnetFlowManager - getResponseFlow: `
+                    //     + `Response Layer: ${JSON.stringify(layer)}`);
+                } catch (error) {
+                    this.errorFlow.next(error);
+
+                    this.logger.logError(`BACnetFlowManager - getResponseFlow: `
+                        + `Response Error: ${error}`);
+                }
+            });
     }
 
     /**
@@ -75,22 +107,7 @@ export class BACnetFlowManager {
      * @return {Observable<Interfaces.FlowManager.Response>}
      */
     public getResponseFlow (): Observable<Interfaces.FlowManager.Response> {
-        return this.server.respFlow
-            .map((resp) => {
-                let layer: BACnet.Interfaces.Layers;
-                this.logger.logDebug(`BACnetFlowManager - getResponseFlow: `
-                    + `Response Message: ${resp.message.toString('hex')}`);
-                try {
-                    layer = BACnet.Utils.BACnetUtil.bufferToLayer(resp.message);
-                    // this.logger.logDebug(`BACnetFlowManager - getResponseFlow: `
-                    //     + `Response Layer: ${JSON.stringify(layer)}`);
-                } catch (error) {
-                    this.errorFlow.next(error);
-                    this.logger.logError(`BACnetFlowManager - getResponseFlow: `
-                        + `Response Error: ${error}`);
-                }
-                return { layer: layer, socket: resp.socket };
-            });
+        return this.respFlow;
     }
 
     /**
