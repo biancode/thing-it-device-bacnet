@@ -50,7 +50,7 @@ export class APIConfirmedReqService {
      */
     public subscribeCOV (opts: BACnet.Interfaces.ConfirmedRequest.Service.SubscribeCOV): void {
         const message = BACnet.Services.ConfirmedReqService.subscribeCOV(opts);
-        this.socket.sendBroadcast(message, 'subscribeCOV');
+        this.socket.send(message, 'subscribeCOV');
     }
 
     /**
@@ -62,6 +62,6 @@ export class APIConfirmedReqService {
      */
     public unsubscribeCOV (opts: BACnet.Interfaces.ConfirmedRequest.Service.UnsubscribeCOV): void {
         const message = BACnet.Services.ConfirmedReqService.unsubscribeCOV(opts);
-        this.socket.sendBroadcast(message, 'unsubscribeCOV');
+        this.socket.send(message, 'unsubscribeCOV');
     }
 }
