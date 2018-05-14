@@ -153,7 +153,7 @@ export class CommonDevice extends DeviceBase {
 
         // Get instances of property values
         const presentValue = presentValueProp.values[0] as T;
-        const statusFlags = presentValueProp.values[0] as BACnet.Types.BACnetStatusFlags;
+        const statusFlags = statusFlagsProp.values[0] as BACnet.Types.BACnetStatusFlags;
 
         return { presentValue, statusFlags };
     }
