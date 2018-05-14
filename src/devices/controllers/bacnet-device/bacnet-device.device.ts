@@ -225,7 +225,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 if (curAddrInfo.address !== respAddrInfo.address) {
                     if (curAddrInfo.address.indexOf('GENERATED_') > -1) {
                         this.logger.logInfo(`BACnetDeviceControllerDevice - subscribeToObject: `
-                            + `Device ID not configured, found at ${respAddrInfo.address}`);
+                            + `Device IP not configured, found at ${respAddrInfo.address}`);
                     } else {
                         this.logger.logInfo(`BACnetDeviceControllerDevice - subscribeToObject: `
                             + `Device configured with ${curAddrInfo.address} found at ${respAddrInfo.address}`);
@@ -245,7 +245,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                 }
 
                 this.state.initialized = true;
-                this.logger.logDebug(`State: ${this.state}`);
+                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToObject: `
+                    + `State - ${JSON.stringify(this.state)}`);
 
                 // Step 9. Inits the BACnet properties
                 this.initProperties();
