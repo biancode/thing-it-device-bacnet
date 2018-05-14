@@ -32,7 +32,7 @@ export class AnalogActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.objectId))
             .subscribe((resp) => {
                 const bacnetProperties = this
-                    .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
+                    .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
 
                 this.state.presentValue = bacnetProperties.presentValue.value;
                 this.state.outOfService = bacnetProperties.statusFlags.value.outOfService;
