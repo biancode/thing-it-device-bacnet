@@ -61,7 +61,7 @@ export class BACnetServiceManager {
 
         const covTimerConfig = _.clone(this.config.covTimer);
         // Starts the COV Timer
-        this.sbCOVTimer = Observable.timer(covTimerConfig.period, covTimerConfig.period)
+        this.sbCOVTimer = Observable.timer(0, covTimerConfig.period)
             .subscribe(() => {
                 const covTimer = new COVTimer();
                 covTimer.init(covTimerConfig);
