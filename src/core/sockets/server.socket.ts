@@ -46,11 +46,13 @@ export class ServerSocket {
      *
      * @return {Bluebird<any>}
      */
-    public destroy (): Bluebird<any> {
+    public async destroy (): Promise<any> {
         this._respFlow.unsubscribe();
         this._respFlow = null;
 
-        return new Bluebird((resolve, reject) => {
+        await this.sequenceManager.destroy();
+
+        await new Bluebird((resolve, reject) => {
             this.sock.close(() => { resolve(); });
         });
     }
