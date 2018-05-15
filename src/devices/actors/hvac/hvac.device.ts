@@ -22,9 +22,11 @@ export class HVACActorDevice extends ActorDevice {
     public setpointModificationObjectId: BACnet.Types.BACnetObjectId;
 
     /**
-     * Creates and inits params of the BACnet Analog Input from plugin configuration.
+     * Creates unit params of the BACnet Object from plugin configuration.
      * Steps:
-     * - creates and inits `objectId`.
+     * - creates `setpointFeedbackObjectId`.
+     * - creates `temperatureObjectId`.
+     * - creates `setpointModificationObjectId`.
      *
      * @return {void}
      */
@@ -135,6 +137,8 @@ export class HVACActorDevice extends ActorDevice {
      * @return {Promise<void>}
      */
     public async initProperties (): Promise<void> {
+        await super.initProperties();
+
         // Gets the `presentValue|statusFlags` property for `setpoint`
         this.sendSubscribeCOV(this.setpointFeedbackObjectId);
 

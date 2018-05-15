@@ -24,9 +24,9 @@ export class ThermostatActorDevice extends HVACActorDevice {
     public stateText: string[];
 
     /**
-     * Creates and inits params of the BACnet Analog Input from plugin configuration.
+     * Creates unit params of the BACnet Object from plugin configuration.
      * Steps:
-     * - creates and inits `objectId`.
+     * - creates and inits `modeObjectId`.
      *
      * @return {void}
      */
@@ -103,7 +103,7 @@ export class ThermostatActorDevice extends HVACActorDevice {
                 });
 
                 this.logger.logDebug(`ThermostatActorDevice - subscribeToProperty: `
-                    + `Light States: ${JSON.stringify(this.stateText)}`);
+                    + `State Text: ${JSON.stringify(this.stateText)}`);
                 this.publishStateChange();
 
                 // Gets the `presentValue|statusFlags` property
@@ -117,6 +117,8 @@ export class ThermostatActorDevice extends HVACActorDevice {
      * @return {Promise<void>}
      */
     public async initProperties (): Promise<void> {
+        await super.initProperties();
+
         this.sendReadProperty(this.modeObjectId, BACnet.Enums.PropertyId.stateText);
     }
 }
