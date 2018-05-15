@@ -55,7 +55,7 @@ export class CommonDevice extends DeviceBase {
     * stop - stops the sensor.
     *
     */
-    public stop (): void {
+    public async stop (): Promise<void> {
         this.isDestroyed = true;
 
         _.map(this.covObjectIds, (objectId) => {

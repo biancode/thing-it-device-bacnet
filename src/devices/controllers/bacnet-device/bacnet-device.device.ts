@@ -53,11 +53,11 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         return initResult;
     }
 
-    public stop () {
+    public async stop (): Promise<void> {
         super.stop();
 
         try {
-            this.socketServer.destroy();
+            await this.socketServer.destroy();
         } catch (error) {
             throw new APIError(`BACnetDeviceControllerDevice - stop: Socket Server - ${error}`);
         }
@@ -66,7 +66,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         }
 
         try {
-            this.serviceManager.destroy();
+            await this.serviceManager.destroy();
         } catch (error) {
             throw new APIError(`BACnetDeviceControllerDevice - stop: Service Manager - ${error}`);
         }
@@ -75,7 +75,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         }
 
         try {
-            this.flowManager.destroy();
+            await this.flowManager.destroy();
         } catch (error) {
             throw new APIError(`BACnetDeviceControllerDevice - stop: Flow Manager - ${error}`);
         }
