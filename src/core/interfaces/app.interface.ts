@@ -61,6 +61,10 @@ export namespace SequenceManager {
         method: any;
         params: any[];
     }
+
+    export interface State {
+        free?: boolean;
+    }
 }
 
 export namespace FlowManager {
