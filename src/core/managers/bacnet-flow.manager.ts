@@ -78,7 +78,7 @@ export class BACnetFlowManager {
                     + `Response Message: ${resp.message.toString('hex')}`);
 
                 try {
-                    layer = BACnet.Utils.BACnetUtil.bufferToLayer(resp.message);
+                    layer = BACnet.Utils.Common.bufferToLayer(resp.message);
                     this.respFlow.next({ layer: layer, socket: resp.socket });
 
                     // this.logger.logDebug(`BACnetFlowManager - getResponseFlow: `
