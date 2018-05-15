@@ -70,6 +70,19 @@ export class BACnetServiceManager {
     }
 
     /**
+     * Generates the instance of the COVTimer and emits redux `tick` event with
+     * instance of the COVTimer.
+     *
+     * @param  {Interfaces.COVTimer.Config} covTimerConfig - config of the COVTimer
+     * @return {void}
+     */
+    private tickCOVTimer (covTimerConfig: Interfaces.COVTimer.Config): void {
+        const covTimer = new COVTimer();
+        covTimer.init(covTimerConfig);
+        BACnetAction.tickCOVTimer(covTimer);
+    }
+
+    /**
      * Creates the API service. Method creates instance of the each BACnet API service.
      *
      * @param  {Logger} logger - instance of the logger
