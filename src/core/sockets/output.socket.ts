@@ -75,8 +75,7 @@ export class OutputSocket {
      * @return {Bluebird<any>}
      */
     public send (msg: Buffer, reqMethodName: string): void {
-        this.seqManager.next({
-            id: `${this.config.rinfo.address}:${this.config.rinfo.port}`,
+        this.seqManager.next(`${this.config.rinfo.address}:${this.config.rinfo.port}`, {
             object: this,
             method: this._send,
             params: [msg, reqMethodName],
@@ -115,8 +114,7 @@ export class OutputSocket {
      * @return {Bluebird<any>}
      */
     public sendBroadcast (msg: Buffer, reqMethodName: string): void {
-        this.seqManager.next({
-            id: `${BroadcastAddress}:${this.config.rinfo.port}`,
+        this.seqManager.next(`${BroadcastAddress}:${this.config.rinfo.port}`, {
             object: this,
             method: this._sendBroadcast,
             params: [msg, reqMethodName],

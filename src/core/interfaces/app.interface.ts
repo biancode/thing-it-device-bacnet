@@ -55,8 +55,7 @@ export namespace SequenceManager {
         delay: number;
     }
 
-    export interface Flow {
-        id: string;
+    export interface Handler {
         object: any;
         method: any;
         params: any[];

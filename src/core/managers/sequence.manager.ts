@@ -6,16 +6,15 @@ import * as Errors from '../errors';
 
 import * as Interfaces from '../interfaces';
 
+import * as Entities from '../entities';
+
 type TObjectID = string;
 
 export class SequenceManager {
     private config: Interfaces.SequenceManager.Config;
-    private sjDataFlow: Rx.Subject<Interfaces.SequenceManager.Flow>;
-    private subDataFlow: Rx.Subscription;
-    private state: Rx.BehaviorSubject<Interfaces.SequenceManager.State>;
 
-    private freeFlows: Map<TObjectID, Interfaces.SequenceManager.Flow[]>;
-    private busyFlows: Map<TObjectID, number>;
+    private flows: Map<TObjectID, Entities.Flow<Interfaces.SequenceManager.Handler>>;
+    private state: Rx.BehaviorSubject<Interfaces.SequenceManager.State>;
 
     constructor () {
     }
@@ -29,36 +28,32 @@ export class SequenceManager {
     public initManager (config: Interfaces.SequenceManager.Config): void {
         this.config = config;
 
-        this.freeFlows = new Map();
-        this.busyFlows = new Map();
+        this.flows = new Map();
 
         this.state = new Rx.BehaviorSubject({
             free: true,
-        });
-        this.sjDataFlow = new Rx.Subject();
-
-        this.subDataFlow = this.sjDataFlow.subscribe((flow) => {
-            if (!this.busyFlows.has(flow.id)) {
-                this.busyFlows.set(flow.id, 0);
-                this.freeFlows.set(flow.id, []);
-            }
-
-            const freeFlows = this.freeFlows.get(flow.id);
-            freeFlows.push(flow);
-
-            this.updateState({ free: false });
-            this.updateQueue(flow);
         });
     }
 
     /**
      * next - emits new "value" for sequence data flow.
      *
-     * @param  {ISequenceFlow} data - value for sequence data flow
+     * @param  {string} flowId - flow ID
+     * @param  {Interfaces.SequenceManager.FlowHandler} flowHandler - flow handler
      * @return {void}
      */
-    public next (data: Interfaces.SequenceManager.Flow): void {
-        return this.sjDataFlow.next(data);
+    public next (flowId: string, flowHandler: Interfaces.SequenceManager.Handler): void {
+        let flow = this.flows.get(flowId);
+
+        if (_.isNil(flow)) {
+            flow = new Entities.Flow<Interfaces.SequenceManager.Handler>();
+        }
+
+        flow.add(flowHandler);
+
+        this.flows.set(flowId, flow);
+
+        this.updateQueue(flowId);
     }
 
     /**
@@ -66,72 +61,60 @@ export class SequenceManager {
      *
      * @return {void}
      */
-    public destroy (): void {
-        try {
-            this.freeFlows.clear();
-            this.freeFlows = null;
+    public async destroy (): Promise<void> {
+        await this.state
+            .filter((state) => !_.isNil(state) && state.free)
+            .first()
+            .toPromise();
 
-            this.busyFlows.clear();
-            this.busyFlows = null;
-
-            this.sjDataFlow.complete();
-            this.sjDataFlow = null;
-
-            this.subDataFlow.unsubscribe();
-        } catch (error) { ; }
+        this.flows.clear();
+        this.flows = null;
     }
 
     /**
      * updateQueue - handles the changes of data flow.
      *
-     * @param  {Interfaces.SequenceManager.Flow} flow - data flow
+     * @param  {Interfaces.SequenceManager.FlowHandler} flow - data flow
      * @return {void}
      */
-    private updateQueue (flow: Interfaces.SequenceManager.Flow): void {
-        let busyFlows = this.busyFlows.get(flow.id);
-        const freeFlows = this.freeFlows.get(flow.id);
+    private updateQueue (flowId: string): void {
+        this.updateState();
 
-        if (busyFlows >= this.config.thread || !freeFlows.length) {
+        let flow = this.flows.get(flowId);
+
+        if (flow.isFree() || flow.active >= this.config.thread) {
             return;
         }
-        this.busyFlows.set(flow.id, busyFlows + 1);
-
-        const freeFlow = freeFlows.shift();
+        const flowHandler = flow.hold();
 
         let endPromise;
         try {
-            endPromise = freeFlow.method.apply(freeFlow.object, freeFlow.params);
+            endPromise = flowHandler.method.apply(flowHandler.object, flowHandler.params);
         } catch (error) {
             throw new Errors.APIError(`SequenceManager - updateQueue: ${error}`);
         }
 
         Bluebird.resolve(endPromise)
-            .then(() => {
-                const freeFlowSize = this.freeFlows.get(flow.id).length;
-                const busyFlowSize = this.busyFlows.get(flow.id);
-
-                if (!freeFlowSize || !busyFlowSize) {
-                    return;
-                }
-
-                this.updateState({ free: true });
-            })
             .delay(this.config.delay).then(() => {
-                busyFlows = this.busyFlows.get(flow.id);
-                this.busyFlows.set(flow.id, busyFlows - 1);
-                this.updateQueue(flow);
+                flow.release();
+                this.updateQueue(flowId);
             });
     }
 
     /**
      * Updates the state of the `Sequence` manager.
      *
-     * @param  {Interfaces.SequenceManager.State} state - state object with new values
      * @return {void}
      */
-    private updateState (state: Interfaces.SequenceManager.State): void {
-        const curState = this.state.getValue();
-        const newState = _.assign({}, curState, state);
-        this.state.next(newState);
+    private updateState (): void {
+        let free = true;
+
+        this.flows.forEach((flow) => {
+            free = free && flow.isFree();
+        })
+
+        this.state.next({
+            free: free,
+        });
     }
 }
