@@ -58,6 +58,7 @@ export class CommonDevice extends DeviceBase {
     public async stop (): Promise<void> {
         this.isDestroyed = true;
 
+        // Sends the `unsubscribeCOV` request to the BACnet Device
         _.map(this.covObjectIds, (objectId) => {
             this.apiService.confirmedReq.unsubscribeCOV({
                 invokeId: 1,

@@ -8,20 +8,19 @@ import * as Interfaces from '../interfaces';
 
 import * as Entities from '../entities';
 
-type TObjectID = string;
+type TFlowID = string;
 
 export class SequenceManager {
     private config: Interfaces.SequenceManager.Config;
 
-    private flows: Map<TObjectID, Entities.Flow<Interfaces.SequenceManager.Handler>>;
+    private flows: Map<TFlowID, Entities.Flow<Interfaces.SequenceManager.Handler>>;
     private state: Rx.BehaviorSubject<Interfaces.SequenceManager.State>;
 
     constructor () {
     }
 
     /**
-     * initManager - inits internal data flow storages, data flow subject and
-     * data flow subscription.
+     * Inits internal data flow storages, state of the manager.
      *
      * @return {void}
      */
@@ -36,7 +35,7 @@ export class SequenceManager {
     }
 
     /**
-     * next - emits new "value" for sequence data flow.
+     * Adds the new flow handler to the flow queue by the flow ID.
      *
      * @param  {string} flowId - flow ID
      * @param  {Interfaces.SequenceManager.FlowHandler} flowHandler - flow handler
@@ -57,7 +56,9 @@ export class SequenceManager {
     }
 
     /**
-     * destroy - unsubscribes from the data flow.
+     * Destroy the manager. Steps:
+     * - waits until manager does not set the `free` state;
+     * - releases the flow storage;
      *
      * @return {void}
      */
@@ -72,12 +73,12 @@ export class SequenceManager {
     }
 
     /**
-     * updateQueue - handles the changes of data flow.
+     * Calls the handler of the flow by flow ID.
      *
-     * @param  {Interfaces.SequenceManager.FlowHandler} flow - data flow
+     * @param  {TFlowID} flowId - flow ID
      * @return {void}
      */
-    private updateQueue (flowId: string): void {
+    private updateQueue (flowId: TFlowID): void {
         this.updateState();
 
         let flow = this.flows.get(flowId);
