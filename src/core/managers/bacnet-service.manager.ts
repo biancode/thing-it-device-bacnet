@@ -60,13 +60,12 @@ export class BACnetServiceManager {
         this.server = store.getState([ 'bacnet', 'bacnetServer' ]);
 
         const covTimerConfig = _.clone(this.config.covTimer);
+        // Emits the first tick of the COV Timer
+        this.tickCOVTimer(covTimerConfig);
+
         // Starts the COV Timer
-        this.sbCOVTimer = Observable.timer(0, covTimerConfig.period)
-            .subscribe(() => {
-                const covTimer = new COVTimer();
-                covTimer.init(covTimerConfig);
-                BACnetAction.tickCOVTimer(covTimer);
-            });
+        this.sbCOVTimer = Observable.timer(covTimerConfig.period, covTimerConfig.period)
+            .subscribe(() => this.tickCOVTimer(covTimerConfig));
     }
 
     /**
