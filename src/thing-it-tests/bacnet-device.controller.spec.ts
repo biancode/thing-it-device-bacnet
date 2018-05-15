@@ -38,8 +38,8 @@ describe('[thing-it] Disruptive Technologies Device', () => {
         });
     });
 
-    after(() => {
-        testDriver.stop();
+    after(async () => {
+        await testDriver.stop();
     });
 
     it('should have completed initialization successfully', async () => {
