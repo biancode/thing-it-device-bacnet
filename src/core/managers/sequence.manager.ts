@@ -1,6 +1,6 @@
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
-import { Subject, Subscription } from 'rxjs';
+import * as Rx from 'rxjs';
 
 import * as Errors from '../errors';
 
@@ -10,8 +10,9 @@ type TObjectID = string;
 
 export class SequenceManager {
     private config: Interfaces.SequenceManager.Config;
-    private sjDataFlow: Subject<Interfaces.SequenceManager.Flow>;
-    private subDataFlow: Subscription;
+    private sjDataFlow: Rx.Subject<Interfaces.SequenceManager.Flow>;
+    private subDataFlow: Rx.Subscription;
+    private state: Rx.BehaviorSubject<Interfaces.SequenceManager.State>;
 
     private freeFlows: Map<TObjectID, Interfaces.SequenceManager.Flow[]>;
     private busyFlows: Map<TObjectID, number>;
@@ -31,7 +32,10 @@ export class SequenceManager {
         this.freeFlows = new Map();
         this.busyFlows = new Map();
 
-        this.sjDataFlow = new Subject();
+        this.state = new Rx.BehaviorSubject({
+            free: true,
+        });
+        this.sjDataFlow = new Rx.Subject();
 
         this.subDataFlow = this.sjDataFlow.subscribe((flow) => {
             if (!this.busyFlows.has(flow.id)) {
@@ -42,6 +46,7 @@ export class SequenceManager {
             const freeFlows = this.freeFlows.get(flow.id);
             freeFlows.push(flow);
 
+            this.updateState({ free: false });
             this.updateQueue(flow);
         });
     }
@@ -83,7 +88,7 @@ export class SequenceManager {
      * @return {void}
      */
     private updateQueue (flow: Interfaces.SequenceManager.Flow): void {
-        const busyFlows = this.busyFlows.get(flow.id);
+        let busyFlows = this.busyFlows.get(flow.id);
         const freeFlows = this.freeFlows.get(flow.id);
 
         if (busyFlows >= this.config.thread || !freeFlows.length) {
@@ -100,9 +105,33 @@ export class SequenceManager {
             throw new Errors.APIError(`SequenceManager - updateQueue: ${error}`);
         }
 
-        Bluebird.resolve(endPromise).delay(this.config.delay).then(() => {
-            this.busyFlows.set(flow.id, busyFlows);
-            this.updateQueue(flow);
-        });
+        Bluebird.resolve(endPromise)
+            .then(() => {
+                const freeFlowSize = this.freeFlows.get(flow.id).length;
+                const busyFlowSize = this.busyFlows.get(flow.id);
+
+                if (!freeFlowSize || !busyFlowSize) {
+                    return;
+                }
+
+                this.updateState({ free: true });
+            })
+            .delay(this.config.delay).then(() => {
+                busyFlows = this.busyFlows.get(flow.id);
+                this.busyFlows.set(flow.id, busyFlows - 1);
+                this.updateQueue(flow);
+            });
+    }
+
+    /**
+     * Updates the state of the `Sequence` manager.
+     *
+     * @param  {Interfaces.SequenceManager.State} state - state object with new values
+     * @return {void}
+     */
+    private updateState (state: Interfaces.SequenceManager.State): void {
+        const curState = this.state.getValue();
+        const newState = _.assign({}, curState, state);
+        this.state.next(newState);
     }
 }
