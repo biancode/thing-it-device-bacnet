@@ -17,8 +17,6 @@ export class HVACActorDevice extends ActorDevice {
     public state: Interfaces.Actor.HVAC.State;
     public config: Interfaces.Actor.HVAC.Config;
 
-    public objectId: BACnet.Types.BACnetObjectId;
-
     public setpointFeedbackObjectId: BACnet.Types.BACnetObjectId;
     public temperatureObjectId: BACnet.Types.BACnetObjectId;
     public setpointModificationObjectId: BACnet.Types.BACnetObjectId;

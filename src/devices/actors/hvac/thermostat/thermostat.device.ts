@@ -107,7 +107,7 @@ export class ThermostatActorDevice extends HVACActorDevice {
                 this.publishStateChange();
 
                 // Gets the `presentValue|statusFlags` property
-                this.sendSubscribeCOV(this.objectId);
+                this.sendSubscribeCOV(this.modeObjectId);
             });
     }
 
