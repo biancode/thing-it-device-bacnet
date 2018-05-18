@@ -1,7 +1,8 @@
 import * as dns from 'dns';
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
-import { combineLatest } from 'rxjs/observable/combineLatest';
+import * as Rx from 'rxjs';
+import * as RxOp from 'rxjs/operators';
 
 import { ControllerDevice } from '../controller.device';
 
@@ -201,16 +202,18 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         const destAddrInfo = this.pluginConfig.manager.service.dest;
 
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.iAm))
-            .filter(this.flowManager.matchFilter(this.config.deviceIdMatchRequired,
-                this.flowManager.isBACnetObject(this.objectId), `device ID`))
-            .filter(this.flowManager.matchFilter(this.config.vendorIdMatchRequired,
-                this.flowManager.isBACnetVendorId(this.config.vendorId), `vendor ID`))
-            .filter(this.flowManager.matchFilter(this.config.ipMatchRequired,
-                this.flowManager.isBACnetIPAddress(destAddrInfo.address), `IP Address`))
-            .timeout(AppConfig.response.iAm.timeout)
-            .first()
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.iAm)),
+                RxOp.filter(this.flowManager.matchFilter(this.config.deviceIdMatchRequired,
+                    this.flowManager.isBACnetObject(this.objectId), `device ID`)),
+                RxOp.filter(this.flowManager.matchFilter(this.config.vendorIdMatchRequired,
+                    this.flowManager.isBACnetVendorId(this.config.vendorId), `vendor ID`)),
+                RxOp.filter(this.flowManager.matchFilter(this.config.ipMatchRequired,
+                    this.flowManager.isBACnetIPAddress(destAddrInfo.address), `IP Address`)),
+                RxOp.timeout(AppConfig.response.iAm.timeout),
+                RxOp.first(),
+            )
             .subscribe((resp) => {
                 // Handles `iAm` response
                 this.logger.logInfo('Initialized BACnet device successfully.');
@@ -275,85 +278,99 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      */
     public subscribeToProperty (): void {
         const readPropertyFlow = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty))
-            .filter(this.flowManager.isBACnetObject(this.objectId));
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.objectId)),
+            );
 
         // Gets the `objectName` property
         const ovObjectName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName))
-            .map((resp) => {
-                const bacnetProperty = BACnet.Helpers.Layer
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName)),
+                RxOp.map((resp) => {
+                    const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
 
-                this.state.name = bacnetProperty.value;
+                    this.state.name = bacnetProperty.value;
 
-                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Object Name: ${this.state.name}`);
-                this.publishStateChange();
-            });
+                    this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                        + `Object Name: ${this.state.name}`);
+                        this.publishStateChange();
+                }),
+            );
 
         // Gets the `description` property
         const ovDescription = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description))
-            .map((resp) => {
-                const bacnetProperty = BACnet.Helpers.Layer
-                    .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description)),
+                RxOp.map((resp) => {
+                    const bacnetProperty = BACnet.Helpers.Layer
+                        .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
 
-                this.state.description = bacnetProperty.value;
+                    this.state.description = bacnetProperty.value;
 
-                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Description: ${this.state.description}`);
-                this.publishStateChange();
-            });
+                    this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                        + `Description: ${this.state.description}`);
+                    this.publishStateChange();
+                }),
+            );
 
         // Gets the `vendorName` property
         const ovVendorName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.vendorName))
-            .map((resp) => {
-                const bacnetProperty = BACnet.Helpers.Layer
-                    .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.vendorName)),
+                RxOp.map((resp) => {
+                    const bacnetProperty = BACnet.Helpers.Layer
+                        .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
 
-                this.state.vendor = bacnetProperty.value;
+                    this.state.vendor = bacnetProperty.value;
 
-                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Vendor ID: ${this.state.vendor}`);
-                this.publishStateChange();
-            });
+                    this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                        + `Vendor ID: ${this.state.vendor}`);
+                    this.publishStateChange();
+                }),
+            );
 
         // Gets the `modelName` property
         const ovModelName = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.modelName))
-            .map((resp) => {
-                const bacnetProperty = BACnet.Helpers.Layer
-                    .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.modelName)),
+                RxOp.map((resp) => {
+                    const bacnetProperty = BACnet.Helpers.Layer
+                        .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
 
-                this.state.model = bacnetProperty.value;
+                    this.state.model = bacnetProperty.value;
 
-                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Model Name: ${this.state.model}`);
-                this.publishStateChange();
-            });
+                    this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                        + `Model Name: ${this.state.model}`);
+                    this.publishStateChange();
+                }),
+            );
 
         // Gets the `applicationSoftwareVersion` property
         const ovSoftwareVersion = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.applicationSoftwareVersion))
-            .map((resp) => {
-                const bacnetProperty = BACnet.Helpers.Layer
-                    .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.applicationSoftwareVersion)),
+                RxOp.map((resp) => {
+                    const bacnetProperty = BACnet.Helpers.Layer
+                        .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
 
-                this.state.softwareVersion = bacnetProperty.value;
+                    this.state.softwareVersion = bacnetProperty.value;
 
-                this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
-                    + `Software Version: ${this.state.softwareVersion}`);
-                this.publishStateChange();
-            });
+                    this.logger.logDebug(`BACnetDeviceControllerDevice - subscribeToProperty: `
+                        + `Software Version: ${this.state.softwareVersion}`);
+                    this.publishStateChange();
+                }),
+            );
 
         // Gets the summary `readProperty` response
-        this.subManager.subscribe = combineLatest(ovObjectName, ovDescription, ovVendorName,
+        this.subManager.subscribe = Rx.combineLatest(ovObjectName, ovDescription, ovVendorName,
                 ovModelName, ovSoftwareVersion)
-            .timeout(AppConfig.response.readProperty.timeout)
-            .first()
+            .pipe(
+                RxOp.timeout(AppConfig.response.readProperty.timeout),
+                RxOp.first(),
+            )
             .subscribe(() => {
                 this.logger.logDebug('BACnetDeviceControllerDevice - subscribeToProperty: '
                     + `Device properties were received`);

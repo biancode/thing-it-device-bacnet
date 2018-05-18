@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as BACnet from 'bacnet-logic';
 
+import * as RxOp from 'rxjs/operators';
+
 import { ActorDevice } from '../actor.device';
 
 import * as Interfaces from '../../../core/interfaces';
@@ -61,9 +63,11 @@ export class LightActorDevice extends ActorDevice {
     public subscribeToProperty (): void {
         // Read `Position` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.levelFeedbackObjectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.levelFeedbackObjectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
@@ -83,9 +87,11 @@ export class LightActorDevice extends ActorDevice {
 
         // Read `Rotation` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetUnsignedInteger>(resp);
@@ -105,13 +111,17 @@ export class LightActorDevice extends ActorDevice {
 
         // Read Property Flow
         const readPropertyFlow = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty));
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+            );
 
         // Gets the `stateText` (light states) property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.stateText))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId)),
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.stateText)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = BACnet.Helpers.Layer
                     .getPropertyValues<BACnet.Types.BACnetCharacterString>(resp.layer);
@@ -129,8 +139,10 @@ export class LightActorDevice extends ActorDevice {
 
         // Gets the `presentValue` (light mode) property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId)),
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+            )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetUnsignedInteger>(resp.layer);
@@ -144,8 +156,10 @@ export class LightActorDevice extends ActorDevice {
 
         // Gets the `presentValue` (dimmer level) property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.levelFeedbackObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetObject(this.levelFeedbackObjectId)),
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+            )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetReal>(resp.layer);

@@ -69,7 +69,7 @@ export class ServerSocket {
             this.logger.logError(`${this.className} - startServer: UDP Error - ${error}`);
         });
 
-        this.sock.on('message', (msg: Buffer, rinfo: dgram.AddressInfo) => {
+        this.sock.on('message', (msg: Buffer, rinfo: Interfaces.ServerSocket.AddressInfo) => {
             // Generate Output Socket
             const outputSoc = this.getOutputSocket({
                 port: rinfo.port, address: rinfo.address,
@@ -80,7 +80,7 @@ export class ServerSocket {
 
         const startPromise = new Bluebird((resolve, reject) => {
             this.sock.on('listening', () => {
-                const addrInfo = this.sock.address();
+                const addrInfo = this.sock.address() as Interfaces.ServerSocket.AddressInfo;
                 this.logger.logInfo(`${this.className} - startServer: `
                     + `UDP Server listening on ${addrInfo.address}:${addrInfo.port}`);
                 resolve(addrInfo);

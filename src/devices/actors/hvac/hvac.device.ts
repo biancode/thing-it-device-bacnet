@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as BACnet from 'bacnet-logic';
 
+import * as RxOp from 'rxjs/operators';
+
 import { ActorDevice } from '../actor.device';
 
 import * as Interfaces from '../../../core/interfaces';
@@ -55,9 +57,11 @@ export class HVACActorDevice extends ActorDevice {
     public subscribeToProperty (): void {
         // Read `Position` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.setpointFeedbackObjectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.setpointFeedbackObjectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
@@ -77,9 +81,11 @@ export class HVACActorDevice extends ActorDevice {
 
         // Read `Rotation` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.temperatureObjectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.temperatureObjectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
@@ -99,13 +105,17 @@ export class HVACActorDevice extends ActorDevice {
 
         // Read Property Flow
         const readPropertyFlow = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty));
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+            );
 
         // Gets the `presentValue` (setpoint) property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.setpointFeedbackObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetObject(this.setpointFeedbackObjectId)),
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+            )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetReal>(resp.layer);
@@ -119,8 +129,10 @@ export class HVACActorDevice extends ActorDevice {
 
         // Gets the `presentValue` (temperature) property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.temperatureObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetObject(this.temperatureObjectId)),
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+            )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetReal>(resp.layer);

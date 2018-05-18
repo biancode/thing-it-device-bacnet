@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as BACnet from 'bacnet-logic';
 
+import * as RxOp from 'rxjs/operators';
+
 import { ActorDevice } from '../actor.device';
 
 import * as Interfaces from '../../../core/interfaces';
@@ -65,9 +67,11 @@ export class JalousieActorDevice extends ActorDevice {
     public subscribeToProperty (): void {
         // Read `Position` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.positionFeedbackObjectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.positionFeedbackObjectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);
@@ -87,9 +91,11 @@ export class JalousieActorDevice extends ActorDevice {
 
         // Read `Rotation` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.rotationFeedbackObjectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.rotationFeedbackObjectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetReal>(resp);

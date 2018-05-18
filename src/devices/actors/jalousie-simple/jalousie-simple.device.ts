@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as BACnet from 'bacnet-logic';
 
+import * as RxOp from 'rxjs/operators';
+
 import { ActorDevice } from '../actor.device';
 
 import * as Enums from '../../../core/enums';
@@ -49,9 +51,11 @@ export class JalousieSimpleActorDevice extends ActorDevice {
     public subscribeToProperty (): void {
         // Read `Position` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.motionDirectionObjectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.motionDirectionObjectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
@@ -71,9 +75,11 @@ export class JalousieSimpleActorDevice extends ActorDevice {
 
         // Read `Rotation` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.stopValueObjectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.stopValueObjectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetEnumerated>(resp);
@@ -93,13 +99,17 @@ export class JalousieSimpleActorDevice extends ActorDevice {
 
         // Read Property Flow
         const readPropertyFlow = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty));
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+            );
 
         // Gets the `presentValue` (position) property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.motionDirectionObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetObject(this.motionDirectionObjectId)),
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+            )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetEnumerated>(resp.layer);
@@ -112,8 +122,10 @@ export class JalousieSimpleActorDevice extends ActorDevice {
 
         // Gets the `presentValue` (rotation) property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetObject(this.stopValueObjectId))
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetObject(this.stopValueObjectId)),
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+            )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetEnumerated>(resp.layer);

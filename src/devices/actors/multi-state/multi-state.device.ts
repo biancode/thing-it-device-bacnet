@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as BACnet from 'bacnet-logic';
 
+import * as RxOp from 'rxjs/operators';
+
 import { ActorDevice } from '../actor.device';
 
 import * as Interfaces from '../../../core/interfaces';
@@ -27,9 +29,11 @@ export class MultiStateActorDevice extends ActorDevice {
     public subscribeToProperty (): void {
         // Read Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification))
-            .filter(this.flowManager.isBACnetObject(this.objectId))
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.objectId)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = this
                     .getCOVNotificationValues<BACnet.Types.BACnetUnsignedInteger>(resp);
@@ -55,13 +59,17 @@ export class MultiStateActorDevice extends ActorDevice {
 
         // Read Property Flow
         const readPropertyFlow = this.flowManager.getResponseFlow()
-            .filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU))
-            .filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty))
-            .filter(this.flowManager.isBACnetObject(this.objectId));
+            .pipe(
+                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+                RxOp.filter(this.flowManager.isBACnetObject(this.objectId)),
+            );
 
         // Gets the `objectName` property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName)),
+            )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
@@ -75,7 +83,9 @@ export class MultiStateActorDevice extends ActorDevice {
 
         // Gets the `description` property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description)),
+            )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
@@ -89,7 +99,9 @@ export class MultiStateActorDevice extends ActorDevice {
 
         // Gets the `stateText` property
         this.subManager.subscribe = readPropertyFlow
-            .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.stateText))
+            .pipe(
+                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.stateText)),
+            )
             .subscribe((resp) => {
                 const bacnetProperties = BACnet.Helpers.Layer
                     .getPropertyValues<BACnet.Types.BACnetCharacterString>(resp.layer);

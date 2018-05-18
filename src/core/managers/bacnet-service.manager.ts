@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
-import { Observable, Subscription } from 'rxjs';
+import * as Rx from 'rxjs';
+import * as RxOp from 'rxjs/operators';
 
 import { APIError } from '../errors';
 
@@ -21,7 +22,7 @@ export class BACnetServiceManager {
     private config: Interfaces.ServiceManager.Config;
     private server: ServerSocket;
 
-    private sbCOVTimer: Subscription;
+    private sbCOVTimer: Rx.Subscription;
 
     constructor (private logger: Logger) {
     }
@@ -64,7 +65,7 @@ export class BACnetServiceManager {
         this.tickCOVTimer(covTimerConfig);
 
         // Starts the COV Timer
-        this.sbCOVTimer = Observable.timer(covTimerConfig.period, covTimerConfig.period)
+        this.sbCOVTimer = Rx.timer(covTimerConfig.period, covTimerConfig.period)
             .subscribe(() => this.tickCOVTimer(covTimerConfig));
     }
 

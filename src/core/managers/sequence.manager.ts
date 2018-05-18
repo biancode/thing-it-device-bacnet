@@ -1,6 +1,7 @@
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import * as Rx from 'rxjs';
+import * as RxOp from 'rxjs/operators';
 
 import * as Errors from '../errors';
 
@@ -64,8 +65,10 @@ export class SequenceManager {
      */
     public async destroy (): Promise<void> {
         await this.state
-            .filter((state) => !_.isNil(state) && state.free)
-            .first()
+            .pipe(
+                RxOp.filter((state) => !_.isNil(state) && state.free),
+                RxOp.first(),
+            )
             .toPromise();
 
         this.flows.clear();
