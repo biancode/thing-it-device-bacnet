@@ -450,7 +450,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public getDevicePort (): number {
         const port = +this.config.port;
 
-        if (port >= 1024 || port <= 65536) {
+        if (port >= 1024 && port <= 65536) {
             return port;
         }
 
