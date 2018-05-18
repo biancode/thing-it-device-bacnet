@@ -16,6 +16,8 @@ import {
 /* Interfaces */
 import * as Interfaces from '../../core/interfaces';
 
+import * as Simulations from '../../core/simulations';
+
 import { store } from '../../redux';
 
 export class ActorDevice extends CommonDevice {
@@ -64,12 +66,26 @@ export class ActorDevice extends CommonDevice {
      * @return {Promise<void>}
      */
     public async createPluginComponents (): Promise<void> {
-        /* Create and init BACnet Flow Manager */
-        this.flowManager = store.getState([ 'bacnet', 'flowManager' ]);
-        /* Create and init BACnet Service Manager */
-        this.serviceManager = store.getState([ 'bacnet', 'serviceManager' ]);
+        if (!this.isSimulated()) {
+            // Create and init BACnet Flow Manager
+            this.flowManager = store.getState([ 'bacnet', 'flowManager' ]);
+            // Create and init BACnet Service Manager
+            this.serviceManager = store.getState([ 'bacnet', 'serviceManager' ]);
+            // Creates instance of the API Service
+            this.apiService = this.serviceManager.createAPIService(this.logger);
+            return;
+        }
+
+        const simulationLogic = this.getSimulationLogic();
+
+        // Create instance of the BACnet Flow Manager
+        this.flowManager = simulationLogic.getFlowManager();
+        // Create instance of the BACnet Service Manager
+        this.serviceManager = simulationLogic.getServiceManager();
         // Creates instance of the API Service
-        this.apiService = this.serviceManager.createAPIService(this.logger);
+        this.apiService = this.serviceManager.createAPIService();
+
+        simulationLogic.startSimulation();
     }
 
     /**
