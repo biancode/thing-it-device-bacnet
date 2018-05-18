@@ -1,6 +1,10 @@
 import { IMasterMetadata } from '../../../core/interfaces/metadata.interface';
 
-import { controllerState, controllerConfig } from '../controller.metadata';
+import {
+    ControllerStates,
+    ControllerServices,
+    ControllerConfigs,
+} from '../controller.metadata';
 
 export const BACnetDeviceControllerMetadata: IMasterMetadata = {
     plugin: 'bacnet-device.controller',
@@ -15,12 +19,14 @@ export const BACnetDeviceControllerMetadata: IMasterMetadata = {
     events: [
     ],
     services: [
+        ...ControllerServices,
         {
             id: 'update',
             label: 'Update',
-        }
+        },
     ],
     state: [
+        ...ControllerStates,
         {
             id: 'name',
             label: 'Name',
@@ -28,28 +34,32 @@ export const BACnetDeviceControllerMetadata: IMasterMetadata = {
                 id: 'string',
             },
             defaultValue: '',
-        }, {
+        },
+        {
             id: 'description',
             label: 'Description',
             type: {
                 id: 'string',
             },
             defaultValue: '',
-        }, {
+        },
+        {
             id: 'vendor',
             label: 'Vendor',
             type: {
                 id: 'string',
             },
             defaultValue: '',
-        }, {
+        },
+        {
             id: 'model',
             label: 'Model',
             type: {
                 id: 'string',
             },
             defaultValue: '',
-        }, {
+        },
+        {
             id: 'softwareVersion',
             label: 'Software Version',
             type: {
@@ -57,9 +67,9 @@ export const BACnetDeviceControllerMetadata: IMasterMetadata = {
             },
             defaultValue: '',
         },
-        ...controllerState,
     ],
     configuration: [
+        ...ControllerConfigs,
         {
             label: 'IP Address',
             id: 'ipAddress',
@@ -148,6 +158,5 @@ export const BACnetDeviceControllerMetadata: IMasterMetadata = {
             },
             defaultValue: 16,
         },
-        ...controllerConfig,
     ],
 };

@@ -1,9 +1,12 @@
 import { CommonStates, CommonConfigs } from '../common.metadata';
 
-export const controllerState = [
+export const ControllerServices = [
+];
+
+export const ControllerStates = [
     ...CommonStates,
 ];
 
-export const controllerConfig = [
+export const ControllerConfigs = [
     ...CommonConfigs,
 ];
