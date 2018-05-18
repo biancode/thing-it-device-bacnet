@@ -28,6 +28,8 @@ import * as Interfaces from '../../../core/interfaces';
 
 import * as BACnet from 'bacnet-logic';
 
+import * as Helpers from '../../../core/helpers';
+
 export class BACnetDeviceControllerDevice extends ControllerDevice {
     public state: Interfaces.Controller.BACnetDevice.State;
     public config: Interfaces.Controller.BACnetDevice.Config;
@@ -203,14 +205,14 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.iAm)),
-                RxOp.filter(this.flowManager.matchFilter(this.config.deviceIdMatchRequired,
-                    this.flowManager.isBACnetObject(this.objectId), `device ID`)),
-                RxOp.filter(this.flowManager.matchFilter(this.config.vendorIdMatchRequired,
-                    this.flowManager.isBACnetVendorId(this.config.vendorId), `vendor ID`)),
-                RxOp.filter(this.flowManager.matchFilter(this.config.ipMatchRequired,
-                    this.flowManager.isBACnetIPAddress(destAddrInfo.address), `IP Address`)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.iAm)),
+                RxOp.filter(Helpers.FlowFilter.matchFilter(this.config.deviceIdMatchRequired,
+                    Helpers.FlowFilter.isBACnetObject(this.objectId), `device ID`)),
+                RxOp.filter(Helpers.FlowFilter.matchFilter(this.config.vendorIdMatchRequired,
+                    Helpers.FlowFilter.isBACnetVendorId(this.config.vendorId), `vendor ID`)),
+                RxOp.filter(Helpers.FlowFilter.matchFilter(this.config.ipMatchRequired,
+                    Helpers.FlowFilter.isBACnetIPAddress(destAddrInfo.address), `IP Address`)),
                 RxOp.timeout(AppConfig.response.iAm.timeout),
                 RxOp.first(),
             )
@@ -279,15 +281,15 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public subscribeToProperty (): void {
         const readPropertyFlow = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
-                RxOp.filter(this.flowManager.isBACnetObject(this.objectId)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)),
             );
 
         // Gets the `objectName` property
         const ovObjectName = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.objectName)),
                 RxOp.map((resp) => {
                     const bacnetProperty = BACnet.Helpers.Layer
                     .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
@@ -303,7 +305,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         // Gets the `description` property
         const ovDescription = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.description)),
                 RxOp.map((resp) => {
                     const bacnetProperty = BACnet.Helpers.Layer
                         .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
@@ -319,7 +321,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         // Gets the `vendorName` property
         const ovVendorName = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.vendorName)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.vendorName)),
                 RxOp.map((resp) => {
                     const bacnetProperty = BACnet.Helpers.Layer
                         .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
@@ -335,7 +337,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         // Gets the `modelName` property
         const ovModelName = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.modelName)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.modelName)),
                 RxOp.map((resp) => {
                     const bacnetProperty = BACnet.Helpers.Layer
                         .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
@@ -351,7 +353,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         // Gets the `applicationSoftwareVersion` property
         const ovSoftwareVersion = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.applicationSoftwareVersion)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.applicationSoftwareVersion)),
                 RxOp.map((resp) => {
                     const bacnetProperty = BACnet.Helpers.Layer
                         .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);

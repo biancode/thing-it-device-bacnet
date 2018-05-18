@@ -16,6 +16,8 @@ import * as Errors from '../../../core/errors';
 
 import { store } from '../../../redux';
 
+import * as Helpers from '../../../core/helpers';
+
 export class JalousieSimpleActorDevice extends ActorDevice {
     public readonly className: string = 'JalousieSimpleActorDevice';
     public state: Interfaces.Actor.JalousieSimple.State;
@@ -52,9 +54,9 @@ export class JalousieSimpleActorDevice extends ActorDevice {
         // Read `Position` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
-                RxOp.filter(this.flowManager.isBACnetObject(this.motionDirectionObjectId)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.motionDirectionObjectId)),
             )
             .subscribe((resp) => {
                 const bacnetProperties = this
@@ -76,9 +78,9 @@ export class JalousieSimpleActorDevice extends ActorDevice {
         // Read `Rotation` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
-                RxOp.filter(this.flowManager.isBACnetObject(this.stopValueObjectId)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.stopValueObjectId)),
             )
             .subscribe((resp) => {
                 const bacnetProperties = this
@@ -100,15 +102,15 @@ export class JalousieSimpleActorDevice extends ActorDevice {
         // Read Property Flow
         const readPropertyFlow = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
             );
 
         // Gets the `presentValue` (position) property
         this.subManager.subscribe = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetObject(this.motionDirectionObjectId)),
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.motionDirectionObjectId)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
             )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
@@ -123,8 +125,8 @@ export class JalousieSimpleActorDevice extends ActorDevice {
         // Gets the `presentValue` (rotation) property
         this.subManager.subscribe = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetObject(this.stopValueObjectId)),
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.stopValueObjectId)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
             )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer

@@ -16,6 +16,8 @@ import * as Enums from '../../../../core/enums';
 
 import { store } from '../../../../redux';
 
+import * as Helpers from '../../../../core/helpers';
+
 export class ThermostatActorDevice extends HVACActorDevice {
     public readonly className: string = 'ThermostatActorDevice';
     public state: Interfaces.Actor.Thermostat.State;
@@ -50,9 +52,9 @@ export class ThermostatActorDevice extends HVACActorDevice {
         // Handle Flow. Sets the `mode`, `heatActive`, `coolActive`
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
-                RxOp.filter(this.flowManager.isBACnetObject(this.modeObjectId)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.modeObjectId)),
             )
             .subscribe((resp) => {
                 const bacnetProperties = this
@@ -90,15 +92,15 @@ export class ThermostatActorDevice extends HVACActorDevice {
         // Read Property Flow
         const readPropertyFlow = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
             );
 
         // Gets the `stateText` property
         this.subManager.subscribe = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetObject(this.modeObjectId)),
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.stateText)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.modeObjectId)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.stateText)),
             )
             .subscribe((resp) => {
                 const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
