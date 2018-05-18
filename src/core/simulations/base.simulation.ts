@@ -9,7 +9,13 @@ import * as Managers from '../managers';
 
 import * as Configs from '../configs';
 
-export class BaseSimulation {
+/**
+ * Implements base simulation logic and provides base simulation interface.
+ *
+ * @class
+ * @abstract
+ */
+export abstract class BaseSimulation {
 
     constructor (private logger: Utils.Logger) {
     }
@@ -17,10 +23,10 @@ export class BaseSimulation {
     /**
      * Starts the simulation logic for specific device.
      *
+     * @abstract
      * @return {void}
      */
-    public startSimulation (): void {
-    }
+    public abstract startSimulation (): void;
 
     /**
      * Factory. Creates the instance of the `flow` manager.
