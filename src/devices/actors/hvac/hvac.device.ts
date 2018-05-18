@@ -14,6 +14,8 @@ import * as Errors from '../../../core/errors';
 
 import { store } from '../../../redux';
 
+import { HVACSimulation } from './hvac.simulation';
+
 export class HVACActorDevice extends ActorDevice {
     public readonly className: string = 'HVACActorDevice';
     public state: Interfaces.Actor.HVAC.State;
@@ -22,6 +24,15 @@ export class HVACActorDevice extends ActorDevice {
     public setpointFeedbackObjectId: BACnet.Types.BACnetObjectId;
     public temperatureObjectId: BACnet.Types.BACnetObjectId;
     public setpointModificationObjectId: BACnet.Types.BACnetObjectId;
+
+    /**
+     * Creates the instance of the simulation logic.
+     *
+     * @return {HVACSimulation}
+     */
+    public getSimulationLogic (): HVACSimulation {
+        return new HVACSimulation(this.logger);
+    }
 
     /**
      * Creates unit params of the BACnet Object from plugin configuration.
