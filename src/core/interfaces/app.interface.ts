@@ -1,6 +1,8 @@
 import { Moment } from 'moment';
 import { Interfaces, Types } from 'bacnet-logic';
 
+import * as Enums from '../enums';
+
 export namespace BACnetResponse {
     export interface Config {
         iAm: ResponseConfig;
@@ -109,4 +111,16 @@ export namespace BACnet {
 export interface IAliasMapElement <T> {
     alias: string|string[];
     value?: T;
+}
+
+export namespace Simulation {
+
+    /**
+     * Data interface. Each API service emits a data using this interface.
+     */
+    export interface APINotification {
+        type: Enums.Simulation.ConfirmedRequestService
+            | Enums.Simulation.UnsonfirmedRequestService;
+        params: any;
+    }
 }
