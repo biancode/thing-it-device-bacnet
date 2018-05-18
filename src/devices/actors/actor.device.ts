@@ -87,4 +87,13 @@ export class ActorDevice extends CommonDevice {
      */
     public async initProperties (): Promise<void> {
     }
+
+    /**
+     * Creates the instance of the simulation logic.
+     *
+     * @return {Simulations.BaseSimulation}
+     */
+    public getSimulationLogic (): Simulations.BaseSimulation {
+        return null;
+    }
 }
