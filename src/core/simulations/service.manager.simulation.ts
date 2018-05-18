@@ -18,7 +18,7 @@ import { COVTimer } from '../entities';
 
 export class BACnetServiceManager {
     private config: Interfaces.ServiceManager.Config;
-    private socket: Rx.Subject<Interfaces.Simulation.APINotification>;
+    private sjAPINotif: Rx.Subject<Interfaces.Simulation.APINotification>;
 
     private sbCOVTimer: Rx.Subscription;
 
@@ -36,12 +36,12 @@ export class BACnetServiceManager {
         this.config = null;
 
         try {
-            this.socket.unsubscribe();
+            this.sjAPINotif.unsubscribe();
         } catch (error) {
-            throw new APIError(`BACnetServiceManager - destroy: Socket ${error}`);
+            throw new APIError(`BACnetServiceManager - destroy: sjAPINotif ${error}`);
         }
         finally {
-            this.socket = null;
+            this.sjAPINotif = null;
         }
 
         try {
@@ -55,7 +55,7 @@ export class BACnetServiceManager {
     }
 
     /**
-     * initService - sets service options, sets server socket, creates instance
+     * initService - sets service options, sets server sjAPINotif, creates instance
      * of API service.
      *
      * @param  {Interfaces.ServiceManager.Config} conifg - manager configuration
@@ -64,7 +64,7 @@ export class BACnetServiceManager {
     public initManager (config: Interfaces.ServiceManager.Config): void {
         this.config = config;
 
-        this.socket = new Rx.Subject();
+        this.sjAPINotif = new Rx.Subject();
 
         const covTimerConfig = _.clone(this.config.covTimer);
         // Emits the first tick of the COV Timer
@@ -98,20 +98,20 @@ export class BACnetServiceManager {
         // Uses default logger if api logger is not provided
         const apiLogger = _.isNil(logger) ? this.logger : logger;
 
-        // Creates output socket
-        const socket = this.socket;
+        // Creates output sjAPINotif
+        const sjAPINotif = this.sjAPINotif;
 
         // Create API Service
         const apiService = new APIService();
 
         // Create API Confirmed Request Service
         const confirmedReqService = new APIBACnetServices
-            .APIConfirmedReqService(apiLogger, socket);
+            .APIConfirmedReqService(apiLogger, sjAPINotif);
         apiService.confirmedReq = confirmedReqService as any;
 
         // Create API Unconfirmed Request Service
         const unconfirmedReqService = new APIBACnetServices
-            .APIUnconfirmedReqService(apiLogger, socket);
+            .APIUnconfirmedReqService(apiLogger, sjAPINotif);
         apiService.unconfirmedReq = unconfirmedReqService as any;
 
         return apiService;

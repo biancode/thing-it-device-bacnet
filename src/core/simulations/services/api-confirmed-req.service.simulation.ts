@@ -10,16 +10,16 @@ import * as Enums from '../../enums';
 export class APIConfirmedReqService {
 
     constructor (private logger: Logger,
-        private socket: Rx.Subject<Interfaces.Simulation.APINotification>) {}
+        private sjAPINotif: Rx.Subject<Interfaces.Simulation.APINotification>) {}
 
     /**
      * Destroys the instance.
-     * - removes socket (sets `null`)
+     * - removes sjAPINotif (sets `null`)
      *
      * @return {Promise<any>}
      */
     public async destroy (): Promise<any> {
-        this.socket = null;
+        this.sjAPINotif = null;
     }
 
     /**
@@ -29,7 +29,7 @@ export class APIConfirmedReqService {
      * @return {void}
      */
     public readProperty (opts: BACnet.Interfaces.ConfirmedRequest.Service.ReadProperty): void {
-        this.socket.next({
+        this.sjAPINotif.next({
             type: Enums.Simulation.ConfirmedRequestService.ReadProperty,
             params: opts,
         });
@@ -42,7 +42,7 @@ export class APIConfirmedReqService {
      * @return {void}
      */
     public writeProperty (opts: BACnet.Interfaces.ConfirmedRequest.Service.WriteProperty): void {
-        this.socket.next({
+        this.sjAPINotif.next({
             type: Enums.Simulation.ConfirmedRequestService.WriteProperty,
             params: opts,
         });
@@ -56,7 +56,7 @@ export class APIConfirmedReqService {
      * @return {void}
      */
     public subscribeCOV (opts: BACnet.Interfaces.ConfirmedRequest.Service.SubscribeCOV): void {
-        this.socket.next({
+        this.sjAPINotif.next({
             type: Enums.Simulation.ConfirmedRequestService.SubscribeCOV,
             params: opts,
         });
@@ -70,7 +70,7 @@ export class APIConfirmedReqService {
      * @return {void}
      */
     public unsubscribeCOV (opts: BACnet.Interfaces.ConfirmedRequest.Service.UnsubscribeCOV): void {
-        this.socket.next({
+        this.sjAPINotif.next({
             type: Enums.Simulation.ConfirmedRequestService.UnsubscribeCOV,
             params: opts,
         });

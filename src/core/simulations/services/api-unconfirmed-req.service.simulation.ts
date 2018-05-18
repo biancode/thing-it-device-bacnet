@@ -10,16 +10,16 @@ import * as Enums from '../../enums';
 export class APIUnconfirmedReqService {
 
     constructor (private logger: Logger,
-        private socket: Rx.Subject<Interfaces.Simulation.APINotification>) {}
+        private sjAPINotif: Rx.Subject<Interfaces.Simulation.APINotification>) {}
 
     /**
      * Destroys the instance.
-     * - removes socket (sets `null`)
+     * - removes sjAPINotif (sets `null`)
      *
      * @return {Promise<any>}
      */
     public async destroy (): Promise<any> {
-        this.socket = null;
+        this.sjAPINotif = null;
     }
 
     /**
@@ -29,7 +29,7 @@ export class APIUnconfirmedReqService {
      * @return {void}
      */
     public whoIsBroadcast (opts: BACnet.Interfaces.UnconfirmedRequest.Service.WhoIs): void {
-        this.socket.next({
+        this.sjAPINotif.next({
             type: Enums.Simulation.UnsonfirmedRequestService.WhoIsBroadcast,
             params: opts,
         });
@@ -42,7 +42,7 @@ export class APIUnconfirmedReqService {
      * @return {void}
      */
     public whoIsUnicast (opts: BACnet.Interfaces.UnconfirmedRequest.Service.WhoIs): void {
-        this.socket.next({
+        this.sjAPINotif.next({
             type: Enums.Simulation.UnsonfirmedRequestService.WhoIsUnicast,
             params: opts,
         });
