@@ -76,6 +76,15 @@ export class BACnetServiceManager {
     }
 
     /**
+     * Returns the `API Notification` flow.
+     *
+     * @return {Rx.Subject<Interfaces.Simulation.APINotification>}
+     */
+    public getAPIFlow (): Rx.Subject<Interfaces.Simulation.APINotification> {
+        return this.sjAPINotif;
+    }
+
+    /**
      * Generates the instance of the COVTimer and emits redux `tick` event with
      * instance of the COVTimer.
      *
