@@ -113,8 +113,8 @@ export class LightActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId))
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.stateText))
             .subscribe((resp) => {
-                const bacnetProperties = this
-                    .getReadPropertyValues<BACnet.Types.BACnetCharacterString>(resp);
+                const bacnetProperties = BACnet.Helpers.Layer
+                    .getPropertyValues<BACnet.Types.BACnetCharacterString>(resp.layer);
 
                 this.stateText = _.map(bacnetProperties, (stateTextItem) => {
                     return stateTextItem.value;
@@ -132,7 +132,8 @@ export class LightActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.lightActiveFeedbackObjectId))
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetUnsignedInteger>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetUnsignedInteger>(resp.layer);
 
                 this.setLightActive(bacnetProperty);
 
@@ -146,7 +147,8 @@ export class LightActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.levelFeedbackObjectId))
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetReal>(resp.layer);
 
                 this.state.dimmerLevel = bacnetProperty.value;
 

@@ -147,9 +147,9 @@ export class CommonDevice extends DeviceBase {
         const covProps = respServiceData.listOfValues;
 
         // Get instances of properties
-        const presentValueProp = BACnet.Utils.Common.findPropById(covProps,
+        const presentValueProp = BACnet.Helpers.Layer.findPropById(covProps,
             BACnet.Enums.PropertyId.presentValue);
-        const statusFlagsProp = BACnet.Utils.Common.findPropById(covProps,
+        const statusFlagsProp = BACnet.Helpers.Layer.findPropById(covProps,
             BACnet.Enums.PropertyId.statusFlags);
 
         // Get instances of property values
@@ -157,38 +157,6 @@ export class CommonDevice extends DeviceBase {
         const statusFlags = statusFlagsProp.values[0] as BACnet.Types.BACnetStatusFlags;
 
         return { presentValue, statusFlags };
-    }
-
-    /**
-     * Extracts the value of the property from the BACnet `ReadProperty` service.
-     *
-     * @template T {extends BACnet.Types.BACnetTypeBase}
-     * @param  {IBACnetResponse} resp - response from BACnet Object (device)
-     * @return {T}
-     */
-    public getReadPropertyValue <T extends BACnet.Types.BACnetTypeBase> (
-            resp: Interfaces.FlowManager.Response): T {
-        const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
-            _.get(resp, 'layer.apdu.service', null);
-
-        const bacnetProperty = respServiceData.prop.values[0] as T;
-        return bacnetProperty;
-    }
-
-    /**
-     * Extracts the values of the property from the BACnet `ReadProperty` service.
-     *
-     * @template T {extends BACnet.Types.BACnetTypeBase}
-     * @param  {IBACnetResponse} resp - response from BACnet Object (device)
-     * @return {T}
-     */
-    public getReadPropertyValues <T extends BACnet.Types.BACnetTypeBase> (
-            resp: Interfaces.FlowManager.Response): T[] {
-        const respServiceData: BACnet.Interfaces.ComplexACK.Read.ReadProperty =
-            _.get(resp, 'layer.apdu.service', null);
-
-        const bacnetProperties = respServiceData.prop.values as T[];
-        return bacnetProperties;
     }
 
     /**

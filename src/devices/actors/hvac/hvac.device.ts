@@ -107,7 +107,8 @@ export class HVACActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.setpointFeedbackObjectId))
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetReal>(resp.layer);
 
                 this.state.setpoint = bacnetProperty.value;
 
@@ -121,7 +122,8 @@ export class HVACActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.temperatureObjectId))
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetReal>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetReal>(resp.layer);
 
                 this.state.temperature = bacnetProperty.value;
 

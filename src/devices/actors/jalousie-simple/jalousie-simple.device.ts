@@ -101,7 +101,8 @@ export class JalousieSimpleActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.motionDirectionObjectId))
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetEnumerated>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetEnumerated>(resp.layer);
 
                 this.state.motionDirection = bacnetProperty.value;
 
@@ -114,7 +115,8 @@ export class JalousieSimpleActorDevice extends ActorDevice {
             .filter(this.flowManager.isBACnetObject(this.stopValueObjectId))
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetEnumerated>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetEnumerated>(resp.layer);
 
                 this.state.stopValue = bacnetProperty.value === 1;
 

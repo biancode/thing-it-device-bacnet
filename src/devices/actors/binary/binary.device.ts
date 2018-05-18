@@ -59,7 +59,8 @@ export class BinaryActorDevice extends ActorDevice {
         this.subManager.subscribe = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.objectName))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
 
                 this.state.objectName = bacnetProperty.value;
 
@@ -72,7 +73,8 @@ export class BinaryActorDevice extends ActorDevice {
         this.subManager.subscribe = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.description))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetCharacterString>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetCharacterString>(resp.layer);
 
                 this.state.description = bacnetProperty.value;
 
@@ -85,7 +87,8 @@ export class BinaryActorDevice extends ActorDevice {
         this.subManager.subscribe = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetEnumerated>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetEnumerated>(resp.layer);
 
                 this.state.presentValue = bacnetProperty.value === 1;
 

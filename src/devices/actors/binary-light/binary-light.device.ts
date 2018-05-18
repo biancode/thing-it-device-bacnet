@@ -71,7 +71,8 @@ export class BinaryLightActorDevice extends ActorDevice {
         this.subManager.subscribe = readPropertyFlow
             .filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue))
             .subscribe((resp) => {
-                const bacnetProperty = this.getReadPropertyValue<BACnet.Types.BACnetEnumerated>(resp);
+                const bacnetProperty = BACnet.Helpers.Layer
+                    .getPropertyValue<BACnet.Types.BACnetEnumerated>(resp.layer);
 
                 this.state.lightActive = bacnetProperty.value === 1;
 
