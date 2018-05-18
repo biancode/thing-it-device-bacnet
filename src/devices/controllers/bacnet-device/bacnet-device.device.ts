@@ -138,10 +138,10 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      * @return {void}
      */
     public initDeviceParamsFromConfig (): void {
-        this.objectId = new BACnet.Types.BACnetObjectId({
-            type: BACnet.Enums.ObjectType.Device,
-            instance: this.config.deviceId,
-        });
+        this.objectId = this.getBACnetObjectId(
+            this.config.deviceId || 0,
+            BACnet.Enums.ObjectType.Device,
+        );
     }
 
     /**
