@@ -76,26 +76,26 @@ export class ActorDevice extends CommonDevice {
      * @return {Promise<void>}
      */
     public async createPluginComponents (): Promise<void> {
-        if (!this.isSimulated()) {
-            // Create and init BACnet Flow Manager
-            this.flowManager = store.getState([ 'bacnet', 'flowManager' ]);
-            // Create and init BACnet Service Manager
-            this.serviceManager = store.getState([ 'bacnet', 'serviceManager' ]);
+        if (this.isSimulated()) {
+            this.simulationLogic = this.getSimulationLogic();
+
+            // Create instance of the BACnet Flow Manager
+            this.flowManager = this.simulationLogic.getFlowManager();
+            // Create instance of the BACnet Service Manager
+            this.serviceManager = this.simulationLogic.getServiceManager();
             // Creates instance of the API Service
-            this.apiService = this.serviceManager.createAPIService(this.logger);
+            this.apiService = this.serviceManager.createAPIService();
+
+            this.simulationLogic.startSimulation();
             return;
         }
 
-        const simulationLogic = this.getSimulationLogic();
-
-        // Create instance of the BACnet Flow Manager
-        this.flowManager = simulationLogic.getFlowManager();
-        // Create instance of the BACnet Service Manager
-        this.serviceManager = simulationLogic.getServiceManager();
+        // Create and init BACnet Flow Manager
+        this.flowManager = store.getState([ 'bacnet', 'flowManager' ]);
+        // Create and init BACnet Service Manager
+        this.serviceManager = store.getState([ 'bacnet', 'serviceManager' ]);
         // Creates instance of the API Service
-        this.apiService = this.serviceManager.createAPIService();
-
-        simulationLogic.startSimulation();
+        this.apiService = this.serviceManager.createAPIService(this.logger);
     }
 
     /**
