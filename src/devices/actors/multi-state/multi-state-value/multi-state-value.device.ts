@@ -8,9 +8,9 @@ import * as Interfaces from '../../../../core/interfaces';
 
 import * as Entities from '../../../../core/entities';
 
-import * as Errors from '../../../../core/errors';
+import * as Helpers from '../../../../core/helpers';
 
-import { store } from '../../../../redux';
+import * as Errors from '../../../../core/errors';
 
 export class MultiStateValueActorDevice extends MultiStateActorDevice {
     public readonly className: string = 'MultiStateValueActorDevice';
@@ -25,7 +25,7 @@ export class MultiStateValueActorDevice extends MultiStateActorDevice {
      * @return {void}
      */
     public initParamsFromConfig (): void {
-        this.objectId = this.getBACnetObjectId(
+        this.objectId = Helpers.BACnet.getBACnetObjectId(
             this.config.objectId,
             BACnet.Enums.ObjectType.MultiStateValue,
         );

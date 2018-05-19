@@ -8,9 +8,9 @@ import * as Interfaces from '../../../../core/interfaces';
 
 import * as Entities from '../../../../core/entities';
 
-import * as Errors from '../../../../core/errors';
+import * as Helpers from '../../../../core/helpers';
 
-import { store } from '../../../../redux';
+import * as Errors from '../../../../core/errors';
 
 export class RoomControlActorDevice extends HVACActorDevice {
     public readonly className: string = 'RoomControlActorDevice';

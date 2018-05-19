@@ -10,11 +10,9 @@ import * as Interfaces from '../../../core/interfaces';
 
 import * as Entities from '../../../core/entities';
 
-import * as Errors from '../../../core/errors';
-
-import { store } from '../../../redux';
-
 import * as Helpers from '../../../core/helpers';
+
+import * as Errors from '../../../core/errors';
 
 export class JalousieActorDevice extends ActorDevice {
     public readonly className: string = 'JalousieActorDevice';
@@ -35,27 +33,27 @@ export class JalousieActorDevice extends ActorDevice {
      * @return {void}
      */
     public initParamsFromConfig (): void {
-        this.positionFeedbackObjectId = this.getBACnetObjectId(
+        this.positionFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.positionFeedbackObjectId,
             this.config.positionFeedbackObjectType,
         );
 
-        this.positionModificationObjectId = this.getBACnetObjectId(
+        this.positionModificationObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.positionModificationObjectId,
             this.config.positionModificationObjectType,
         );
 
-        this.rotationFeedbackObjectId = this.getBACnetObjectId(
+        this.rotationFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.rotationFeedbackObjectId,
             this.config.rotationFeedbackObjectType,
         );
 
-        this.rotationModificationObjectId = this.getBACnetObjectId(
+        this.rotationModificationObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.rotationModificationObjectId,
             this.config.rotationModificationObjectType,
         );
 
-        this.actionObjectId = this.getBACnetObjectId(
+        this.actionObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.actionObjectId,
             this.config.actionObjectType,
         );
