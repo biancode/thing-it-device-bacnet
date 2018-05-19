@@ -21,12 +21,12 @@ export abstract class BaseSimulation {
     }
 
     /**
-     * Starts the simulation logic for specific device.
+     * Starts the simulation logic for specific device. Default steps:
      *
-     * @abstract
      * @return {void}
      */
-    public abstract startSimulation (): void;
+    public startSimulation (): void {
+    }
 
     /**
      * Stops the simulation logic for specific device. Default steps:
