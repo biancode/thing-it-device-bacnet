@@ -35,6 +35,7 @@ export class ActorDevice extends CommonDevice {
 
         if (this.isSimulated()) {
             this.simulationLogic.stopSimulation();
+            await this.simulationLogic.destroy();
         }
     }
 
@@ -78,6 +79,7 @@ export class ActorDevice extends CommonDevice {
     public async createPluginComponents (): Promise<void> {
         if (this.isSimulated()) {
             this.simulationLogic = this.getSimulationLogic();
+            this.simulationLogic.init(this.config);
 
             // Create instance of the BACnet Flow Manager
             this.flowManager = this.simulationLogic.getFlowManager();
