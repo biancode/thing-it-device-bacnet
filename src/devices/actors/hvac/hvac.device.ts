@@ -169,13 +169,13 @@ export class HVACActorDevice extends ActorDevice {
       *
       * @return {Promise<void>}
       */
-     public setSetpointModification (newSetpoint: number): Bluebird<void> {
+     public setSetpointModification (setpointModifier: number): Bluebird<void> {
          this.logger.logDebug('HVACActorDevice - setSetpointModification: '
-             + `Setting setpoint modification: ${newSetpoint}`);
+             + `Setting setpoint modification: ${setpointModifier}`);
 
          // Gets the `presentValue|statusFlags` property for `setpoint`
          this.sendWriteProperty(this.setpointModificationObjectId, BACnet.Enums.PropertyId.presentValue,
-             [ new BACnet.Types.BACnetReal(newSetpoint) ]);
+             [ new BACnet.Types.BACnetReal(setpointModifier) ]);
 
          return Bluebird.resolve();
      }
