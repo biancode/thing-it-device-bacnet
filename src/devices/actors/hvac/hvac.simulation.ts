@@ -11,6 +11,17 @@ import * as Enums from '../../../core/enums';
 export class HVACSimulation extends Simulations.BaseSimulation {
     public config: Interfaces.Actor.HVAC.Config;
 
+    public state: Interfaces.Actor.HVAC.State = {
+        temperature: 21,
+        setpoint: 21,
+    };
+
+    private operatingState: boolean = true;
+
+    public setpointFeedbackObjectId: BACnet.Types.BACnetObjectId;
+    public temperatureObjectId: BACnet.Types.BACnetObjectId;
+    public setpointModificationObjectId: BACnet.Types.BACnetObjectId;
+
     /**
      * Creates unit params of the BACnet Object from plugin configuration.
      * Steps:
@@ -29,6 +40,15 @@ export class HVACSimulation extends Simulations.BaseSimulation {
      * @return {void}
      */
     public async startSimulation (): Promise<void> {
+        this.subManager.subscribe = Rx.timer(0, 10000)
+            .subscribe(() => {
+                const tempModif = this.operatingState ? -0.5 : 0.5;
+
+                this.state.temperature += tempModif;
+
+                this.operatingState = this.state.temperature > (this.state.setpoint - 1);
+            });
+    }
 
     /**
      * Stops the simulation logic for specific device.
