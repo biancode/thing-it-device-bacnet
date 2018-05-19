@@ -14,6 +14,8 @@ import * as Errors from '../../../core/errors';
 
 import { store } from '../../../redux';
 
+import * as Helpers from '../../../core/helpers';
+
 export class JalousieActorDevice extends ActorDevice {
     public readonly className: string = 'JalousieActorDevice';
     public state: Interfaces.Actor.Jalousie.State;
@@ -68,9 +70,9 @@ export class JalousieActorDevice extends ActorDevice {
         // Read `Position` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
-                RxOp.filter(this.flowManager.isBACnetObject(this.positionFeedbackObjectId)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.positionFeedbackObjectId)),
             )
             .subscribe((resp) => {
                 const bacnetProperties = this
@@ -92,9 +94,9 @@ export class JalousieActorDevice extends ActorDevice {
         // Read `Rotation` Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
-                RxOp.filter(this.flowManager.isBACnetObject(this.rotationFeedbackObjectId)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.rotationFeedbackObjectId)),
             )
             .subscribe((resp) => {
                 const bacnetProperties = this
