@@ -16,6 +16,8 @@ import { store } from '../../../redux';
 
 import * as Helpers from '../../../core/helpers';
 
+import { HVACSimulation } from './hvac.simulation';
+
 export class HVACActorDevice extends ActorDevice {
     public readonly className: string = 'HVACActorDevice';
     public state: Interfaces.Actor.HVAC.State;
