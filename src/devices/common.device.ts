@@ -160,42 +160,6 @@ export class CommonDevice extends DeviceBase {
     }
 
     /**
-     * Returns the BACnet Object Identifier.
-     *
-     * @param  {string|number} objectType - instance of the BACnet object
-     * @param  {string|BACnet.Enums.ObjectType} objectType - type of the BACnet object
-     * @return {BACnet.Types.BACnetObjectId}
-     */
-    public getBACnetObjectId (objectId: string|number, objectType?: string|BACnet.Enums.ObjectType,
-            defObjectType?: BACnet.Enums.ObjectType): BACnet.Types.BACnetObjectId {
-        const bacnetObjectId = +objectId;
-
-        if ((_.isString(objectId) && objectId === '') || !_.isFinite(bacnetObjectId)) {
-            throw new Errors.APIError(`CommonDevice - getObjectId: `
-                + `Object ID must have the valid 'number' value. Current value: ${objectId}`);
-        }
-
-        let bacnetObjectType: BACnet.Enums.ObjectType;
-        if (_.isNumber(objectType)) {
-            bacnetObjectType = objectType;
-        } else {
-            bacnetObjectType = !_.isNil(objectType) && objectType !== ''
-                ? BACnet.Enums.ObjectType[objectType]
-                : defObjectType;
-        }
-
-        if (!_.isNumber(bacnetObjectType)) {
-            throw new Errors.APIError(`CommonDevice - getObjectId: `
-                + `Object Type must have the valid BACnet type. Current type: ${objectType}`);
-        }
-
-        return new BACnet.Types.BACnetObjectId({
-            type: bacnetObjectType,
-            instance: bacnetObjectId,
-        });
-    }
-
-    /**
      * Sends the `WriteProperty` confirmed request.
      *
      * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
