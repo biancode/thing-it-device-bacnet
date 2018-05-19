@@ -133,10 +133,7 @@ export class FlowFilter {
     static matchFilter (isRequired: boolean, filterFn: BACnetFlowFilter,
             matchName: string = 'object'): BACnetFlowFilter {
         return (resp: Interfaces.FlowManager.Response): boolean => {
-            if (!isRequired || filterFn(resp)) {
-                return true;
-            }
-            return false;
+            return !isRequired || filterFn(resp);
         };
     }
 }
