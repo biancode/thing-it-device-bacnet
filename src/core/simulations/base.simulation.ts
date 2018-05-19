@@ -16,6 +16,11 @@ import * as Configs from '../configs';
  * @abstract
  */
 export abstract class BaseSimulation {
+    /**
+     * Device configuration
+     */
+    public config: any;
+
     public subManager: Managers.SubscriptionManager;
 
     public flowManager: BACnetFlowManager;
@@ -26,14 +31,19 @@ export abstract class BaseSimulation {
 
     /**
      * Inits the instance of simulation class. Default steps:
+     * - saves the device configuration;
      * - creates an instance of the subscribtion manager;
      * - calls the `initParamsFromConfig` method;
      *
      * @return {void}
      */
-    public async init (): Promise<void> {
+    public async init (config: any): Promise<void> {
+        this.config = config;
+
         this.subManager = new Managers.SubscriptionManager();
         this.subManager.initManager();
+
+        this.initParamsFromConfig();
     }
 
     /**
