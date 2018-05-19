@@ -1,6 +1,16 @@
+import * as Rx from 'rxjs';
+import * as RxOp from 'rxjs/operators';
+import * as BACnet from 'bacnet-logic';
+
 import * as Simulations from '../../../core/simulations';
 
+import * as Interfaces from '../../../core/interfaces';
+
+import * as Enums from '../../../core/enums';
+
 export class HVACSimulation extends Simulations.BaseSimulation {
+    public config: Interfaces.Actor.HVAC.Config;
+
     /**
      * Creates unit params of the BACnet Object from plugin configuration.
      * Steps:
