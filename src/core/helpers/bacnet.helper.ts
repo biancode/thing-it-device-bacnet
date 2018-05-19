@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+
 import * as BACnetLogic from 'bacnet-logic';
 
 import * as Errors from '../errors';
@@ -19,7 +20,7 @@ export class BACnet {
         const bacnetObjectId = +objectId;
 
         if ((_.isString(objectId) && objectId === '') || !_.isFinite(bacnetObjectId)) {
-            throw new Errors.APIError(`CommonDevice - getObjectId: `
+            throw new Errors.APIError(`BACnet - getBACnetObjectId: `
                 + `Object ID must have the valid BACnet object instance number. Current value: ${objectId}`);
         }
 
@@ -33,7 +34,7 @@ export class BACnet {
         }
 
         if (!_.isNumber(bacnetObjectType)) {
-            throw new Errors.APIError(`CommonDevice - getObjectId: `
+            throw new Errors.APIError(`BACnet - getBACnetObjectId: `
                 + `Object Type must have the valid BACnet object type. Current type: ${objectType}`);
         }
 
