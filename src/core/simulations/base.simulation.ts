@@ -29,6 +29,14 @@ export abstract class BaseSimulation {
     public abstract startSimulation (): void;
 
     /**
+     * Stops the simulation logic for specific device. Default steps:
+     *
+     * @return {void}
+     */
+    public stopSimulation (): void {
+    }
+
+    /**
      * Factory. Creates the instance of the `flow` manager.
      *
      * @return {Managers.BACnetFlowManager} - instance of the `flow` manager
