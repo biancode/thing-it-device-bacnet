@@ -16,24 +16,31 @@ import * as Configs from '../configs';
  * @abstract
  */
 export abstract class BaseSimulation {
+    private subManager: Managers.SubscriptionManager;
 
     constructor (private logger: Utils.Logger) {
     }
 
     /**
      * Starts the simulation logic for specific device. Default steps:
+     * - creates an instance of the subscribtion manager;
      *
      * @return {void}
      */
     public startSimulation (): void {
+        this.subManager = new Managers.SubscriptionManager();
+        this.subManager.initManager();
     }
 
     /**
      * Stops the simulation logic for specific device. Default steps:
+     * - destroys the subscribtion manager;
      *
      * @return {void}
      */
     public stopSimulation (): void {
+        this.subManager.destroy();
+        this.subManager = null;
     }
 
     /**
