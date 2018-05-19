@@ -18,6 +18,9 @@ import * as Configs from '../configs';
 export abstract class BaseSimulation {
     public subManager: Managers.SubscriptionManager;
 
+    public flowManager: BACnetFlowManager;
+    public serviceManager: BACnetServiceManager;
+
     constructor (private logger: Utils.Logger) {
     }
 
@@ -49,12 +52,12 @@ export abstract class BaseSimulation {
      * @return {Managers.BACnetFlowManager} - instance of the `flow` manager
      */
     public getFlowManager (): Managers.BACnetFlowManager {
-        const flowManager = new BACnetFlowManager(this.logger);
+        this.flowManager = new BACnetFlowManager(this.logger);
 
         const managerConfgig = _.cloneDeep(Configs.AppConfig.manager.flow);
-        flowManager.initManager(managerConfgig);
+        this.flowManager.initManager(managerConfgig);
 
-        return flowManager as any as Managers.BACnetFlowManager;
+        return this.flowManager as any as Managers.BACnetFlowManager;
     }
 
     /**
@@ -63,11 +66,11 @@ export abstract class BaseSimulation {
      * @return {Managers.BACnetServiceManager} - instance of the `service` manager
      */
     public getServiceManager (): Managers.BACnetServiceManager {
-        const serviceManager = new BACnetServiceManager(this.logger);
+        this.serviceManager = new BACnetServiceManager(this.logger);
 
         const managerConfgig = _.cloneDeep(Configs.AppConfig.manager.service);
-        serviceManager.initManager(managerConfgig);
+        this.serviceManager.initManager(managerConfgig);
 
-        return serviceManager as any as Managers.BACnetServiceManager;
+        return this.serviceManager as any as Managers.BACnetServiceManager;
     }
 }
