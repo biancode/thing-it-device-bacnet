@@ -25,23 +25,23 @@ export abstract class BaseSimulation {
     }
 
     /**
-     * Starts the simulation logic for specific device. Default steps:
+     * Inits the instance of simulation class. Default steps:
      * - creates an instance of the subscribtion manager;
      *
      * @return {void}
      */
-    public startSimulation (): void {
+    public async init (): Promise<void> {
         this.subManager = new Managers.SubscriptionManager();
         this.subManager.initManager();
     }
 
     /**
-     * Stops the simulation logic for specific device. Default steps:
+     * Destroys the instance of simulation class. Default steps:
      * - destroys the subscribtion manager;
      *
      * @return {void}
      */
-    public stopSimulation (): void {
+    public async destroy (config: any): Promise<void> {
         this.subManager.destroy();
         this.subManager = null;
     }
@@ -73,4 +73,18 @@ export abstract class BaseSimulation {
 
         return this.serviceManager as any as Managers.BACnetServiceManager;
     }
+
+    /**
+     * Starts the simulation logic for specific device.
+     *
+     * @return {void}
+     */
+    public abstract async startSimulation (): Promise<void>;
+
+    /**
+     * Stops the simulation logic for specific device.
+     *
+     * @return {void}
+     */
+    public abstract async stopSimulation (): Promise<void>;
 }
