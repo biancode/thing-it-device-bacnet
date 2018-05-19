@@ -28,6 +28,16 @@ export class ActorDevice extends CommonDevice {
     public serviceManager: BACnetServiceManager;
     public apiService: APIService;
 
+    public simulationLogic: Simulations.BaseSimulation;
+
+    public async stop (): Promise<void> {
+        await super.stop();
+
+        if (this.isSimulated()) {
+            this.simulationLogic.stopSimulation();
+        }
+    }
+
     /**
      * initDevice - initializes the unit, sets initial states.
      *
