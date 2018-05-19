@@ -27,6 +27,7 @@ export abstract class BaseSimulation {
     /**
      * Inits the instance of simulation class. Default steps:
      * - creates an instance of the subscribtion manager;
+     * - calls the `initParamsFromConfig` method;
      *
      * @return {void}
      */
@@ -73,6 +74,13 @@ export abstract class BaseSimulation {
 
         return this.serviceManager as any as Managers.BACnetServiceManager;
     }
+
+    /**
+     * Inits the simulation configuration from device configuration.
+     *
+     * @return {void}
+     */
+    public abstract async initParamsFromConfig (): Promise<void>;
 
     /**
      * Starts the simulation logic for specific device.
