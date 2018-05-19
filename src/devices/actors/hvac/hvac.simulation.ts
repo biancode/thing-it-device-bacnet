@@ -19,5 +19,12 @@ export class HVACSimulation extends Simulations.BaseSimulation {
      * @return {void}
      */
     public async startSimulation (): Promise<void> {
+
+    /**
+     * Stops the simulation logic for specific device.
+     *
+     * @return {void}
+     */
+    public async stopSimulation (): Promise<void> {
     }
 }
