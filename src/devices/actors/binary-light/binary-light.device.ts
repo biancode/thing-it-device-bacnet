@@ -14,6 +14,9 @@ import * as Errors from '../../../core/errors';
 
 import { store } from '../../../redux';
 
+import * as Helpers from '../../../core/helpers';
+import { FlowFilter } from '../../../core/helpers';
+
 export class BinaryLightActorDevice extends ActorDevice {
     public readonly className: string = 'BinaryLightActorDevice';
     public state: Interfaces.Actor.BinaryLight.State;
@@ -44,9 +47,9 @@ export class BinaryLightActorDevice extends ActorDevice {
         // Read Property Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
-                RxOp.filter(this.flowManager.isBACnetObject(this.objectId))
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId))
             )
             .subscribe((resp) => {
                 const bacnetProperties = this
@@ -68,15 +71,15 @@ export class BinaryLightActorDevice extends ActorDevice {
         // Read Property Flow
         const readPropertyFlow = this.flowManager.getResponseFlow()
             .pipe(
-                RxOp.filter(this.flowManager.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
-                RxOp.filter(this.flowManager.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
-                RxOp.filter(this.flowManager.isBACnetObject(this.objectId)),
+                RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+                RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)),
             )
 
         // Gets the `presentValue` property
         this.subManager.subscribe = readPropertyFlow
             .pipe(
-                RxOp.filter(this.flowManager.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
+                RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)),
             )
             .subscribe((resp) => {
                 const bacnetProperty = BACnet.Helpers.Layer
