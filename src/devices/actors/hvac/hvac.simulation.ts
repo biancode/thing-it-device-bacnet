@@ -18,6 +18,6 @@ export class HVACSimulation extends Simulations.BaseSimulation {
      *
      * @return {void}
      */
-    public startSimulation () {
+    public async startSimulation (): Promise<void> {
     }
 }
