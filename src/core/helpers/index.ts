@@ -1,1 +1,1 @@
-export * from './flow.filter';
+export * from './flow-filter.helper';
