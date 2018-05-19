@@ -16,7 +16,7 @@ import * as Configs from '../configs';
  * @abstract
  */
 export abstract class BaseSimulation {
-    private subManager: Managers.SubscriptionManager;
+    public subManager: Managers.SubscriptionManager;
 
     constructor (private logger: Utils.Logger) {
     }
