@@ -10,11 +10,9 @@ import * as Interfaces from '../../../core/interfaces';
 
 import * as Entities from '../../../core/entities';
 
-import * as Errors from '../../../core/errors';
-
-import { store } from '../../../redux';
-
 import * as Helpers from '../../../core/helpers';
+
+import * as Errors from '../../../core/errors';
 
 export class LightActorDevice extends ActorDevice {
     public readonly className: string = 'LightActorDevice';
@@ -36,22 +34,22 @@ export class LightActorDevice extends ActorDevice {
      * @return {void}
      */
     public initParamsFromConfig (): void {
-        this.levelFeedbackObjectId = this.getBACnetObjectId(
+        this.levelFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.levelFeedbackObjectId,
             this.config.levelFeedbackObjectType,
         );
 
-        this.levelModificationObjectId = this.getBACnetObjectId(
+        this.levelModificationObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.levelModificationObjectId,
             this.config.levelModificationObjectType,
         );
 
-        this.lightActiveFeedbackObjectId = this.getBACnetObjectId(
+        this.lightActiveFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.lightActiveFeedbackObjectId,
             this.config.lightActiveFeedbackObjectType,
         );
 
-        this.lightActiveModificationObjectId = this.getBACnetObjectId(
+        this.lightActiveModificationObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.lightActiveModificationObjectId,
             this.config.lightActiveModificationObjectType,
         );

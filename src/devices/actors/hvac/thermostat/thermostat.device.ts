@@ -10,13 +10,11 @@ import * as Interfaces from '../../../../core/interfaces';
 
 import * as Entities from '../../../../core/entities';
 
+import * as Helpers from '../../../../core/helpers';
+
 import * as Errors from '../../../../core/errors';
 
 import * as Enums from '../../../../core/enums';
-
-import { store } from '../../../../redux';
-
-import * as Helpers from '../../../../core/helpers';
 
 export class ThermostatActorDevice extends HVACActorDevice {
     public readonly className: string = 'ThermostatActorDevice';
@@ -37,7 +35,7 @@ export class ThermostatActorDevice extends HVACActorDevice {
     public initParamsFromConfig (): void {
         super.initParamsFromConfig();
 
-        this.modeObjectId = this.getBACnetObjectId(
+        this.modeObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.modeObjectId,
             this.config.modeObjectType,
         );

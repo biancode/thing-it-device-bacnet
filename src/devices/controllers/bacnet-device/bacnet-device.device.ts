@@ -1,8 +1,11 @@
 import * as dns from 'dns';
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
+
 import * as Rx from 'rxjs';
 import * as RxOp from 'rxjs/operators';
+
+import * as BACnet from 'bacnet-logic';
 
 import { ControllerDevice } from '../controller.device';
 
@@ -15,18 +18,11 @@ import { AppConfig } from '../../../core/configs';
 
 import { ServerSocket } from '../../../core/sockets';
 
-import {
-    BACnetFlowManager,
-    BACnetServiceManager,
-} from '../../../core/managers';
+import * as Managers from '../../../core/managers';
 
-import {
-    APIService,
-} from '../../../core/services';
+import { APIService } from '../../../core/services';
 
 import * as Interfaces from '../../../core/interfaces';
-
-import * as BACnet from 'bacnet-logic';
 
 import * as Helpers from '../../../core/helpers';
 
@@ -37,8 +33,8 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public pluginConfig: Interfaces.AppConfig;
 
     public socketServer: ServerSocket;
-    public flowManager: BACnetFlowManager;
-    public serviceManager: BACnetServiceManager;
+    public flowManager: Managers.BACnetFlowManager;
+    public serviceManager: Managers.BACnetServiceManager;
     public apiService: APIService;
 
     private objectId: BACnet.Types.BACnetObjectId;
@@ -140,7 +136,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
      * @return {void}
      */
     public initDeviceParamsFromConfig (): void {
-        this.objectId = this.getBACnetObjectId(
+        this.objectId = Helpers.BACnet.getBACnetObjectId(
             this.config.deviceId || 0,
             BACnet.Enums.ObjectType.Device,
         );
@@ -185,12 +181,12 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
         BACnetAction.setBACnetServer(this.socketServer);
 
         /* Create and init BACnet Service Manager */
-        this.serviceManager = new BACnetServiceManager(this.logger);
+        this.serviceManager = new Managers.BACnetServiceManager(this.logger);
         this.serviceManager.initManager(this.pluginConfig.manager.service);
         BACnetAction.setBACnetServiceManager(this.serviceManager);
 
         /* Create and init BACnet Flow Manager */
-        this.flowManager = new BACnetFlowManager(this.logger);
+        this.flowManager = new Managers.BACnetFlowManager(this.logger);
         this.flowManager.initManager(this.pluginConfig.manager.flow);
         BACnetAction.setBACnetFlowManager(this.flowManager);
     }
