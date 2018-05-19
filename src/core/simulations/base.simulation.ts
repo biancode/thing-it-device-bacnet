@@ -52,7 +52,7 @@ export abstract class BaseSimulation {
      *
      * @return {void}
      */
-    public async destroy (config: any): Promise<void> {
+    public async destroy (): Promise<void> {
         this.subManager.destroy();
         this.subManager = null;
     }
