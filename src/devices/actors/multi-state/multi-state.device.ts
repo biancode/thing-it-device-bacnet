@@ -10,11 +10,9 @@ import * as Interfaces from '../../../core/interfaces';
 
 import * as Entities from '../../../core/entities';
 
-import * as Errors from '../../../core/errors';
-
-import { store } from '../../../redux';
-
 import * as Helpers from '../../../core/helpers';
+
+import * as Errors from '../../../core/errors';
 
 export class MultiStateActorDevice extends ActorDevice {
     public readonly className: string = 'MultiStateActorDevice';

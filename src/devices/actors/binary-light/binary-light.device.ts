@@ -10,12 +10,9 @@ import * as Interfaces from '../../../core/interfaces';
 
 import * as Entities from '../../../core/entities';
 
-import * as Errors from '../../../core/errors';
-
-import { store } from '../../../redux';
-
 import * as Helpers from '../../../core/helpers';
-import { FlowFilter } from '../../../core/helpers';
+
+import * as Errors from '../../../core/errors';
 
 export class BinaryLightActorDevice extends ActorDevice {
     public readonly className: string = 'BinaryLightActorDevice';
@@ -32,7 +29,7 @@ export class BinaryLightActorDevice extends ActorDevice {
      * @return {void}
      */
     public initParamsFromConfig (): void {
-        this.objectId = this.getBACnetObjectId(
+        this.objectId = Helpers.BACnet.getBACnetObjectId(
             this.config.lightActiveObjectId,
             this.config.lightActiveObjectType,
         );

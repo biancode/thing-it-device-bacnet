@@ -8,9 +8,9 @@ import * as Interfaces from '../../../../core/interfaces';
 
 import * as Entities from '../../../../core/entities';
 
-import * as Errors from '../../../../core/errors';
+import * as Helpers from '../../../../core/helpers';
 
-import { store } from '../../../../redux';
+import * as Errors from '../../../../core/errors';
 
 export class AnalogInputActorDevice extends AnalogActorDevice {
     public readonly className: string = 'AnalogInputActorDevice';
@@ -25,7 +25,7 @@ export class AnalogInputActorDevice extends AnalogActorDevice {
      * @return {void}
      */
     public initParamsFromConfig (): void {
-        this.objectId = this.getBACnetObjectId(
+        this.objectId = Helpers.BACnet.getBACnetObjectId(
             this.config.objectId,
             this.config.objectType,
             BACnet.Enums.ObjectType.AnalogInput,

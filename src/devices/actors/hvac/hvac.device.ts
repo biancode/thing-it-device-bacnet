@@ -10,13 +10,11 @@ import * as Interfaces from '../../../core/interfaces';
 
 import * as Entities from '../../../core/entities';
 
-import * as Errors from '../../../core/errors';
-
-import { store } from '../../../redux';
-
 import * as Helpers from '../../../core/helpers';
 
 import { HVACSimulation } from './hvac.simulation';
+
+import * as Errors from '../../../core/errors';
 
 export class HVACActorDevice extends ActorDevice {
     public readonly className: string = 'HVACActorDevice';
@@ -46,17 +44,17 @@ export class HVACActorDevice extends ActorDevice {
      * @return {void}
      */
     public initParamsFromConfig (): void {
-        this.setpointFeedbackObjectId = this.getBACnetObjectId(
+        this.setpointFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.setpointFeedbackObjectId,
             this.config.setpointFeedbackObjectType,
         );
 
-        this.temperatureObjectId = this.getBACnetObjectId(
+        this.temperatureObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.temperatureObjectId,
             this.config.temperatureObjectType,
         );
 
-        this.setpointModificationObjectId = this.getBACnetObjectId(
+        this.setpointModificationObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.setpointModificationObjectId,
             this.config.setpointModificationObjectType,
         );

@@ -12,11 +12,9 @@ import * as Interfaces from '../../../core/interfaces';
 
 import * as Entities from '../../../core/entities';
 
-import * as Errors from '../../../core/errors';
-
-import { store } from '../../../redux';
-
 import * as Helpers from '../../../core/helpers';
+
+import * as Errors from '../../../core/errors';
 
 export class JalousieSimpleActorDevice extends ActorDevice {
     public readonly className: string = 'JalousieSimpleActorDevice';
@@ -34,12 +32,12 @@ export class JalousieSimpleActorDevice extends ActorDevice {
      * @return {void}
      */
     public initParamsFromConfig (): void {
-        this.motionDirectionObjectId = this.getBACnetObjectId(
+        this.motionDirectionObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.motionDirectionObjectId,
             this.config.motionDirectionObjectType,
         );
 
-        this.stopValueObjectId = this.getBACnetObjectId(
+        this.stopValueObjectId = Helpers.BACnet.getBACnetObjectId(
             this.config.stopValueObjectId,
             this.config.stopValueObjectType,
         );
