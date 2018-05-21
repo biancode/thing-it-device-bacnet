@@ -24,6 +24,8 @@ export class HVACSimulation extends Simulations.BaseSimulation {
     public temperatureObjectId: BACnet.Types.BACnetObjectId;
     public setpointModificationObjectId: BACnet.Types.BACnetObjectId;
 
+    public temperatureIsSubscribed: boolean = false;
+
     /**
      * Creates unit params of the BACnet Object from plugin configuration.
      * Steps:
@@ -56,7 +58,19 @@ export class HVACSimulation extends Simulations.BaseSimulation {
      * @return {void}
      */
     public async startSimulation (): Promise<void> {
+        this.subscribeToProperty();
+
         this.initProperties();
+    }
+
+    public async subscribeToProperty (): Promise<void> {
+        this.subManager.subscribe = Rx.timer(0, 10000)
+            .subscribe(() => {
+                if (!this.temperatureIsSubscribed) {
+                    return;
+                }
+                this.simulateCOVTemperature();
+            });
     }
 
     /**
