@@ -56,11 +56,38 @@ export class HVACSimulation extends Simulations.BaseSimulation {
      * @return {void}
      */
     public async startSimulation (): Promise<void> {
+    }
+
+    /**
+     * Simulates the COV events for the temperature.
+     *
+     * @async
+     * @return {Promise<void>}
+     */
+    public async simulateCOVTemperature (): Promise<void> {
         this.subManager.subscribe = Rx.timer(0, 10000)
             .subscribe(() => {
                 const tempModif = this.operatingState ? -0.5 : 0.5;
 
                 this.state.temperature += tempModif;
+
+                this.flowManager.next(Enums.Simulation.FlowType.Response, <any>{
+                    apdu: {
+                        type: BACnet.Enums.ServiceType.UnconfirmedReqPDU,
+                        serviceChoice: BACnet.Enums.UnconfirmedServiceChoice.covNotification,
+                        service: {
+                            objId: this.setpointFeedbackObjectId,
+                            listOfValues: [
+                                {
+                                    id: BACnet.Enums.PropertyId.presentValue,
+                                    values: [
+                                        new BACnet.Types.BACnetReal(this.state.temperature),
+                                    ],
+                                }
+                            ]
+                        },
+                    },
+                });
 
                 this.operatingState = this.state.temperature > (this.state.setpoint - 1);
             });
