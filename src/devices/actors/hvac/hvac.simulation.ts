@@ -56,6 +56,21 @@ export class HVACSimulation extends Simulations.BaseSimulation {
      * @return {void}
      */
     public async startSimulation (): Promise<void> {
+        this.initProperties();
+    }
+
+    /**
+     * Simulates the `initProperties` method.
+     *
+     * @async
+     * @return {Promise<void>}
+     */
+    public async initProperties (): Promise<void> {
+        this.subManager.subscribe = this.getAPIFlowByType(
+                Enums.Simulation.ConfirmedRequestService.SubscribeCOV)
+            .subscribe(() => {
+                this.simulateCOVTemperature();
+            });
     }
 
     /**
