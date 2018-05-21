@@ -66,9 +66,18 @@ export class HVACSimulation extends Simulations.BaseSimulation {
      * @return {Promise<void>}
      */
     public async initProperties (): Promise<void> {
-        this.subManager.subscribe = this.getAPIFlowByType(
-                Enums.Simulation.ConfirmedRequestService.SubscribeCOV)
+        this.subManager.subscribe = this.serviceManager.getAPIFlow()
+            .pipe(
+                RxOp.filter(this.serviceManager
+                    .isAPIFlow(Enums.Simulation.ConfirmedRequestService.SubscribeCOV)),
+                RxOp.filter((resp) => {
+                    const params = resp.params as BACnet.Interfaces
+                        .ConfirmedRequest.Service.SubscribeCOV;
+                    return this.setpointFeedbackObjectId.isEqual(params.objId);
+                }),
+            )
             .subscribe(() => {
+                this.temperatureIsSubscribed = true;
                 this.simulateCOVTemperature();
             });
     }
