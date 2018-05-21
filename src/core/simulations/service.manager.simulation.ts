@@ -10,11 +10,15 @@ import { APIService } from '../services';
 
 import * as Interfaces from '../interfaces';
 
+import * as Enums from '../enums';
+
 import { Logger } from '../utils';
 
 import { BACnetAction } from '../../redux/actions';
 
 import { COVTimer } from '../entities';
+
+type SimulationAPIFilter = (resp: Interfaces.Simulation.APINotification) => boolean;
 
 export class BACnetServiceManager {
     private config: Interfaces.ServiceManager.Config;
@@ -124,5 +128,17 @@ export class BACnetServiceManager {
         apiService.unconfirmedReq = unconfirmedReqService as any;
 
         return apiService;
+    }
+
+    /**
+     * Filters the flow by a type of the API service.
+     *
+     * @param  {Logger} logger - instance of the logger
+     * @return {APIService} - instance of the API service
+     */
+    public isAPIFlow (apiType: Interfaces.Simulation.APIServiceType): SimulationAPIFilter {
+        return (notif: Interfaces.Simulation.APINotification): boolean => {
+            return notif.type === apiType;
+        }
     }
 }
