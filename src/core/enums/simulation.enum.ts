@@ -6,7 +6,7 @@ export namespace Simulation {
         UnsubscribeCOV,
     }
 
-    export enum UnsonfirmedRequestService {
+    export enum UnconfirmedRequestService {
         WhoIsBroadcast,
         WhoIsUnicast,
     }

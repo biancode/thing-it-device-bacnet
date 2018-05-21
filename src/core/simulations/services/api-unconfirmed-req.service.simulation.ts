@@ -30,7 +30,7 @@ export class APIUnconfirmedReqService {
      */
     public whoIsBroadcast (opts: BACnet.Interfaces.UnconfirmedRequest.Service.WhoIs): void {
         this.sjAPINotif.next({
-            type: Enums.Simulation.UnsonfirmedRequestService.WhoIsBroadcast,
+            type: Enums.Simulation.UnconfirmedRequestService.WhoIsBroadcast,
             params: opts,
         });
     }
@@ -43,7 +43,7 @@ export class APIUnconfirmedReqService {
      */
     public whoIsUnicast (opts: BACnet.Interfaces.UnconfirmedRequest.Service.WhoIs): void {
         this.sjAPINotif.next({
-            type: Enums.Simulation.UnsonfirmedRequestService.WhoIsUnicast,
+            type: Enums.Simulation.UnconfirmedRequestService.WhoIsUnicast,
             params: opts,
         });
     }

@@ -115,12 +115,14 @@ export interface IAliasMapElement <T> {
 
 export namespace Simulation {
 
+    export type APIServiceType = Enums.Simulation.ConfirmedRequestService
+        | Enums.Simulation.UnconfirmedRequestService;
+
     /**
      * Data interface. Each API service emits a data using this interface.
      */
     export interface APINotification {
-        type: Enums.Simulation.ConfirmedRequestService
-            | Enums.Simulation.UnsonfirmedRequestService;
+        type: APIServiceType;
         params: any;
     }
 }
