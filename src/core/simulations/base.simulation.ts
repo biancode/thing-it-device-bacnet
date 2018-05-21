@@ -128,7 +128,6 @@ export abstract class BaseSimulation {
         return this.serviceManager.getAPIFlow()
             .pipe(
                 RxOp.filter(this.serviceManager.isAPIFlow(apiServiceType)),
-                RxOp.first(),
             );
     }
 }
