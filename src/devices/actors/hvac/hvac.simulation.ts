@@ -6,6 +6,8 @@ import * as Simulations from '../../../core/simulations';
 
 import * as Interfaces from '../../../core/interfaces';
 
+import * as Helpers from '../../../core/helpers';
+
 import * as Enums from '../../../core/enums';
 
 export class HVACSimulation extends Simulations.BaseSimulation {
@@ -32,6 +34,20 @@ export class HVACSimulation extends Simulations.BaseSimulation {
      * @return {void}
      */
     public async initParamsFromConfig (): Promise<void> {
+        this.setpointFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
+            this.config.setpointFeedbackObjectId,
+            this.config.setpointFeedbackObjectType,
+        );
+
+        this.temperatureObjectId = Helpers.BACnet.getBACnetObjectId(
+            this.config.temperatureObjectId,
+            this.config.temperatureObjectType,
+        );
+
+        this.setpointModificationObjectId = Helpers.BACnet.getBACnetObjectId(
+            this.config.setpointModificationObjectId,
+            this.config.setpointModificationObjectType,
+        );
     }
 
     /**
