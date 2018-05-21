@@ -1,9 +1,15 @@
 import * as _ from 'lodash';
+import * as Rx from 'rxjs';
+import * as RxOp from 'rxjs/operators';
 
 import { BACnetFlowManager } from './flow.manager.simulation';
 import { BACnetServiceManager } from './service.manager.simulation';
 
 import * as Utils from '../utils';
+
+import * as Interfaces from '../interfaces';
+
+import * as Enums from '../enums';
 
 import * as Managers from '../managers';
 
@@ -105,4 +111,24 @@ export abstract class BaseSimulation {
      * @return {void}
      */
     public abstract async stopSimulation (): Promise<void>;
+
+
+    /**
+     * HELPERs
+     */
+
+    /**
+     * Returns API flow for specific API method.
+     *
+     * @param  {Interfaces.Simulation.APIServiceType} apiServiceType - type of the API service
+     * @return {Rx.Observable<Interfaces.Simulation.APINotification>}
+     */
+    public getAPIFlowByType (apiServiceType: Interfaces.Simulation.APIServiceType)
+            : Rx.Observable<Interfaces.Simulation.APINotification> {
+        return this.serviceManager.getAPIFlow()
+            .pipe(
+                RxOp.filter(this.serviceManager.isAPIFlow(apiServiceType)),
+                RxOp.first(),
+            );
+    }
 }
