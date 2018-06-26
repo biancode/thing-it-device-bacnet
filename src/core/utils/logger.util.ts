@@ -5,7 +5,7 @@ export class Logger {
     private loggerMethods: Map<Enums.LogLevel, any> = new Map();
 
     constructor (private tidDevice: any) {
-        this.tidDevice.loglevel = 'debug';
+        this.tidDevice.logLevel = 'debug';
     }
 
     /**
