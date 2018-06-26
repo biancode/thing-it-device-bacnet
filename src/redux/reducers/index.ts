@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import * as redux from 'redux';
 
 /* Store Interfaces */
 import {
@@ -18,6 +18,6 @@ export const StoreInitialState: IStoreState = {
 };
 
 /* Combine State Reducers */
-export const StoreReducer = combineReducers<IStoreState>({
+export const StoreReducer = redux.combineReducers<IStoreState>({
     bacnet: BACnetReducer,
 });
