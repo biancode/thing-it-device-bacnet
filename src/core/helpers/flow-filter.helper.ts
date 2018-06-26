@@ -4,7 +4,7 @@ import * as BACnet from 'bacnet-logic';
 
 import * as Interfaces from '../interfaces';
 
-type BACnetFlowFilter = (resp: Interfaces.FlowManager.Response) => boolean;
+export type BACnetFlowFilter = (resp: Interfaces.FlowManager.Response) => boolean;
 
 export class FlowFilter {
 
