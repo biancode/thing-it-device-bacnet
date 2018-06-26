@@ -18,6 +18,8 @@ import * as Interfaces from '../core/interfaces';
 
 import * as BACnet from 'bacnet-logic';
 
+import * as Enums from '../core/enums';
+
 import { store } from '../redux';
 
 export class CommonDevice extends DeviceBase {
@@ -116,11 +118,11 @@ export class CommonDevice extends DeviceBase {
      * @return {any}
      */
     public createLogger (): Logger {
-        return {
-            logDebug: (message) => this.logDebug.bind(this)(message),
-            logError: (message) => this.logError.bind(this)(message),
-            logInfo: (message) => this.logInfo.bind(this)(message),
-        };
+        const logger = new Logger(this);
+        logger.setLogMethod(Enums.LogLevel.Debug, this.logDebug);
+        logger.setLogMethod(Enums.LogLevel.Error, this.logError);
+        logger.setLogMethod(Enums.LogLevel.Info, this.logInfo);
+        return logger;
     }
 
     /**
