@@ -27,6 +27,19 @@ export class ActorDevice extends CommonDevice {
     public apiService: APIService;
 
     /**
+     * start - initializes default state of the actor.
+     *
+     * @return {Promise<any>}
+     */
+    public async start (): Promise<any> {
+        await super.start();
+
+        // Init the default state
+        this.setState(this.state);
+        this.state.initialized = false;
+    }
+
+    /**
      * initDevice - initializes the unit, sets initial states.
      *
      * @return {Promise<any>}
