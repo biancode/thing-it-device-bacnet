@@ -46,11 +46,6 @@ export class CommonDevice extends DeviceBase {
      */
     public async start (): Promise<any> {
         this.isDestroyed = false;
-
-        this.covObjectIds = [];
-
-        this.subManager = new Managers.SubscriptionManager();
-        await this.subManager.initManager();
     }
 
     /**
@@ -91,6 +86,11 @@ export class CommonDevice extends DeviceBase {
         }
 
         this.logger = this.createLogger();
+
+        this.covObjectIds = [];
+
+        this.subManager = new Managers.SubscriptionManager();
+        await this.subManager.initManager();
     }
 
     /**
