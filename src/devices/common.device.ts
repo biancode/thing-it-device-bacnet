@@ -139,7 +139,7 @@ export class CommonDevice extends DeviceBase {
      */
     public getCOVNotificationValues <T extends BACnet.Types.BACnetTypeBase> (
             resp: Interfaces.FlowManager.Response): Interfaces.BACnet.COVNotificationResponse<T> {
-        this.logger.logDebug(`CommonDevice - getCOVNotificationValues: `
+        this.logger.logDebug(`getCOVNotificationValues: `
             + `Received notification`);
 
         const respServiceData: BACnet.Interfaces.UnconfirmedRequest.Read.COVNotification =
