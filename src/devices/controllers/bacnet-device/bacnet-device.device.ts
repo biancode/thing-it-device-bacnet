@@ -244,6 +244,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
                     // Create new instance of the `service` manager
                     this.serviceManager.destroy();
                     this.serviceManager.initManager(this.pluginConfig.manager.service);
+                    BACnetAction.setBACnetServiceManager(this.serviceManager);
                     // Create new instance of the API service
                     this.apiService.destroy();
                     this.apiService = this.serviceManager.createAPIService();
