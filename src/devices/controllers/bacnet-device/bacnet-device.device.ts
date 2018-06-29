@@ -42,7 +42,12 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public start () {
         super.start();
 
+        Bluebird.map(this.actors, (actor) => {
+            return actor.initSubManager();
+        }, { concurrency: 1 });
+
         let initResult: Promise<any>;
+
         try {
             initResult = this.initDevice();
         } catch (error) {
