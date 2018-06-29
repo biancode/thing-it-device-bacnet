@@ -91,6 +91,11 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
     public async initDevice (): Promise<any> {
         await super.initDevice();
 
+        this.covObjectIds = [];
+
+        this.subManager = new Managers.SubscriptionManager();
+        await this.subManager.initManager();
+
         // Inits specific internal properties
         this.logger.logDebug(`BACnetDeviceControllerDevice - initDevice: `
             + `Inits specific internal properties`);

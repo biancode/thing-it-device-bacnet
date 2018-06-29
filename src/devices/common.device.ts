@@ -87,10 +87,6 @@ export class CommonDevice extends DeviceBase {
 
         this.logger = this.createLogger();
 
-        this.covObjectIds = [];
-
-        this.subManager = new Managers.SubscriptionManager();
-        await this.subManager.initManager();
     }
 
     /**

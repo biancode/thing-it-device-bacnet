@@ -7,6 +7,7 @@ import { CommonDevice } from '../common.device';
 import {
     BACnetFlowManager,
     BACnetServiceManager,
+    SubscriptionManager
 } from '../../core/managers';
 
 import {
@@ -39,6 +40,18 @@ export class ActorDevice extends CommonDevice {
         this.state.initialized = false;
     }
 
+    /**
+     * initSubManager - initializes actor subscription manager and
+     * covObjectIds array.
+     *
+     * @return {Promise<any>}
+     */
+    public async initSubManager(): Promise<any> {
+        this.covObjectIds = [];
+
+        this.subManager = new SubscriptionManager();
+        await this.subManager.initManager();
+    }
     /**
      * initDevice - initializes the unit, sets initial states.
      *
