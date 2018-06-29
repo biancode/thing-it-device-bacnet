@@ -37,7 +37,6 @@ export class ActorDevice extends CommonDevice {
 
         // Init the default state
         this.setState(this.state);
-        this.state.initialized = false;
     }
 
     /**
