@@ -49,7 +49,7 @@ export class BinaryActorDevice extends ActorDevice {
                 this.publishStateChange();
             }, (error) => {
                 this.logger.logDebug(`BinaryActorDevice - subscribeToProperty: `
-                    + `Analog Input COV notification was not received ${error}`);
+                    + `Binary Actor COV notification was not received ${error}`);
                 this.publishStateChange();
             });
 

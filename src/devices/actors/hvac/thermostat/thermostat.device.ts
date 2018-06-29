@@ -76,13 +76,13 @@ export class ThermostatActorDevice extends HVACActorDevice {
                         break;
                 }
 
-                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`ThermostatActorDevice - subscribeToProperty: `
                     + `Mode ${JSON.stringify(this.state.mode)}`);
-                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`ThermostatActorDevice - subscribeToProperty: `
                     + `State ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             }, (error) => {
-                this.logger.logDebug(`HVACActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`ThermostatActorDevice - subscribeToProperty: `
                     + `Mode COV notification was not received ${error}`);
                 this.publishStateChange();
             });

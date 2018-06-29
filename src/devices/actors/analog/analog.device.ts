@@ -42,14 +42,14 @@ export class AnalogActorDevice extends ActorDevice {
                 this.state.outOfService = bacnetProperties.statusFlags.value.outOfService;
                 this.state.alarmValue = bacnetProperties.statusFlags.value.inAlarm;
 
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
                     + `presentValue ${JSON.stringify(this.state.presentValue)}`);
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
                     + `State ${JSON.stringify(this.state)}`);
                 this.publishStateChange();
             }, (error) => {
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
-                    + `Analog Input COV notification was not received ${error}`);
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
+                    + `Analog Actor COV notification was not received ${error}`);
                 this.publishStateChange();
             });
 
@@ -72,7 +72,7 @@ export class AnalogActorDevice extends ActorDevice {
 
                 this.state.max = bacnetProperty.value;
 
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
                     + `Max value for 'Present Value' property retrieved: ${this.state.max}`);
                 this.publishStateChange();
             });
@@ -88,7 +88,7 @@ export class AnalogActorDevice extends ActorDevice {
 
                 this.state.min = bacnetProperty.value;
 
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
                     + `Min value for 'Present Value' property retrieved: ${this.state.min}`);
                 this.publishStateChange();
             });
@@ -104,7 +104,7 @@ export class AnalogActorDevice extends ActorDevice {
 
                 this.state.objectName = bacnetProperty.value;
 
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
                     + `Object Name retrieved: ${this.state.objectName}`);
                 this.publishStateChange();
             });
@@ -120,7 +120,7 @@ export class AnalogActorDevice extends ActorDevice {
 
                 this.state.description = bacnetProperty.value;
 
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
                     + `Object Description retrieved: ${this.state.description}`);
                 this.publishStateChange();
             });
@@ -137,7 +137,7 @@ export class AnalogActorDevice extends ActorDevice {
                 const unit: string = BACnet.Enums.EngineeringUnits[bacnetProperty.value];
                 this.state.unit = _.isNil(unit) ? 'none' : unit;
 
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
                     + `Object Unit retrieved: ${this.state.unit}`);
                 this.publishStateChange();
             });
@@ -153,7 +153,7 @@ export class AnalogActorDevice extends ActorDevice {
 
                 this.state.presentValue = bacnetProperty.value;
 
-                this.logger.logDebug(`AnalogInputActorDevice - subscribeToProperty: `
+                this.logger.logDebug(`AnalogActorDevice - subscribeToProperty: `
                     + `Object Present Value retrieved: ${this.state.presentValue}`);
                 this.publishStateChange();
             });

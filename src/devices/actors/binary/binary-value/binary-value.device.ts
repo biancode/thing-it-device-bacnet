@@ -38,7 +38,7 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
      * @return {Bluebird<void>}
      */
     public setPresentValue (presentValue: boolean): Bluebird<void> {
-        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called setPresentValue()');
+        this.logger.logDebug('BinaryValueActorDevice - setPresentValue: Called setPresentValue()');
 
         this.sendWriteProperty(this.objectId, BACnet.Enums.PropertyId.presentValue,
             [ new BACnet.Types.BACnetEnumerated(+presentValue) ]);
@@ -56,7 +56,7 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
      * @return {Bluebird<void>}
      */
     public toggle (): Bluebird<void> {
-        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called toggle()');
+        this.logger.logDebug('BinaryValueActorDevice - setPresentValue: Called toggle()');
 
         if (this.state.presentValue) {
             this.off();
@@ -73,7 +73,7 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
      * @return {Bluebird<void>}
      */
     public on (): Bluebird<void> {
-        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called on()');
+        this.logger.logDebug('BinaryValueActorDevice - setPresentValue: Called on()');
 
         this.setPresentValue(true);
         return Bluebird.resolve();
@@ -85,7 +85,7 @@ export class BinaryValueActorDevice extends BinaryActorDevice {
      * @return {Bluebird<void>}
      */
     public off (): Bluebird<void> {
-        this.logger.logDebug('AnalogValueActorDevice - setPresentValue: Called off()');
+        this.logger.logDebug('BinaryValueActorDevice - setPresentValue: Called off()');
 
         this.setPresentValue(false);
         return Bluebird.resolve();

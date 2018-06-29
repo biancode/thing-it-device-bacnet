@@ -111,7 +111,7 @@ export class MultiStateActorDevice extends ActorDevice {
                 });
 
                 this.logger.logDebug(`MultiStateActorDevice - subscribeToProperty: `
-                    + `Light States: ${JSON.stringify(this.state.stateText)}`);
+                    + `Actor States: ${JSON.stringify(this.state.stateText)}`);
                 this.publishStateChange();
 
                 // Gets the `presentValue|statusFlags` property

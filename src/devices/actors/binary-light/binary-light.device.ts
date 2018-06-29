@@ -61,7 +61,7 @@ export class BinaryLightActorDevice extends ActorDevice {
                 this.publishStateChange();
             }, (error) => {
                 this.logger.logDebug(`BinaryLightActorDevice - subscribeToProperty: `
-                    + `Analog Input COV notification was not received ${error}`);
+                    + `Binary Light Actor COV notification was not received ${error}`);
                 this.publishStateChange();
             });
 
