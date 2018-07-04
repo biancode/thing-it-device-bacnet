@@ -40,8 +40,8 @@ export class MultiStateActorDevice extends ActorDevice {
 
                 this.state.presentValue = bacnetProperties.presentValue.value;
 
-                const lightStateIndex = bacnetProperties.presentValue.value - 1;
-                this.state.presentValueText = this.state.stateText[lightStateIndex];
+                const stateIndex = bacnetProperties.presentValue.value - 1;
+                this.state.presentValueText = this.state.stateText[stateIndex];
 
                 this.state.outOfService = bacnetProperties.statusFlags.value.outOfService;
                 this.state.alarmValue = bacnetProperties.statusFlags.value.inAlarm;
