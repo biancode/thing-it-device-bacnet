@@ -2,7 +2,7 @@ import { OutputSocket } from '../../sockets';
 
 import { Logger } from '../../utils';
 
-import * as BACnet from 'bacnet-logic';
+import * as BACnet from 'tid-bacnet-logic';
 
 export class APIUnconfirmedReqService {
     constructor (private logger: Logger,

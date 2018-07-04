@@ -16,7 +16,7 @@ import * as Entities from '../core/entities';
 
 import * as Interfaces from '../core/interfaces';
 
-import * as BACnet from 'bacnet-logic';
+import * as BACnet from 'tid-bacnet-logic';
 
 import * as Enums from '../core/enums';
 

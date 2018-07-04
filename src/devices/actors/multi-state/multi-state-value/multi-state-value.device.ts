@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
-import * as BACnet from 'bacnet-logic';
+import * as BACnet from 'tid-bacnet-logic';
 
 import { MultiStateActorDevice } from '../multi-state.device';
 

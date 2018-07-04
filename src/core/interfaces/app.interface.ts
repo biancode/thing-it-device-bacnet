@@ -1,5 +1,5 @@
 import { Moment } from 'moment';
-import { Interfaces, Types } from 'bacnet-logic';
+import { Interfaces, Types } from 'tid-bacnet-logic';
 
 export namespace BACnetResponse {
     export interface Config {

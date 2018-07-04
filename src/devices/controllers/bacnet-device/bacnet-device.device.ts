@@ -5,7 +5,7 @@ import * as Bluebird from 'bluebird';
 import * as Rx from 'rxjs';
 import * as RxOp from 'rxjs/operators';
 
-import * as BACnet from 'bacnet-logic';
+import * as BACnet from 'tid-bacnet-logic';
 
 import { ControllerDevice } from '../controller.device';
 

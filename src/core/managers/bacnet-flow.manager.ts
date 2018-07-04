@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
-import * as BACnet from 'bacnet-logic';
+import * as BACnet from 'tid-bacnet-logic';
 
 import { APIError } from '../errors';
 
