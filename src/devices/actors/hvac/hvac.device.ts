@@ -55,7 +55,7 @@ export class HVACActorDevice extends ActorDevice {
      * @return {void}
      */
     public subscribeToProperty (): void {
-        // Read `Position` Property Flow
+        // Handle `Setpoint` Property COV Notifications Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
                 RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
@@ -79,7 +79,7 @@ export class HVACActorDevice extends ActorDevice {
                 this.publishStateChange();
             });
 
-        // Read `Rotation` Property Flow
+        // Handle `Temperature` Property COV Notifications Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
                 RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),

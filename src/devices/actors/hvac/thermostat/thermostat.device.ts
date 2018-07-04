@@ -47,7 +47,7 @@ export class ThermostatActorDevice extends HVACActorDevice {
      * @return {void}
      */
     public subscribeToProperty (): void {
-        // Handle Flow. Sets the `mode`, `heatActive`, `coolActive`
+        // Handle COV Notifications Flow. Sets the `mode`, `heatActive`, `coolActive`
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
                 RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),

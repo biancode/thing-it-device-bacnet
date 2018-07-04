@@ -61,7 +61,7 @@ export class LightActorDevice extends ActorDevice {
      * @return {void}
      */
     public subscribeToProperty (): void {
-        // Read `Position` Property Flow
+        // Handle `Dimmer Level` COV Notifications Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
                 RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
@@ -85,7 +85,7 @@ export class LightActorDevice extends ActorDevice {
                 this.publishStateChange();
             });
 
-        // Read `Rotation` Property Flow
+        // Handle `Light State` COV Notifications Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
                 RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),

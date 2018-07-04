@@ -65,7 +65,7 @@ export class JalousieActorDevice extends ActorDevice {
      * @return {void}
      */
     public subscribeToProperty (): void {
-        // Read `Position` Property Flow
+        // Handle `Position` COV Notifications Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
                 RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
@@ -89,7 +89,7 @@ export class JalousieActorDevice extends ActorDevice {
                 this.publishStateChange();
             });
 
-        // Read `Rotation` Property Flow
+        // Handle `Rotation` COVNotifications Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
                 RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),

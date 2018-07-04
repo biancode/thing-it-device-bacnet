@@ -41,7 +41,7 @@ export class BinaryLightActorDevice extends ActorDevice {
      * @return {void}
      */
     public subscribeToProperty (): void {
-        // Read Property Flow
+        // Handle `Present Value` COV Notifications Flow
         this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(
                 RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
