@@ -63,7 +63,10 @@ export class ServerSocket {
      * @return {void}
      */
     public startServer () {
-        this.sock = dgram.createSocket('udp4');
+        this.sock = dgram.createSocket({
+            type: 'udp4',
+            reuseAddr: true
+        });
 
         this.sock.on('error', (error) => {
             this.logger.logError(`${this.className} - startServer: UDP Error - ${error}`);
