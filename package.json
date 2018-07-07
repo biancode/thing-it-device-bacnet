@@ -1,13 +1,11 @@
 {
-  "name": "thing-it-bacnet-server",
-  "version": "1.0.0",
-  "description": "thing-it-bacnet-server",
-  "main": "./dist/index.js",
+  "name": "thing-it-device-bacnet",
+  "version": "1.1.0",
+  "description": "[thing-it-node] Device Plugin for BACnet networks.",
+  "main": "",
   "scripts": {
-    "test": "gulp watch:test:unit",
-    "test:mock": "gulp watch:test:mock",
-    "build": "gulp build:prod",
-    "start": "npm run build && node ./dist/index.js"
+    "test": "mocha ./tests/bacNetDevice.spec.js"
+
   },
   "repository": {
     "type": "git",
