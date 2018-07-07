@@ -1,0 +1,13 @@
+<div class="flexLayout flexDirectionColumn" style="width: 100%">
+    <div class="flexLayout flexAlignCenter" style="justify-content: center;">
+        <div class="marginRight1 marginBottom0_5" style="flex-grow: 0; flex-shrink: 0">
+            <i ng-if="component._state.alarmValue == true" style="color: orange"
+               class="fa fa-warning fa-2x" aria-hidden="true"></i>&nbsp;
+        </div>
+
+        <select ng-model="component._state.presentValue"
+                ng-change="panel.callActorService(component, 'setPresentValue', {value: component._state.presentValue})">
+            <option ng-repeat="state in component._state.stateText" ng-value="$index + 1">{{state}}</option>
+        </select>
+    </div>
+</div>

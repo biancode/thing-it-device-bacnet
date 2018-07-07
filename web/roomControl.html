@@ -1,0 +1,101 @@
+<div class="flexLayout flexDirectionColumn flexJustifyCenter flexAlignCenter">
+    <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1">
+        <div class="flexGrow1 marginRight0_5">
+            <span ng-if="component._state.coolActive" class="lightPrimaryColor"><i
+                    class="fa fa-thermometer-full"></i></span>
+        </div>
+        <div class="circleButton marginLeft0_5" style="display: inline-block;"
+             ng-click="panel.callActorService(component, 'decrementSetpoint')">
+            <i class="icon sl-minus-1"></i>
+        </div>
+        <div class="flexLayout flexDirectionColumn flexJustifyCenter flexAlignCenter marginLeft0_5">
+            <div class="flexGrow1">
+                <span class="lightPrimaryColor" style="font-size: 4em;">{{component._state.setpoint | number:1}}</span>
+                <span class="smallFont lightPrimaryColor">&deg;C</span>
+            </div>
+            <div class="marginLeft0_5 flexGrow1">
+                <span class="smallFont lightPrimaryColor">{{component._state.temperature | number:1}} &deg;C</span>
+            </div>
+            <div class="marginLeft0_5 flexGrow1">
+                <span ng-if="component._state.heatActive" class="lightPrimaryColor">
+                    <i class="fa fa-fire"></i>
+                </span>
+                <span ng-if="component._state.coolActive" class="lightPrimaryColor">
+                    <i class="fa fa-snowflake-o"></i>
+                </span>
+            </div>
+        </div>
+        <div class="circleButton marginLeft0_5" style="display: inline-block;"
+             ng-click="panel.callActorService(component, 'incrementSetpoint')">
+            <i class="icon sl-add-1"></i>
+        </div>
+    </div>
+    <div class="flexGrow1 marginTop0_5 marginBottom0_5">
+    </div>
+    <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1">
+        <div class="flexGrow1 flexAlignCenter">
+            <span ng-if="component._state.coolActive" class="lightPrimaryColor"><i class="fa fa-lightbulb-o"></i></span>
+        </div>
+        <div class="flexLayout flexDirectionColumn flexJustifyCenter flexAlignCenter marginLeft0_5">
+            <div style='min-width:17em;' class="marginLeft0_5 flexAlignCenter flexJustifyCenter flexGrow1">
+                <input ti-slider=""
+                       ti-model="component._state.dimmerLevel" ti-min="0"
+                       ti-max="100"
+                       ti-change="panel.callActorService(component, 'changeDimmer', {value: component._state.dimmerLevel} )">
+            </div>
+            <div class="flexGrow1 flexAlignCenter flexJustifyCenter marginLeft0_5">
+                <ti-switch ti-model="component._state.lightActive"
+                           ti-change="panel.callActorService(component, 'toggleLight')"></ti-switch>
+            </div>
+        </div>
+    </div>
+    <div class="flexGrow1 marginTop0_5 marginBottom0_5">
+    </div>
+    <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1 marginTop0_5">
+        <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1 marginTop0_5">
+            <div class="flexGrow1">
+                <span ng-if="component._state.coolActive" class="lightPrimaryColor"><i class="fa fa-sun-o"></i></span>
+            </div>
+            <div class="flexLayout flexDirectionColumn flexJustifyCenter flexAlignCenter marginLeft0_5">
+                <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1 marginTop0_5">
+                    <div class="circleButton marginLeft0_5" style="display: inline-block;"
+                         ng-click="panel.callActorService(component, 'raiseJalousie')">
+                        <i class="fa fa-angle-double-down"></i>
+                    </div>
+                    <div class="circleButton marginLeft0_5" style="display: inline-block;"
+                         ng-click="panel.callActorService(component, 'decrementJalousie')">
+                        <i class="fa fa-angle-down"></i>
+                    </div>
+                    <div class="flexGrow1 flexAlignTop marginLeft0_5">
+                <span class="lightPrimaryColor"
+                      style="font-size: 2.5em;">{{component._state.jalousiePosition | number:0}}</span>
+                        <span class="smallFont lightPrimaryColor">%</span>
+                    </div>
+                    <div class="circleButton marginLeft0_5" style="display: inline-block;"
+                         ng-click="panel.callActorService(component, 'incrementJalousie')">
+                        <i class="fa fa-angle-up"></i>
+                    </div>
+                    <div class="circleButton marginLeft0_5" style="display: inline-block;"
+                         ng-click="panel.callActorService(component, 'lowerJalousie')">
+                        <i class="fa fa-angle-double-up"></i>
+                    </div>
+                </div>
+                <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1 marginTop0_5">
+                    <div class="circleButton marginLeft0_5" style="display: inline-block;"
+                         ng-click="panel.callActorService(component, 'decrementJalousie')">
+                        <i class="fa fa-angle-down"></i>
+                    </div>
+                    <div class="flexGrow1 flexAlignTop marginLeft0_5">
+                <span class="lightPrimaryColor"
+                      style="font-size: 2.5em;">{{component._state.jalousieRotation | number:0}}</span>
+                        <span class="smallFont lightPrimaryColor">&deg;</span>
+                    </div>
+                    <div class="circleButton marginLeft0_5" style="display: inline-block;"
+                         ng-click="panel.callActorService(component, 'incrementJalousie')">
+                        <i class="fa fa-angle-up"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

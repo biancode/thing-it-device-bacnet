@@ -1,0 +1,16 @@
+<div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1">
+    <div class="marginRight1 marginBottom0_5" style="flex-grow: 0; flex-shrink: 0">
+        <i ng-if="component._state.alarmValue == true" style="color: orange"
+           class="fa fa-warning fa-2x" aria-hidden="true"></i>&nbsp;
+    </div>
+    <div class="marginRight1 marginBottom0_5" style="flex-grow: 0; flex-shrink: 0">
+            <span ng-if="component.configuration.unit != ''"
+                  class="lighterSecondaryColor ">{{component.configuration.unit}}</span>
+    </div>
+    <div class="marginLeft0_5 flexGrow1">
+        <input ti-slider=""
+               ti-model="component._state.presentValue" ti-min="component._state.min"
+               ti-max="component._state.max"
+               ti-change="panel.callActorService(component, 'changeValue', {value: component._state.presentValue} )">
+    </div>
+</div>
