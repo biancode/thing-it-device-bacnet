@@ -1,0 +1,38 @@
+{
+  "name": "thing-it-bacnet-server",
+  "version": "1.0.0",
+  "description": "thing-it-bacnet-server",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "gulp watch:test:unit",
+    "test:mock": "gulp watch:test:mock",
+    "build": "gulp build:prod",
+    "start": "npm run build && node ./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndreyShuleiko/thing-it-device-bacnet.git"
+  },
+  "author": "Andrey Shuleiko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AndreyShuleiko/thing-it-device-bacnet/issues"
+  },
+  "homepage": "https://github.com/AndreyShuleiko/thing-it-device-bacnet#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.1.1",
+    "sinon": "^5.0.7",
+    "thing-it-test": "0.0.21"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "es6-map": "^0.1.5",
+    "es6-set": "^0.1.5",
+    "lodash": "^4.17.10",
+    "moment": "^2.22.1",
+    "redux": "^4.0.0",
+    "rxjs": "^6.1.0",
+    "tid-bacnet-logic": "git+https://github.com/NikitaMikhaliuk/tid-bacnet-logic.git"
+  }
+}
