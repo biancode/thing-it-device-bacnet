@@ -55,8 +55,9 @@ export class BACnetServiceManager {
      * @param  {Interfaces.ServiceManager.Config} conifg - manager configuration
      * @return {void}
      */
-    public initManager (config: Interfaces.ServiceManager.Config): void {
+    public initManager (config: Interfaces.ServiceManager.Config, priority: number = 16): void {
         this.config = config;
+        this.config.priority = priority
 
         this.server = store.getState([ 'bacnet', 'bacnetServer' ]);
 
@@ -100,7 +101,7 @@ export class BACnetServiceManager {
 
         // Create API Confirmed Request Service
         const confirmedReqService = new APIBACnetServices
-            .APIConfirmedReqService(apiLogger, socket);
+            .APIConfirmedReqService(apiLogger, socket, this.config.priority);
         apiService.confirmedReq = confirmedReqService;
 
         // Create API Unconfirmed Request Service
