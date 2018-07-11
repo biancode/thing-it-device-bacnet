@@ -3,11 +3,13 @@ import { OutputSocket } from '../../sockets';
 import { Logger } from '../../utils';
 
 import * as BACnet from 'tid-bacnet-logic';
+import * as _ from 'lodash';
 
 export class APIConfirmedReqService {
 
     constructor (private logger: Logger,
-        private socket: OutputSocket) {}
+        private socket: OutputSocket,
+        private priority: number) {}
 
     /**
      * Destroys the instance.
@@ -37,7 +39,9 @@ export class APIConfirmedReqService {
      * @return {void}
      */
     public writeProperty (opts: BACnet.Interfaces.ConfirmedRequest.Service.WriteProperty): void {
-        const message = BACnet.Services.ConfirmedReqService.writeProperty(opts);
+        const message = BACnet.Services.ConfirmedReqService.writeProperty(_.assign({}, opts, {
+            priority: this.priority
+        }));
         this.socket.sendBroadcast(message, 'writeProperty');
     }
 
