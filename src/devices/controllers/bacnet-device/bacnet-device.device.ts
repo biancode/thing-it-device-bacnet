@@ -192,7 +192,7 @@ export class BACnetDeviceControllerDevice extends ControllerDevice {
 
         /* Create and init BACnet Service Manager */
         this.serviceManager = new Managers.BACnetServiceManager(this.logger);
-        this.serviceManager.initManager(this.pluginConfig.manager.service);
+        this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority);
         BACnetAction.setBACnetServiceManager(this.serviceManager);
 
         /* Create and init BACnet Flow Manager */
