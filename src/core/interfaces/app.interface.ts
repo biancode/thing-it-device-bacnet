@@ -80,6 +80,7 @@ export namespace ServiceManager {
     export interface Config {
         covTimer: COVTimer.Config;
         dest: ServerSocket.AddressInfo;
+        priority?: number;
     }
 }
 
