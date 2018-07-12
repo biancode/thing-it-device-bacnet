@@ -39,8 +39,10 @@ export class APIConfirmedReqService {
      * @return {void}
      */
     public writeProperty (opts: BACnet.Interfaces.ConfirmedRequest.Service.WriteProperty): void {
-        const message = BACnet.Services.ConfirmedReqService.writeProperty(_.assign({}, opts, {
-            priority: this.priority
+        const message = BACnet.Services.ConfirmedReqService.writeProperty(_.merge({}, opts, {
+            prop: {
+                priority: new BACnet.Types.BACnetUnsignedInteger(+this.priority)
+            }
         }));
         this.socket.sendBroadcast(message, 'writeProperty');
     }
