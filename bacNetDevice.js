@@ -417,7 +417,7 @@ BACNetDevice.prototype.subscribeToObject = function () {
             });
             // Create new instance of the `service` manager
             this.serviceManager.destroy();
-            this.serviceManager.initManager(this.pluginConfig.manager.service);
+            this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority);
             BACnetAction.setBACnetServiceManager(this.serviceManager);
             // Create new instance of the API service
             this.apiService.destroy().catch((function(error) {
