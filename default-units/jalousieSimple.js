@@ -224,12 +224,12 @@ JalousieSimple.prototype.initSubManager = function () {
 JalousieSimple.prototype.initParamsFromConfig = function () {
     this.motionDirectionObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.motionDirectionObjectId,
-        this.config.motionDirectionObjectType,
+        this.config.motionDirectionObjectType
     );
 
     this.stopValueObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.stopValueObjectId,
-        this.config.stopValueObjectType,
+        this.config.stopValueObjectType
     );
 };
 

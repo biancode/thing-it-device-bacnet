@@ -173,7 +173,7 @@ BinaryLight.prototype.initSubManager = function () {
 BinaryLight.prototype.initParamsFromConfig = function () {
     this.objectId = Helpers.BACnet.getBACnetObjectId(
         this.config.lightActiveObjectId,
-        this.config.lightActiveObjectType,
+        this.config.lightActiveObjectType
     );
 };
 

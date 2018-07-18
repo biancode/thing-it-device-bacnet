@@ -293,27 +293,27 @@ Jalousie.prototype.initSubManager = function () {
 Jalousie.prototype.initParamsFromConfig = function () {
     this.positionFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.positionFeedbackObjectId,
-        this.config.positionFeedbackObjectType,
+        this.config.positionFeedbackObjectType
     );
 
     this.positionModificationObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.positionModificationObjectId,
-        this.config.positionModificationObjectType,
+        this.config.positionModificationObjectType
     );
 
     this.rotationFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.rotationFeedbackObjectId,
-        this.config.rotationFeedbackObjectType,
+        this.config.rotationFeedbackObjectType
     );
 
     this.rotationModificationObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.rotationModificationObjectId,
-        this.config.rotationModificationObjectType,
+        this.config.rotationModificationObjectType
     );
 
     this.actionObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.actionObjectId,
-        this.config.actionObjectType,
+        this.config.actionObjectType
     );
 };
 

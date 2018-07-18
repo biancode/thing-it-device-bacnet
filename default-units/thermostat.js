@@ -235,22 +235,22 @@ Thermostat.prototype.initSubManager = function () {
 Thermostat.prototype.initParamsFromConfig = function () {
     this.setpointFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.setpointFeedbackObjectId,
-        this.config.setpointFeedbackObjectType,
+        this.config.setpointFeedbackObjectType
     );
 
     this.temperatureObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.temperatureObjectId,
-        this.config.temperatureObjectType,
+        this.config.temperatureObjectType
     );
 
     this.setpointModificationObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.setpointModificationObjectId,
-        this.config.setpointModificationObjectType,
+        this.config.setpointModificationObjectType
     );
 
     this.modeObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.modeObjectId,
-        this.config.modeObjectType,
+        this.config.modeObjectType
     );
 };
 

@@ -231,7 +231,7 @@ MultiStateValue.prototype.initSubManager = function () {
 MultiStateValue.prototype.initParamsFromConfig = function () {
     this.objectId = Helpers.BACnet.getBACnetObjectId(
         this.config.objectId,
-        BACnet.Enums.ObjectType.MultiStateValue,
+        BACnet.Enums.ObjectType.MultiStateValue
     );
 };
 

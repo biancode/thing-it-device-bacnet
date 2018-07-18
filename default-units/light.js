@@ -242,22 +242,22 @@ Light.prototype.initSubManager = function () {
 Light.prototype.initParamsFromConfig = function () {
     this.levelFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.levelFeedbackObjectId,
-        this.config.levelFeedbackObjectType,
+        this.config.levelFeedbackObjectType
     );
 
     this.levelModificationObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.levelModificationObjectId,
-        this.config.levelModificationObjectType,
+        this.config.levelModificationObjectType
     );
 
     this.lightActiveFeedbackObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.lightActiveFeedbackObjectId,
-        this.config.lightActiveFeedbackObjectType,
+        this.config.lightActiveFeedbackObjectType
     );
 
     this.lightActiveModificationObjectId = Helpers.BACnet.getBACnetObjectId(
         this.config.lightActiveModificationObjectId,
-        this.config.lightActiveModificationObjectType,
+        this.config.lightActiveModificationObjectType
     );
 };
 

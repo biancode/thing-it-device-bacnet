@@ -231,7 +231,7 @@ MultiStateInput.prototype.initParamsFromConfig = function () {
     this.objectId = Helpers.BACnet.getBACnetObjectId(
         this.config.objectId,
         this.config.objectType,
-        BACnet.Enums.ObjectType.MultiStateInput,
+        BACnet.Enums.ObjectType.MultiStateInput
     );
 };
 

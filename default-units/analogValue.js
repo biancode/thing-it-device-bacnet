@@ -289,7 +289,7 @@ AnalogValue.prototype.initSubManager = function () {
 AnalogValue.prototype.initParamsFromConfig = function () {
     this.objectId = Helpers.BACnet.getBACnetObjectId(
         this.config.objectId,
-        BACnet.Enums.ObjectType.AnalogValue,
+        BACnet.Enums.ObjectType.AnalogValue
     );
 };
 

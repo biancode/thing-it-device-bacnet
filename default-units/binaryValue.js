@@ -240,7 +240,7 @@ BinaryValue.prototype.initSubManager = function () {
 BinaryValue.prototype.initParamsFromConfig = function () {
     this.objectId = Helpers.BACnet.getBACnetObjectId(
         this.config.objectId,
-        BACnet.Enums.ObjectType.BinaryValue,
+        BACnet.Enums.ObjectType.BinaryValue
     );
 };
 
