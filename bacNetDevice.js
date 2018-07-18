@@ -322,7 +322,7 @@ BACNetDevice.prototype.createPluginConfig = function () {
     // Gets device address information
     return this.getDeviceIpAddress()
         .then((function(ipAddress) {
-            const port = this.getDevicePort();
+            var port = this.getDevicePort();
             // Creates the config for the plugin components
             return _.merge({}, _.cloneDeep(Configs.AppConfig), {
                 server: {
