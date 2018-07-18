@@ -155,7 +155,7 @@ JalousieSimple.prototype.start = function () {
 JalousieSimple.prototype.stop = function () {
     this.isDestroyed = true;
 
-    // Sends the `unsubscribeCOV` request to the BACnet Device
+    // Sends the 'unsubscribeCOV' request to the BACnet Device
     _.map(this.covObjectIds, (function (objectId) {
         this.apiService.confirmedReq.unsubscribeCOV({
             invokeId: 1,
@@ -187,11 +187,11 @@ JalousieSimple.prototype.initDevice = function () {
     this.initParamsFromConfig();
 
     // Creates instances of the plugin componets
-    this.logger.logDebug(`BACNetActor - initDevice: `
-    + `Creates instances of the plugin componets`);
+    this.logger.logDebug('BACNetActor - initDevice: '
+    + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Creates `subscribtion` to the BACnet object properties
+    // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
     // Inits the BACnet object properties
@@ -217,7 +217,7 @@ JalousieSimple.prototype.initSubManager = function () {
 /**
  * Creates and inits params of the BACnet Analog Input from plugin configuration.
  * Steps:
- * - creates and inits `objectId`.
+ * - creates and inits 'objectId'.
  *
  * @return {void}
  */
@@ -254,21 +254,21 @@ JalousieSimple.prototype.createPluginComponents = function () {
  */
 JalousieSimple.prototype.initProperties = function () {
 
-    // Gets the `presentValue|statusFlags` property for `motionDirection`
+    // Gets the 'presentValue|statusFlags' property for 'motionDirection'
     this.sendSubscribeCOV(this.motionDirectionObjectId);
 
-    // Gets the `presentValue|statusFlags` property for `stopValue`
+    // Gets the 'presentValue|statusFlags' property for 'stopValue'
     this.sendSubscribeCOV(this.stopValueObjectId);
 };
 
 /**
- * Creates `subscribtion` to the BACnet object properties.
+ * Creates 'subscribtion' to the BACnet object properties.
  *
  * @return {void}
  */
 JalousieSimple.prototype.subscribeToProperty = function () {
     var _this = this;
-    // Handle `Motion Direction` COV Notifications Flow
+    // Handle 'Motion Direction' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.motionDirectionObjectId)))
         .subscribe(function (resp) {
@@ -285,7 +285,7 @@ JalousieSimple.prototype.subscribeToProperty = function () {
             + ("Motion Direction COV notification was not received " + error));
         _this.publishStateChange();
     });
-    // Handle `Stop Value` COV Notifications Flow
+    // Handle 'Stop Value' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.stopValueObjectId)))
         .subscribe(function (resp) {
@@ -305,7 +305,7 @@ JalousieSimple.prototype.subscribeToProperty = function () {
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)));
-    // Gets the `presentValue` (position) property
+    // Gets the 'presentValue' (position) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.motionDirectionObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
@@ -315,7 +315,7 @@ JalousieSimple.prototype.subscribeToProperty = function () {
         _this.logger.logDebug("JalousieSimpleActorDevice - subscribeToProperty: "
             + ("Motion direction: " + bacnetProperty.value));
     });
-    // Gets the `presentValue` (rotation) property
+    // Gets the 'presentValue' (rotation) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.stopValueObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
@@ -328,8 +328,8 @@ JalousieSimple.prototype.subscribeToProperty = function () {
 };
 
 /**
- * Extracts the `presentValue` and `statusFlags` of the BACnet Object from
- * the BACnet `COVNotification` service.
+ * Extracts the 'presentValue' and 'statusFlags' of the BACnet Object from
+ * the BACnet 'COVNotification' service.
  * @param  {IBACnetResponse} resp - response from BACnet Object (device)
  * @return {[T,BACnet.Types.BACnetStatusFlags]}
  */
@@ -349,7 +349,7 @@ JalousieSimple.prototype.getCOVNotificationValues = function (resp) {
 };
 
 /**
- * Sends the `WriteProperty` confirmed request.
+ * Sends the 'WriteProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -369,7 +369,7 @@ JalousieSimple.prototype.sendWriteProperty = function (objectId, propId, values)
 };
 
 /**
- * Sends the `ReadProperty` confirmed request.
+ * Sends the 'ReadProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -386,7 +386,7 @@ JalousieSimple.prototype.sendReadProperty = function (objectId, propId) {
 };
 
 /**
- * Sends the `SubscribeCOV` confirmed request.
+ * Sends the 'SubscribeCOV' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @return {void}
@@ -452,7 +452,7 @@ JalousieSimple.prototype.setMotion = function (targetState) {
 };
 
 /**
- * Sets the `stopValue` state.
+ * Sets the 'stopValue' state.
  *
  * @param  {boolean} targetState - new stop value
  * @return {Bluebird<void>}
@@ -471,7 +471,7 @@ JalousieSimple.prototype.setStopMotion = function (targetState) {
  */
 
 /**
- * Toggles the `stopValue` state.
+ * Toggles the 'stopValue' state.
  *
  * @return {Bluebird<void>}
  */
@@ -483,7 +483,7 @@ JalousieSimple.prototype.stopMotion = function () {
     return Bluebird.resolve();
 };
 /**
- * Starts the step of `raise` operation.
+ * Starts the step of 'raise' operation.
  *
  * @return {Bluebird<void>}
  */
@@ -496,7 +496,7 @@ JalousieSimple.prototype.raisePosition = function () {
         .then(function () { return _this.stopMotion(); });
 };
 /**
- * Starts the step of `lower` operation.
+ * Starts the step of 'lower' operation.
  *
  * @return {Bluebird<void>}
  */
@@ -509,7 +509,7 @@ JalousieSimple.prototype.lowerPosition = function () {
         .then(function () { return _this.stopMotion(); });
 };
 /**
- * Sets the `UP` motion direction.
+ * Sets the 'UP' motion direction.
  *
  * @return {Bluebird<void>}
  */
@@ -519,7 +519,7 @@ JalousieSimple.prototype.positionUp = function () {
     return this.setMotion(Enums.MotionDirection.Up);
 };
 /**
- * Sets the `DOWN` motion direction.
+ * Sets the 'DOWN' motion direction.
  *
  * @return {Bluebird<void>}
  */
@@ -529,7 +529,7 @@ JalousieSimple.prototype.positionDown = function () {
     return this.setMotion(Enums.MotionDirection.Down);
 };
 /**
- * Sets the `UP` motion direction (fixed delay).
+ * Sets the 'UP' motion direction (fixed delay).
  *
  * @return {Bluebird<void>}
  */
@@ -542,7 +542,7 @@ JalousieSimple.prototype.openBlade = function () {
         .then(function () { return _this.stopMotion(); });
 };
 /**
- * Sets the `DOWN` motion direction (fixed delay).
+ * Sets the 'DOWN' motion direction (fixed delay).
  *
  * @return {Bluebird<void>}
  */
@@ -555,7 +555,7 @@ JalousieSimple.prototype.closeBlade = function () {
         .then(function () { return _this.stopMotion(); });
 };
 /**
- * Sends the `ReadProperty` request to update the motion direction and stop value params.
+ * Sends the 'ReadProperty' request to update the motion direction and stop value params.
  *
  * @return {Bluebird<void>}
  */

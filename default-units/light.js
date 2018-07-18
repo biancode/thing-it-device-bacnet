@@ -173,7 +173,7 @@ Light.prototype.start = function () {
 Light.prototype.stop = function () {
     this.isDestroyed = true;
 
-    // Sends the `unsubscribeCOV` request to the BACnet Device
+    // Sends the 'unsubscribeCOV' request to the BACnet Device
     _.map(this.covObjectIds, (function (objectId) {
         this.apiService.confirmedReq.unsubscribeCOV({
             invokeId: 1,
@@ -205,11 +205,11 @@ Light.prototype.initDevice = function () {
     this.initParamsFromConfig();
 
     // Creates instances of the plugin componets
-    this.logger.logDebug(`BACNetActor - initDevice: `
-    + `Creates instances of the plugin componets`);
+    this.logger.logDebug('BACNetActor - initDevice: '
+    + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Creates `subscribtion` to the BACnet object properties
+    // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
     // Inits the BACnet object properties
@@ -235,7 +235,7 @@ Light.prototype.initSubManager = function () {
 /**
  * Creates and inits params of the BACnet Analog Input from plugin configuration.
  * Steps:
- * - creates and inits `objectId`.
+ * - creates and inits 'objectId'.
  *
  * @return {void}
  */
@@ -282,21 +282,21 @@ Light.prototype.createPluginComponents = function () {
  */
 Light.prototype.initProperties = function () {
 
-    // Gets the `StateText` property for `light state`
+    // Gets the 'StateText' property for 'light state'
     this.sendReadProperty(this.lightActiveFeedbackObjectId, BACnet.Enums.PropertyId.stateText);
 
-    // Gets the `presentValue|statusFlags` property for `dimmer level`
+    // Gets the 'presentValue|statusFlags' property for 'dimmer level'
     this.sendSubscribeCOV(this.levelFeedbackObjectId);
 };
 
 /**
- * Creates `subscribtion` to the BACnet object properties.
+ * Creates 'subscribtion' to the BACnet object properties.
  *
  * @return {void}
  */
 Light.prototype.subscribeToProperty = function () {
     var _this = this;
-    // Handle `Dimmer Level` COVNotifications Flow
+    // Handle 'Dimmer Level' COVNotifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.levelFeedbackObjectId)))
         .subscribe(function (resp) {
@@ -313,7 +313,7 @@ Light.prototype.subscribeToProperty = function () {
             + ("Dimmer Level COV notification was not received " + error));
         _this.publishStateChange();
     });
-    // Handle `Light Active` COVNotifications Flow
+    // Handle 'Light Active' COVNotifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.lightActiveFeedbackObjectId)))
         .subscribe(function (resp) {
@@ -333,7 +333,7 @@ Light.prototype.subscribeToProperty = function () {
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)));
-    // Gets the `stateText` (light states) property
+    // Gets the 'stateText' (light states) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.lightActiveFeedbackObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.stateText)))
         .subscribe(function (resp) {
@@ -347,7 +347,7 @@ Light.prototype.subscribeToProperty = function () {
             + ("Light States: " + JSON.stringify(_this.stateText)));
         _this.sendSubscribeCOV(_this.lightActiveFeedbackObjectId);
     });
-    // Gets the `presentValue` (light mode) property
+    // Gets the 'presentValue' (light mode) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.lightActiveFeedbackObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
@@ -358,7 +358,7 @@ Light.prototype.subscribeToProperty = function () {
         _this.logger.logDebug("LightActorDevice - subscribeToProperty: "
             + ("Light Active: " + _this.state.lightActive));
     });
-    // Gets the `presentValue` (dimmer level) property
+    // Gets the 'presentValue' (dimmer level) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.levelFeedbackObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
@@ -372,8 +372,8 @@ Light.prototype.subscribeToProperty = function () {
 };
 
 /**
- * Extracts the `presentValue` and `statusFlags` of the BACnet Object from
- * the BACnet `COVNotification` service.
+ * Extracts the 'presentValue' and 'statusFlags' of the BACnet Object from
+ * the BACnet 'COVNotification' service.
  * @param  {IBACnetResponse} resp - response from BACnet Object (device)
  * @return {[T,BACnet.Types.BACnetStatusFlags]}
  */
@@ -393,7 +393,7 @@ Light.prototype.getCOVNotificationValues = function (resp) {
 };
 
 /**
- * Sends the `WriteProperty` confirmed request.
+ * Sends the 'WriteProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -413,7 +413,7 @@ Light.prototype.sendWriteProperty = function (objectId, propId, values) {
 };
 
 /**
- * Sends the `ReadProperty` confirmed request.
+ * Sends the 'ReadProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -430,7 +430,7 @@ Light.prototype.sendReadProperty = function (objectId, propId) {
 };
 
 /**
- * Sends the `SubscribeCOV` confirmed request.
+ * Sends the 'SubscribeCOV' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @return {void}
@@ -475,7 +475,7 @@ Light.prototype.createLogger = function () {
 };
 
 /**
- * Sends the `writeProperty` request to set the Dimmer Level (`presentValue` property).
+ * Sends the 'writeProperty' request to set the Dimmer Level ('presentValue' property).
  *
  * @param  {number} dimmerLevel - dimmer level
  * @return {Bluebird<void>}
@@ -487,7 +487,7 @@ Light.prototype.setDimmerLevelModification = function (dimmerLevel) {
     return Bluebird.resolve();
 };
 /**
- * Sends the `writeProperty` request to set the Light Mode (`presentValue` property).
+ * Sends the 'writeProperty' request to set the Light Mode ('presentValue' property).
  *
  * @param  {number} lightMode - light mode
  * @return {Bluebird<void>}
@@ -500,7 +500,7 @@ Light.prototype.setLightActiveModification = function (lightMode) {
 };
 
 /**
- * Sets the `lightActive` state.
+ * Sets the 'lightActive' state.
  *
  * @param  {BACnet.Types.BACnetUnsignedInteger} presentValue - BACnet present value
  * @return {void}
@@ -526,7 +526,7 @@ Light.prototype.setLightActive = function (presentValue) {
  * TID API Methods
  */
 /**
- * Sends the `readProperty` request to get new `presentValue` properties of the
+ * Sends the 'readProperty' request to get new 'presentValue' properties of the
  * Dimmer Level and Light Mode.
  *
  * @return {Bluebird<void>}

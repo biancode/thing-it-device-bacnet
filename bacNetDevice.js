@@ -199,14 +199,14 @@ BACNetDevice.prototype.start = function () {
         return this.initDevice()
     }).bind(this))
     .catch((function(error) {
-        this.logError(`BACNetDeviceController - start: ${error}`);
+        this.logError('BACNetDeviceController - start: ' + error);
     }).bind(this));
 };
 
 BACNetDevice.prototype.stop = function () {
     this.isDestroyed = true;
 
-    // Sends the `unsubscribeCOV` request to the BACnet Device
+    // Sends the 'unsubscribeCOV' request to the BACnet Device
     _.map(this.covObjectIds, (function (objectId) {
         this.apiService.confirmedReq.unsubscribeCOV({
             invokeId: 1,
@@ -274,24 +274,24 @@ BACNetDevice.prototype.initDevice = function () {
     return this.createPluginConfig().then((function(pluginConfig) {
         this.pluginConfig = pluginConfig;
         // Creates instances of the plugin componets
-        this.logger.logDebug(`BACNetDeviceControllerDevice - initDevice: `
-            + `Creates instances of the plugin componets`);
+        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+            + 'Creates instances of the plugin componets');
         return this.createPluginComponents();
     }).bind(this))
     .then((function() {
         // Creates instance of the API Service
-        this.logger.logDebug(`BACNetDeviceControllerDevice - initDevice: `
-            + `Creates the instance of the API Service`);
+        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+            + 'Creates the instance of the API Service');
         this.apiService = this.serviceManager.createAPIService();
 
-        // Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow
-        this.logger.logDebug(`BACNetDeviceControllerDevice - initDevice: `
-            + `Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow`);
+        // Creates 'subscribtion' to the BACnet 'whoIs' - 'iAm' flow
+        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+            + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
         this.subscribeToObject();
 
-        // Send `WhoIs` request
-        this.logger.logDebug(`BACNetDeviceControllerDevice - initDevice: `
-            + `Send "WhoIs" request`);
+        // Send 'WhoIs' request
+        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+            + 'Send "WhoIs" request');
         if (this.config.unicastWhoIsConfirmation) {
             this.apiService.unconfirmedReq.whoIsUnicast({});
         } else {
@@ -305,7 +305,7 @@ BACNetDevice.prototype.initDevice = function () {
 /**
  * Creates and inits params of the BACnet Device from plugin configuration.
  * Steps:
- * - creates and inits `objectId`.
+ * - creates and inits 'objectId'.
  *
  * @return {void}
  */
@@ -365,7 +365,7 @@ BACNetDevice.prototype.createPluginComponents = function () {
 };
 
 /**
- * Creates `subscribtion` to the BACnet `whoIs` - `iAm` flow.
+ * Creates 'subscribtion' to the BACnet 'whoIs' - 'iAm' flow.
  *
  * @return {void}
  */
@@ -385,11 +385,11 @@ BACNetDevice.prototype.subscribeToObject = function () {
             RxOp.timeout(Configs.AppConfig.response.iAm.timeout), RxOp.first()
         )
         .subscribe((function (resp) {
-        // Handles `iAm` response
+        // Handles 'iAm' response
         this.logger.logInfo('Initialized BACnet device successfully.');
         var iAmService = resp.layer.apdu.service;
         this.objectId = iAmService.objId;
-        // Creates `subscribtion` to the BACnet device properties
+        // Creates 'subscribtion' to the BACnet device properties
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Creates \"subscribtion\" to the BACnet device properties");
         this.subscribeToProperty();
@@ -404,7 +404,7 @@ BACNetDevice.prototype.subscribeToObject = function () {
                 this.logger.logInfo("BACNetDeviceControllerDevice - subscribeToObject: "
                     + ("Device configured with " + curAddrInfo.address + " found at " + respAddrInfo.address));
             }
-            // Sets IP from response to `plugin` config
+            // Sets IP from response to 'plugin' config
             this.pluginConfig = _.merge({}, _.cloneDeep(this.pluginConfig), 
             {
                 manager: { 
@@ -415,7 +415,7 @@ BACNetDevice.prototype.subscribeToObject = function () {
                     } 
                 },
             });
-            // Create new instance of the `service` manager
+            // Create new instance of the 'service' manager
             this.serviceManager.destroy();
             this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority);
             BACnetAction.setBACnetServiceManager(this.serviceManager);
@@ -433,7 +433,7 @@ BACNetDevice.prototype.subscribeToObject = function () {
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Inits the BACnet properties");
         this.initProperties();
-        // Call `init` method each actor
+        // Call 'init' method each actor
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Inits the TID units");
         Bluebird.map(this.actors, function (actor) {
@@ -452,20 +452,20 @@ BACNetDevice.prototype.subscribeToObject = function () {
  */
 BACNetDevice.prototype.initProperties = function () {
     
-    // Gets the `objectName` property
+    // Gets the 'objectName' property
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.objectName);
-    // Gets the `description` property
+    // Gets the 'description' property
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.description);
-    // Gets the `vendorName` property
+    // Gets the 'vendorName' property
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.vendorName);
-    // Gets the `modelName` property
+    // Gets the 'modelName' property
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.modelName);
-    // Gets the `applicationSoftwareVersion` property
+    // Gets the 'applicationSoftwareVersion' property
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.applicationSoftwareVersion);
 };
 
 /**
- * Creates `subscribtion` to the BACnet device properties.
+ * Creates 'subscribtion' to the BACnet device properties.
  *
  * @return {void}
  */
@@ -477,7 +477,7 @@ BACNetDevice.prototype.subscribeToProperty = function () {
             RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
             RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId))
         );
-    // Gets the `objectName` property
+    // Gets the 'objectName' property
     var ovObjectName = readPropertyFlow
         .pipe(
             RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.objectName)),
@@ -490,7 +490,7 @@ BACNetDevice.prototype.subscribeToProperty = function () {
                 this.publishStateChange();
             }).bind(this))
         );
-    // Gets the `description` property
+    // Gets the 'description' property
     var ovDescription = readPropertyFlow
         .pipe(
             RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.description)), 
@@ -503,7 +503,7 @@ BACNetDevice.prototype.subscribeToProperty = function () {
                 this.publishStateChange();
             }).bind(this))
         );
-    // Gets the `vendorName` property
+    // Gets the 'vendorName' property
     var ovVendorName = readPropertyFlow
         .pipe(
             RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.vendorName)),
@@ -516,7 +516,7 @@ BACNetDevice.prototype.subscribeToProperty = function () {
                 this.publishStateChange();
             }).bind(this))
         );
-    // Gets the `modelName` property
+    // Gets the 'modelName' property
     var ovModelName = readPropertyFlow
         .pipe(
             RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.modelName)),
@@ -529,7 +529,7 @@ BACNetDevice.prototype.subscribeToProperty = function () {
                 this.publishStateChange();
             }).bind(this))
         );
-    // Gets the `applicationSoftwareVersion` property
+    // Gets the 'applicationSoftwareVersion' property
     var ovSoftwareVersion = readPropertyFlow
         .pipe(
             RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.applicationSoftwareVersion)),
@@ -542,7 +542,7 @@ BACNetDevice.prototype.subscribeToProperty = function () {
                 this.publishStateChange();
             }).bind(this))
         );
-    // Gets the summary `readProperty` response
+    // Gets the summary 'readProperty' response
     this.subManager.subscribe = Rx.combineLatest(ovObjectName, ovDescription, ovVendorName, 
             ovModelName, ovSoftwareVersion)
         .pipe(
@@ -562,8 +562,8 @@ BACNetDevice.prototype.subscribeToProperty = function () {
 
 
 /**
- * Extracts the `presentValue` and `statusFlags` of the BACnet Object from
- * the BACnet `COVNotification` service.
+ * Extracts the 'presentValue' and 'statusFlags' of the BACnet Object from
+ * the BACnet 'COVNotification' service.
  * @param  {IBACnetResponse} resp - response from BACnet Object (device)
  * @return {[T,BACnet.Types.BACnetStatusFlags]}
  */
@@ -583,7 +583,7 @@ BACNetDevice.prototype.getCOVNotificationValues = function (resp) {
 };
 
 /**
- * Sends the `WriteProperty` confirmed request.
+ * Sends the 'WriteProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -603,7 +603,7 @@ BACNetDevice.prototype.sendWriteProperty = function (objectId, propId, values) {
 };
 
 /**
- * Sends the `ReadProperty` confirmed request.
+ * Sends the 'ReadProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -620,7 +620,7 @@ BACNetDevice.prototype.sendReadProperty = function (objectId, propId) {
 };
 
 /**
- * Sends the `SubscribeCOV` confirmed request.
+ * Sends the 'SubscribeCOV' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @return {void}
@@ -677,9 +677,9 @@ BACNetDevice.prototype.createLogger = function () {
  * HELPERs
  */
 /**
- * Calculates the `IP` address of the BACnet device.
+ * Calculates the 'IP' address of the BACnet device.
  *
- * @return {string} - `IP` address of the BACnet device
+ * @return {string} - 'IP' address of the BACnet device
  */
 BACNetDevice.prototype.getDeviceIpAddress = function () {
     var _this = this;
@@ -709,9 +709,9 @@ BACNetDevice.prototype.getDeviceIpAddress = function () {
 };
 
 /**
- * Calculates the `PORT` of the BACnet device.
+ * Calculates the 'PORT' of the BACnet device.
  *
- * @return {number} - `PORT` of the BACnet device
+ * @return {number} - 'PORT' of the BACnet device
  */
 BACNetDevice.prototype.getDevicePort = function () {
     var port = +this.config.port;

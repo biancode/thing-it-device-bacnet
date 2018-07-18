@@ -224,7 +224,7 @@ Jalousie.prototype.start = function () {
 Jalousie.prototype.stop = function () {
     this.isDestroyed = true;
 
-    // Sends the `unsubscribeCOV` request to the BACnet Device
+    // Sends the 'unsubscribeCOV' request to the BACnet Device
     _.map(this.covObjectIds, (function (objectId) {
         this.apiService.confirmedReq.unsubscribeCOV({
             invokeId: 1,
@@ -256,11 +256,11 @@ Jalousie.prototype.initDevice = function () {
     this.initParamsFromConfig();
 
     // Creates instances of the plugin componets
-    this.logger.logDebug(`BACNetActor - initDevice: `
-    + `Creates instances of the plugin componets`);
+    this.logger.logDebug('BACNetActor - initDevice: '
+    + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Creates `subscribtion` to the BACnet object properties
+    // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
     // Inits the BACnet object properties
@@ -286,7 +286,7 @@ Jalousie.prototype.initSubManager = function () {
 /**
  * Creates and inits params of the BACnet Analog Input from plugin configuration.
  * Steps:
- * - creates and inits `objectId`.
+ * - creates and inits 'objectId'.
  *
  * @return {void}
  */
@@ -338,21 +338,21 @@ Jalousie.prototype.createPluginComponents = function () {
  */
 Jalousie.prototype.initProperties = function () {
 
-    // Gets the `presentValue|statusFlags` property for `position`
+    // Gets the 'presentValue|statusFlags' property for 'position'
     this.sendSubscribeCOV(this.positionFeedbackObjectId);
 
-    // Gets the `presentValue|statusFlags` property for `rotation`
+    // Gets the 'presentValue|statusFlags' property for 'rotation'
     this.sendSubscribeCOV(this.rotationFeedbackObjectId);
 };
 
 /**
- * Creates `subscribtion` to the BACnet object properties.
+ * Creates 'subscribtion' to the BACnet object properties.
  *
  * @return {void}
  */
 Jalousie.prototype.subscribeToProperty = function () {
     var _this = this;
-    // Handle `Position` COV Notifications Flow
+    // Handle 'Position' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.positionFeedbackObjectId)))
         .subscribe(function (resp) {
@@ -369,7 +369,7 @@ Jalousie.prototype.subscribeToProperty = function () {
             + ("Position COV notification was not received " + error));
         _this.publishStateChange();
     });
-    // Handle `Rotation` COV Notifications Flow
+    // Handle 'Rotation' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.rotationFeedbackObjectId)))
         .subscribe(function (resp) {
@@ -389,8 +389,8 @@ Jalousie.prototype.subscribeToProperty = function () {
 };
 
 /**
- * Extracts the `presentValue` and `statusFlags` of the BACnet Object from
- * the BACnet `COVNotification` service.
+ * Extracts the 'presentValue' and 'statusFlags' of the BACnet Object from
+ * the BACnet 'COVNotification' service.
  * @param  {IBACnetResponse} resp - response from BACnet Object (device)
  * @return {[T,BACnet.Types.BACnetStatusFlags]}
  */
@@ -410,7 +410,7 @@ Jalousie.prototype.getCOVNotificationValues = function (resp) {
 };
 
 /**
- * Sends the `WriteProperty` confirmed request.
+ * Sends the 'WriteProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -430,7 +430,7 @@ Jalousie.prototype.sendWriteProperty = function (objectId, propId, values) {
 };
 
 /**
- * Sends the `ReadProperty` confirmed request.
+ * Sends the 'ReadProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -447,7 +447,7 @@ Jalousie.prototype.sendReadProperty = function (objectId, propId) {
 };
 
 /**
- * Sends the `SubscribeCOV` confirmed request.
+ * Sends the 'SubscribeCOV' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @return {void}
@@ -492,9 +492,9 @@ Jalousie.prototype.createLogger = function () {
 };
 
 /**
- * Sends the `writeProperty` request to set the value of the `presentValue` property.
+ * Sends the 'writeProperty' request to set the value of the 'presentValue' property.
  *
- * @param  {number} presentValue - value of the `presentValue` property.
+ * @param  {number} presentValue - value of the 'presentValue' property.
  * @return {Bluebird<void>}
  */
 Jalousie.prototype.setModification = function (position, rotation) {

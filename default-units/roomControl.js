@@ -134,7 +134,7 @@ RoomControl.prototype.start = function () {
 RoomControl.prototype.stop = function () {
     this.isDestroyed = true;
 
-    // Sends the `unsubscribeCOV` request to the BACnet Device
+    // Sends the 'unsubscribeCOV' request to the BACnet Device
     _.map(this.covObjectIds, (function (objectId) {
         this.apiService.confirmedReq.unsubscribeCOV({
             invokeId: 1,
@@ -166,11 +166,11 @@ RoomControl.prototype.initDevice = function () {
     this.initParamsFromConfig();
 
     // Creates instances of the plugin componets
-    this.logger.logDebug(`BACNetActor - initDevice: `
-    + `Creates instances of the plugin componets`);
+    this.logger.logDebug('BACNetActor - initDevice: '
+    + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Creates `subscribtion` to the BACnet object properties
+    // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
     // Inits the BACnet object properties
@@ -196,7 +196,7 @@ RoomControl.prototype.initSubManager = function () {
 /**
  * Creates and inits params of the BACnet Analog Input from plugin configuration.
  * Steps:
- * - creates and inits `objectId`.
+ * - creates and inits 'objectId'.
  *
  * @return {void}
  */
@@ -238,21 +238,21 @@ RoomControl.prototype.createPluginComponents = function () {
  */
 RoomControl.prototype.initProperties = function () {
 
-   // Gets the `presentValue|statusFlags` property for `setpoint`
+   // Gets the 'presentValue|statusFlags' property for 'setpoint'
    this.sendSubscribeCOV(this.setpointFeedbackObjectId);
 
-   // Gets the `presentValue|statusFlags` property for `temperature`
+   // Gets the 'presentValue|statusFlags' property for 'temperature'
    this.sendSubscribeCOV(this.temperatureObjectId);
 };
 
 /**
- * Creates `subscribtion` to the BACnet object properties.
+ * Creates 'subscribtion' to the BACnet object properties.
  *
  * @return {void}
  */
 RoomControl.prototype.subscribeToProperty = function () {
     var _this = this;
-    // Handle `Setpoint` COV Notifications Flow
+    // Handle 'Setpoint' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.setpointFeedbackObjectId)))
         .subscribe(function (resp) {
@@ -269,7 +269,7 @@ RoomControl.prototype.subscribeToProperty = function () {
             + ("Setpoint COV notification was not received " + error));
         _this.publishStateChange();
     });
-    // handle `Temperature` COV Notifications Flow
+    // handle 'Temperature' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.temperatureObjectId)))
         .subscribe(function (resp) {
@@ -289,7 +289,7 @@ RoomControl.prototype.subscribeToProperty = function () {
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)));
-    // Gets the `presentValue` (setpoint) property
+    // Gets the 'presentValue' (setpoint) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.setpointFeedbackObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
@@ -300,7 +300,7 @@ RoomControl.prototype.subscribeToProperty = function () {
             + ("Setpoint: " + _this.state.setpoint));
         _this.publishStateChange();
     });
-    // Gets the `presentValue` (temperature) property
+    // Gets the 'presentValue' (temperature) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.temperatureObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
@@ -314,8 +314,8 @@ RoomControl.prototype.subscribeToProperty = function () {
 };
 
 /**
- * Extracts the `presentValue` and `statusFlags` of the BACnet Object from
- * the BACnet `COVNotification` service.
+ * Extracts the 'presentValue' and 'statusFlags' of the BACnet Object from
+ * the BACnet 'COVNotification' service.
  * @param  {IBACnetResponse} resp - response from BACnet Object (device)
  * @return {[T,BACnet.Types.BACnetStatusFlags]}
  */
@@ -335,7 +335,7 @@ RoomControl.prototype.getCOVNotificationValues = function (resp) {
 };
 
 /**
- * Sends the `WriteProperty` confirmed request.
+ * Sends the 'WriteProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -355,7 +355,7 @@ RoomControl.prototype.sendWriteProperty = function (objectId, propId, values) {
 };
 
 /**
- * Sends the `ReadProperty` confirmed request.
+ * Sends the 'ReadProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -372,7 +372,7 @@ RoomControl.prototype.sendReadProperty = function (objectId, propId) {
 };
 
 /**
- * Sends the `SubscribeCOV` confirmed request.
+ * Sends the 'SubscribeCOV' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @return {void}
@@ -417,14 +417,14 @@ RoomControl.prototype.createLogger = function () {
 };
 
 /**
- * Sends the `writeProperty` request to set the setpoint of the `presentValue` property.
+ * Sends the 'writeProperty' request to set the setpoint of the 'presentValue' property.
  *
  * @return {Promise<void>}
  */
 RoomControl.prototype.setSetpointModification = function (setpointModifier) {
     this.logger.logDebug('RoomControl - setSetpointModification: '
         + ("Setting setpoint modification: " + setpointModifier));
-    // Gets the `presentValue|statusFlags` property for `setpoint`
+    // Gets the 'presentValue|statusFlags' property for 'setpoint'
     this.sendWriteProperty(this.setpointModificationObjectId, BACnet.Enums.PropertyId.presentValue, [new BACnet.Types.BACnetReal(setpointModifier)]);
     return Bluebird.resolve();
 };
@@ -433,8 +433,8 @@ RoomControl.prototype.setSetpointModification = function (setpointModifier) {
  * TID API Methods
  */
 /**
- * Sends the `readProperty` requests to get the values (temperature, setpoint)
- * of the `presentValue` property.
+ * Sends the 'readProperty' requests to get the values (temperature, setpoint)
+ * of the 'presentValue' property.
  *
  * @return {Bluebird<void>}
  */
@@ -446,7 +446,7 @@ RoomControl.prototype.update = function () {
     return Bluebird.resolve();
 };
 /**
- * Increments the `setpoint` value.
+ * Increments the 'setpoint' value.
  *
  * @return {Bluebird<void>}
  */
@@ -456,7 +456,7 @@ RoomControl.prototype.incrementSetpoint = function () {
     return this.setSetpointModification(1);
 };
 /**
- * Decrements the `setpoint` value.
+ * Decrements the 'setpoint' value.
  *
  * @return {Bluebird<void>}
  */

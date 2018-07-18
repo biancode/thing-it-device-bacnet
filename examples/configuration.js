@@ -40,7 +40,7 @@ module.exports = {
                 logLevel: 'debug',
                 configuration: {
                     lightActiveObjectId: 9,
-                    lightActiveObjectType: `BinaryValue`,
+                    lightActiveObjectType: 'BinaryValue',
                 },
             },
             {

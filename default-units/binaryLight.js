@@ -104,7 +104,7 @@ BinaryLight.prototype.start = function () {
 BinaryLight.prototype.stop = function () {
     this.isDestroyed = true;
 
-    // Sends the `unsubscribeCOV` request to the BACnet Device
+    // Sends the 'unsubscribeCOV' request to the BACnet Device
     _.map(this.covObjectIds, (function (objectId) {
         this.apiService.confirmedReq.unsubscribeCOV({
             invokeId: 1,
@@ -136,11 +136,11 @@ BinaryLight.prototype.initDevice = function () {
     this.initParamsFromConfig();
 
     // Creates instances of the plugin componets
-    this.logger.logDebug(`BACNetActor - initDevice: `
-    + `Creates instances of the plugin componets`);
+    this.logger.logDebug('BACNetActor - initDevice: '
+    + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Creates `subscribtion` to the BACnet object properties
+    // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
     // Inits the BACnet object properties
@@ -166,7 +166,7 @@ BinaryLight.prototype.initSubManager = function () {
 /**
  * Creates and inits params of the BACnet Analog Input from plugin configuration.
  * Steps:
- * - creates and inits `objectId`.
+ * - creates and inits 'objectId'.
  *
  * @return {void}
  */
@@ -198,18 +198,18 @@ BinaryLight.prototype.createPluginComponents = function () {
  */
 BinaryLight.prototype.initProperties = function () {
 
-    // Gets the `presentValue|statusFlags` property
+    // Gets the 'presentValue|statusFlags' property
     this.sendSubscribeCOV(this.objectId);
 };
 
 /**
- * Creates `subscribtion` to the BACnet object properties.
+ * Creates 'subscribtion' to the BACnet object properties.
  *
  * @return {void}
  */
 BinaryLight.prototype.subscribeToProperty = function () {
     var _this = this;
-    // Handle `Present Value` COV Notifications Flow
+    // Handle 'Present Value' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
             .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)))
             .subscribe(function (resp) {
@@ -229,7 +229,7 @@ BinaryLight.prototype.subscribeToProperty = function () {
         // Read Property Flow
         var readPropertyFlow = this.flowManager.getResponseFlow()
             .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)));
-        // Gets the `presentValue` property
+        // Gets the 'presentValue' property
         this.subManager.subscribe = readPropertyFlow
             .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
             .subscribe(function (resp) {
@@ -243,8 +243,8 @@ BinaryLight.prototype.subscribeToProperty = function () {
 };
 
 /**
- * Extracts the `presentValue` and `statusFlags` of the BACnet Object from
- * the BACnet `COVNotification` service.
+ * Extracts the 'presentValue' and 'statusFlags' of the BACnet Object from
+ * the BACnet 'COVNotification' service.
  * @param  {IBACnetResponse} resp - response from BACnet Object (device)
  * @return {[T,BACnet.Types.BACnetStatusFlags]}
  */
@@ -264,7 +264,7 @@ BinaryLight.prototype.getCOVNotificationValues = function (resp) {
 };
 
 /**
- * Sends the `WriteProperty` confirmed request.
+ * Sends the 'WriteProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -284,7 +284,7 @@ BinaryLight.prototype.sendWriteProperty = function (objectId, propId, values) {
 };
 
 /**
- * Sends the `ReadProperty` confirmed request.
+ * Sends the 'ReadProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -301,7 +301,7 @@ BinaryLight.prototype.sendReadProperty = function (objectId, propId) {
 };
 
 /**
- * Sends the `SubscribeCOV` confirmed request.
+ * Sends the 'SubscribeCOV' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @return {void}
@@ -346,9 +346,9 @@ BinaryLight.prototype.createLogger = function () {
 };
 
 /**
- * Sends the `writeProperty` request to set the value of the `presentValue` property.
+ * Sends the 'writeProperty' request to set the value of the 'presentValue' property.
  *
- * @param  {number} presentValue - value of the `presentValue` property.
+ * @param  {number} presentValue - value of the 'presentValue' property.
  * @return {Bluebird<void>}
  */
 BinaryLight.prototype.setLightActive = function (targetState) {
@@ -361,7 +361,7 @@ BinaryLight.prototype.setLightActive = function (targetState) {
  * TID API Methods
  */
 /**
- * Sends the `readProperty` request to get the value of the `presentValue` property.
+ * Sends the 'readProperty' request to get the value of the 'presentValue' property.
  *
  * @return {Bluebird<void>}
  */
@@ -374,7 +374,7 @@ BinaryLight.prototype.update = function () {
 };
 
 /**
- * Switches the value of the `presentValue` property.
+ * Switches the value of the 'presentValue' property.
  *
  * @return {Bluebird<void>}
  */
@@ -391,7 +391,7 @@ BinaryLight.prototype.toggle = function () {
 };
 
 /**
- * Sets `1` (true) value of the `presentValue` property.
+ * Sets '1' (true) value of the 'presentValue' property.
  *
  * @return {Bluebird<void>}
  */
@@ -403,7 +403,7 @@ BinaryLight.prototype.on = function () {
 };
 
 /**
- * Sets `0` (false) value of the `presentValue` property.
+ * Sets '0' (false) value of the 'presentValue' property.
  *
  * @return {Bluebird<void>}
  */

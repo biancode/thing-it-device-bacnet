@@ -5,20 +5,22 @@ const path = require('path');
 const TestDriver = require('thing-it-test');
 
 function wait (delay, fn) {
-    return new Bluebird((resolve, reject) => setTimeout(() => {
-        fn && fn();
-        resolve();
-    }, delay));
+    return new Bluebird(function (resolve, reject) {
+        setTimeout(function () {
+            fn && fn();
+            resolve();
+        }, delay)
+    });
 }
 
-describe('[thing-it] BacNet Device - code test', () => {
+describe('[thing-it] BacNet Device - code test', function() {
     let testDriver;
 
     const time = {
         test1: 15000,
     }
 
-    before(() => {
+    before(function() {
         testDriver = TestDriver.createTestDriver({ logLevel: 'debug' });
         testDriver.registerDevicePlugin('bacnet', path.resolve(__dirname, '../bacNetDevice'));
         testDriver.registerUnitPlugin(path.resolve(__dirname, '../default-units/binaryInput'));
@@ -39,11 +41,11 @@ describe('[thing-it] BacNet Device - code test', () => {
         });
     });
 
-    after(async () => {
+    after(async function() {
         await testDriver.stop();
     });
 
-    it('should have completed initialization successfully', async () => {
+    it('should have completed initialization successfully', async function() {
         await wait(time.test1);
     }).timeout(time.test1 + 2000);
 });

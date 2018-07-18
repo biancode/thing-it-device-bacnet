@@ -166,7 +166,7 @@ Thermostat.prototype.start = function () {
 Thermostat.prototype.stop = function () {
     this.isDestroyed = true;
 
-    // Sends the `unsubscribeCOV` request to the BACnet Device
+    // Sends the 'unsubscribeCOV' request to the BACnet Device
     _.map(this.covObjectIds, (function (objectId) {
         this.apiService.confirmedReq.unsubscribeCOV({
             invokeId: 1,
@@ -198,11 +198,11 @@ Thermostat.prototype.initDevice = function () {
     this.initParamsFromConfig();
 
     // Creates instances of the plugin componets
-    this.logger.logDebug(`BACNetActor - initDevice: `
-    + `Creates instances of the plugin componets`);
+    this.logger.logDebug('BACNetActor - initDevice: '
+    + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Creates `subscribtion` to the BACnet object properties
+    // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
     // Inits the BACnet object properties
@@ -228,7 +228,7 @@ Thermostat.prototype.initSubManager = function () {
 /**
  * Creates and inits params of the BACnet Analog Input from plugin configuration.
  * Steps:
- * - creates and inits `objectId`.
+ * - creates and inits 'objectId'.
  *
  * @return {void}
  */
@@ -275,23 +275,23 @@ Thermostat.prototype.createPluginComponents = function () {
  */
 Thermostat.prototype.initProperties = function () {
 
-   // Gets the `presentValue|statusFlags` property for `setpoint`
+   // Gets the 'presentValue|statusFlags' property for 'setpoint'
    this.sendSubscribeCOV(this.setpointFeedbackObjectId);
 
-   // Gets the `presentValue|statusFlags` property for `temperature`
+   // Gets the 'presentValue|statusFlags' property for 'temperature'
    this.sendSubscribeCOV(this.temperatureObjectId);
 
    this.sendReadProperty(this.modeObjectId, BACnet.Enums.PropertyId.stateText);
 };
 
 /**
- * Creates `subscribtion` to the BACnet object properties.
+ * Creates 'subscribtion' to the BACnet object properties.
  *
  * @return {void}
  */
 Thermostat.prototype.subscribeToProperty = function () {
     var _this = this;
-    // Handle COV Notifications Flow. Sets the `mode`, `heatActive`, `coolActive`
+    // Handle COV Notifications Flow. Sets the 'mode', 'heatActive', 'coolActive'
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.modeObjectId)))
         .subscribe(function (resp) {
@@ -326,7 +326,7 @@ Thermostat.prototype.subscribeToProperty = function () {
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)));
-    // Gets the `stateText` property
+    // Gets the 'stateText' property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.modeObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.stateText)))
         .subscribe(function (resp) {
@@ -338,14 +338,14 @@ Thermostat.prototype.subscribeToProperty = function () {
         _this.logger.logDebug("ThermostatActorDevice - subscribeToProperty: "
             + ("State Text: " + JSON.stringify(_this.stateText)));
         _this.publishStateChange();
-        // Gets the `presentValue|statusFlags` property
+        // Gets the 'presentValue|statusFlags' property
         _this.sendSubscribeCOV(_this.modeObjectId);
     });
 };
 
 /**
- * Extracts the `presentValue` and `statusFlags` of the BACnet Object from
- * the BACnet `COVNotification` service.
+ * Extracts the 'presentValue' and 'statusFlags' of the BACnet Object from
+ * the BACnet 'COVNotification' service.
  * @param  {IBACnetResponse} resp - response from BACnet Object (device)
  * @return {[T,BACnet.Types.BACnetStatusFlags]}
  */
@@ -365,7 +365,7 @@ Thermostat.prototype.getCOVNotificationValues = function (resp) {
 };
 
 /**
- * Sends the `WriteProperty` confirmed request.
+ * Sends the 'WriteProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -385,7 +385,7 @@ Thermostat.prototype.sendWriteProperty = function (objectId, propId, values) {
 };
 
 /**
- * Sends the `ReadProperty` confirmed request.
+ * Sends the 'ReadProperty' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @param  {BACnet.Enums.PropertyId} propId - BACnet property identifier
@@ -402,7 +402,7 @@ Thermostat.prototype.sendReadProperty = function (objectId, propId) {
 };
 
 /**
- * Sends the `SubscribeCOV` confirmed request.
+ * Sends the 'SubscribeCOV' confirmed request.
  *
  * @param  {BACnet.Types.BACnetObjectId} objectId - BACnet object identifier
  * @return {void}
@@ -447,14 +447,14 @@ Thermostat.prototype.createLogger = function () {
 };
 
 /**
- * Sends the `writeProperty` request to set the setpoint of the `presentValue` property.
+ * Sends the 'writeProperty' request to set the setpoint of the 'presentValue' property.
  *
  * @return {Promise<void>}
  */
 Thermostat.prototype.setSetpointModification = function (setpointModifier) {
     this.logger.logDebug('Thermostat - setSetpointModification: '
         + ("Setting setpoint modification: " + setpointModifier));
-    // Gets the `presentValue|statusFlags` property for `setpoint`
+    // Gets the 'presentValue|statusFlags' property for 'setpoint'
     this.sendWriteProperty(this.setpointModificationObjectId, BACnet.Enums.PropertyId.presentValue, [new BACnet.Types.BACnetReal(setpointModifier)]);
     return Bluebird.resolve();
 };
@@ -463,8 +463,8 @@ Thermostat.prototype.setSetpointModification = function (setpointModifier) {
  * TID API Methods
  */
 /**
- * Sends the `readProperty` requests to get the values (temperature, setpoint)
- * of the `presentValue` property.
+ * Sends the 'readProperty' requests to get the values (temperature, setpoint)
+ * of the 'presentValue' property.
  *
  * @return {Bluebird<void>}
  */
@@ -476,7 +476,7 @@ Thermostat.prototype.update = function () {
     return Bluebird.resolve();
 };
 /**
- * Increments the `setpoint` value.
+ * Increments the 'setpoint' value.
  *
  * @return {Bluebird<void>}
  */
@@ -486,7 +486,7 @@ Thermostat.prototype.incrementSetpoint = function () {
     return this.setSetpointModification(1);
 };
 /**
- * Decrements the `setpoint` value.
+ * Decrements the 'setpoint' value.
  *
  * @return {Bluebird<void>}
  */
