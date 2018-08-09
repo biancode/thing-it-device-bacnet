@@ -445,7 +445,7 @@ BinaryValue.prototype.createLogger = function () {
 /**
  * Sends the 'writeProperty' request to set the value of the 'presentValue' property.
  *
- * @param  {number} presentValue - value of the 'presentValue' property.
+ * @param  {boolean} presentValue - value of the 'presentValue' property.
  * @return {Bluebird<void>}
  */
 BinaryValue.prototype.setPresentValue = function (presentValue) {

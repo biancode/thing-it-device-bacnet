@@ -348,7 +348,7 @@ BinaryLight.prototype.createLogger = function () {
 /**
  * Sends the 'writeProperty' request to set the value of the 'presentValue' property.
  *
- * @param  {number} presentValue - value of the 'presentValue' property.
+ * @param  {boolean} targetState - value of the 'presentValue' property.
  * @return {Bluebird<void>}
  */
 BinaryLight.prototype.setLightActive = function (targetState) {

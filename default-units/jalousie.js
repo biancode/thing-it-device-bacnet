@@ -511,7 +511,7 @@ Jalousie.prototype.setModification = function (position, rotation) {
  */
 
 /**
- * Service Stub
+ * 
  */
 Jalousie.prototype.raisePosition = function () {
     var targetPosition = this.state.position - this.config.positionStepSize;
@@ -521,7 +521,7 @@ Jalousie.prototype.raisePosition = function () {
     return Bluebird.resolve();
 };
 /**
- * Service Stub
+ * 
  */
 Jalousie.prototype.lowerPosition = function () {
     var targetPosition = this.state.position + this.config.positionStepSize;
@@ -531,7 +531,7 @@ Jalousie.prototype.lowerPosition = function () {
     return Bluebird.resolve();
 };
 /**
- * Service Stub
+ * 
  */
 Jalousie.prototype.positionUp = function () {
     this.logDebug('JalousieActorDevice - positionUp: '
@@ -540,7 +540,7 @@ Jalousie.prototype.positionUp = function () {
     return Bluebird.resolve();
 };
 /**
- * Service Stub
+ * 
  */
 Jalousie.prototype.positionDown = function () {
     this.logDebug('JalousieActorDevice - positionDown: '
@@ -549,7 +549,7 @@ Jalousie.prototype.positionDown = function () {
     return Bluebird.resolve();
 };
 /**
- * Service Stub
+ * 
  */
 Jalousie.prototype.incrementRotation = function () {
     var targetRotation = this.state.rotation + this.config.rotationStepSize;
@@ -559,7 +559,7 @@ Jalousie.prototype.incrementRotation = function () {
     return Bluebird.resolve();
 };
 /**
- * Service Stub
+ * 
  */
 Jalousie.prototype.decrementRotation = function () {
     var targetRotation = this.state.rotation - this.config.rotationStepSize;
@@ -569,7 +569,7 @@ Jalousie.prototype.decrementRotation = function () {
     return Bluebird.resolve();
 };
 /**
- * Service Stub
+ * 
  */
 Jalousie.prototype.stopMotion = function () {
     this.sendWriteProperty(this.actionObjectId, BACnet.Enums.PropertyId.presentValue, [new BACnet.Types.BACnetUnsignedInteger(this.config.actionStopValue)]);

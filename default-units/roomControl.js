@@ -418,7 +418,7 @@ RoomControl.prototype.createLogger = function () {
 
 /**
  * Sends the 'writeProperty' request to set the setpoint of the 'presentValue' property.
- *
+ * @param {number} setpointModifier
  * @return {Promise<void>}
  */
 RoomControl.prototype.setSetpointModification = function (setpointModifier) {

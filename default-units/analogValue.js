@@ -557,7 +557,7 @@ AnalogValue.prototype.setPresentValue = function (presentValue) {
 /**
  * Calls the 'setPresentValue' method to set the value of the 'presentValue' property.
  *
- * @param  {any} parameters
+ * @param  {{value:number}} parameters
  * @return {Bluebird<void>}
  */
 AnalogValue.prototype.changeValue = function (parameters) {
