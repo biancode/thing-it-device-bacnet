@@ -562,8 +562,8 @@ Light.prototype.changeDimmer = function (param) {
     var paramValue = _.get(param, 'value', null);
     this.logger.logDebug('LightActorDevice - changeDimmer: '
         + ("Dimmer Level: " + paramValue));
-    if (!_.isNil(paramValue)) {
-        throw new Errors.APIError('LightActorDevice - changeDimmer: No value provided to change!');
+    if (_.isNil(paramValue)) {
+        throw new APIError('LightActorDevice - changeDimmer: No value provided to change!');
     }
     this.setDimmerLevelModification(paramValue);
     return Bluebird.resolve();
