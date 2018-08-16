@@ -291,6 +291,41 @@ Thermostat.prototype.initProperties = function () {
  */
 Thermostat.prototype.subscribeToProperty = function () {
     var _this = this;
+    // Handle 'Setpoint' COV Notifications Flow
+    this.subManager.subscribe = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.setpointFeedbackObjectId)))
+        .subscribe(function (resp) {
+        var bacnetProperties = _this
+            .getCOVNotificationValues(resp);
+        _this.state.setpoint = bacnetProperties.presentValue.value;
+        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+            + ("Setpoint " + JSON.stringify(_this.state.setpoint)));
+        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+            + ("State " + JSON.stringify(_this.state)));
+        _this.publishStateChange();
+    }, function (error) {
+        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+            + ("Setpoint COV notification was not received " + error));
+        _this.publishStateChange();
+    });
+    // handle 'Temperature' COV Notifications Flow
+    this.subManager.subscribe = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.temperatureObjectId)))
+        .subscribe(function (resp) {
+        var bacnetProperties = _this
+            .getCOVNotificationValues(resp);
+        _this.state.temperature = bacnetProperties.presentValue.value;
+        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+            + ("Temperature " + JSON.stringify(_this.state.temperature)));
+        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+            + ("State " + JSON.stringify(_this.state)));
+        _this.publishStateChange();
+    }, function (error) {
+        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+            + ("Temperature COV notification was not received " + error));
+        _this.publishStateChange();
+    });
+
     // Handle COV Notifications Flow. Sets the 'mode', 'heatActive', 'coolActive'
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.modeObjectId)))
@@ -340,6 +375,29 @@ Thermostat.prototype.subscribeToProperty = function () {
         _this.publishStateChange();
         // Gets the 'presentValue|statusFlags' property
         _this.sendSubscribeCOV(_this.modeObjectId);
+    });
+
+    // Gets the 'presentValue' (setpoint) property
+    this.subManager.subscribe = readPropertyFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.setpointFeedbackObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
+        .subscribe(function (resp) {
+        var bacnetProperty = BACnet.Helpers.Layer
+            .getPropertyValue(resp.layer);
+        _this.state.setpoint = bacnetProperty.value;
+        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+            + ("Setpoint: " + _this.state.setpoint));
+        _this.publishStateChange();
+    });
+    // Gets the 'presentValue' (temperature) property
+    this.subManager.subscribe = readPropertyFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.temperatureObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
+        .subscribe(function (resp) {
+        var bacnetProperty = BACnet.Helpers.Layer
+            .getPropertyValue(resp.layer);
+        _this.state.temperature = bacnetProperty.value;
+        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+            + ("Temperature: " + _this.state.setpoint));
+        _this.publishStateChange();
     });
 };
 
