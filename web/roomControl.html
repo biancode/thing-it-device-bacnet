@@ -38,12 +38,12 @@
         </div>
         <div class="flexLayout flexDirectionColumn flexJustifyCenter flexAlignCenter marginLeft0_5">
             <div style='min-width:17em;' class="marginLeft0_5 flexAlignCenter flexJustifyCenter flexGrow1">
-                    <ti-dimmer 
-                        state="component._state"
-                        change="panel.callActorService(component, 'changeDimmer', {value: component._state.dimmerLevel} )"></ti-dimmer>
+                <ti-dimmer
+                    state="{brightness: component._state.dimmerLevel, switch: component._state.lightActive}"
+                    change="panel.callActorService(component, 'changeDimmer', {value: component._state.dimmerLevel} )"></ti-dimmer>
             </div>
             <div class="flexGrow1 flexAlignCenter flexJustifyCenter marginLeft0_5">
-                <ti-switch ti-model="component._state"
+                <ti-switch ti-model="{ switch: component._state.lightActive }"
                            ti-change="panel.callActorService(component, 'toggleLight')"></ti-switch>
             </div>
         </div>
