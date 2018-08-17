@@ -384,7 +384,7 @@ Thermostat.prototype.subscribeToProperty = function () {
         var bacnetProperty = BACnet.Helpers.Layer
             .getPropertyValue(resp.layer);
         _this.state.setpoint = bacnetProperty.value;
-        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToProperty: "
             + ("Setpoint: " + _this.state.setpoint));
         _this.publishStateChange();
     });
@@ -395,7 +395,7 @@ Thermostat.prototype.subscribeToProperty = function () {
         var bacnetProperty = BACnet.Helpers.Layer
             .getPropertyValue(resp.layer);
         _this.state.temperature = bacnetProperty.value;
-        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToProperty: "
             + ("Temperature: " + _this.state.setpoint));
         _this.publishStateChange();
     });
