@@ -420,6 +420,7 @@ JalousieSimple.prototype.getState = function () {
 JalousieSimple.prototype.setState = function (state) {
     this.logDebug('setState', state);
     this.state = _.isObjectLike(state) ? _.cloneDeep(state) : {};
+    return Bluebird.resolve();
 };
 
 JalousieSimple.prototype.createLogger = function () {
@@ -439,16 +440,20 @@ JalousieSimple.prototype.createLogger = function () {
 JalousieSimple.prototype.setMotion = function (targetState) {
     this.logger.logDebug('JalousieSimpleActorDevice - setMotion: '
         + ("Modifying motion state " + targetState));
+    var promise = Bluebird.resolve();
+    var _this = this;
     if (this.state.motionDirection === targetState) {
-        this.state.motionDirection = this.state.motionDirection === Enums.MotionDirection.Down
-            ? Enums.MotionDirection.Up : Enums.MotionDirection.Down;
+        if (this.state.motionDirection === Enums.MotionDirection.Down) {
+            promise = this.setMotion(Enums.MotionDirection.Up);
+        } else {
+            promise = this.setMotion(Enums.MotionDirection.Down);
+        }
     }
-    else {
-        this.state.motionDirection = targetState;
-    }
+    this.state.motionDirection = targetState;
     this.publishStateChange();
-    this.sendWriteProperty(this.motionDirectionObjectId, BACnet.Enums.PropertyId.presentValue, [new BACnet.Types.BACnetEnumerated(this.state.motionDirection)]);
-    return Bluebird.resolve();
+    return promise.then(function() {
+        this.sendWriteProperty(this.motionDirectionObjectId, BACnet.Enums.PropertyId.presentValue, [new BACnet.Types.BACnetEnumerated(targetState)]);
+    }.bind(this));
 };
 
 /**
