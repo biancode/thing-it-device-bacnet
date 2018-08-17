@@ -493,7 +493,15 @@ Thermostat.prototype.getState = function () {
  */
 Thermostat.prototype.setState = function (state) {
     this.logDebug('setState', state);
-    this.state = _.isObjectLike(state) ? _.cloneDeep(state) : {};
+    if (_.isObjectLike(state)) {
+        if (_.isNumber(state.setpoint) && state.setpoint !== this.state.setpoint) {
+            var delta = state.setpoint - this.state.setpoint;
+            this.setSetpointModification(delta);
+        }
+        this.state = _.cloneDeep(state);
+    } else {
+        this.state = {}
+    }
 };
 
 Thermostat.prototype.createLogger = function () {
