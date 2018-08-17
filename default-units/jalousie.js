@@ -480,8 +480,10 @@ Jalousie.prototype.getState = function () {
  */
 Jalousie.prototype.setState = function (state) {
     this.logDebug('setState', state);
-    if (_.isObjectLike(state)) {
-        this.setModification(state.position, state.rotation)
+    if (_.isObjectLike(state)) { 
+        if (this.state.position !== state.position || this.state.rotation !== state.rotation) {
+            this.setModification(state.position, state.rotation);
+        }
         this.state = state;
     } else {
         this.state = {}
