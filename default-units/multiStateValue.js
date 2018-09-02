@@ -175,13 +175,15 @@ MultiStateValue.prototype.stop = function () {
     this.subManager = null;    
 };
 
-MultiStateValue.prototype.initDevice = function () {
+MultiStateValue.prototype.initDevice = function (deviceId) {
     // Init the default state
     this.setState(this.state);
 
     this.state.initialized = false;
 
     this.config = this.configuration;
+    
+    this.deviceId = deviceId;
 
     if (!this.config) {
         throw new APIError('initDevice - Configuration is not defined!');
@@ -242,9 +244,9 @@ MultiStateValue.prototype.initParamsFromConfig = function () {
  */
 MultiStateValue.prototype.createPluginComponents = function () {
     /* Create and init BACnet Flow Manager */
-    this.flowManager = store.getState([ 'bacnet', 'flowManager' ]);
+    this.flowManager = store.getState([ 'bacnet', this.deviceId, 'flowManager' ]);
     /* Create and init BACnet Service Manager */
-    this.serviceManager = store.getState([ 'bacnet', 'serviceManager' ]);
+    this.serviceManager = store.getState([ 'bacnet', this.deviceId, 'serviceManager' ]);
     // Creates instance of the API Service
     this.apiService = this.serviceManager.createAPIService(this.logger);
 };
@@ -402,7 +404,7 @@ MultiStateValue.prototype.sendReadProperty = function (objectId, propId) {
  */
 MultiStateValue.prototype.sendSubscribeCOV = function (objectId) {
 
-    this.subManager.subscribe = store.select(['bacnet', 'covTimer'])
+    this.subManager.subscribe = store.select(['bacnet', this.deviceId, 'covTimer'])
         .subscribe((function (covTimer) {
             this.apiService.confirmedReq.subscribeCOV({
                 invokeId: 1,

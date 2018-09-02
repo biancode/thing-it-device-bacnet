@@ -340,6 +340,15 @@ BACNetDevice.prototype.createPluginConfig = function () {
 };
 
 /**
+ * Creates string key for objectId.
+ *
+ * @return {Promise<void>}
+ */
+BACNetDevice.prototype.getObjectIdStringKey = function () {
+    return this.objectId.value.type + ':' + this.objectId.value.instance;
+}
+
+/**
  * Creates instances of the plugin componets.
  *
  * @return {Promise<void>}
@@ -350,17 +359,18 @@ BACNetDevice.prototype.createPluginComponents = function () {
     this.socketServer.initServer(this.pluginConfig.server);
     return this.socketServer.startServer()
         .then((function() {
-            BACnetAction.setBACnetServer(this.socketServer);
+            var deviceId = this.getObjectIdStringKey();
+            BACnetAction.setBACnetServer(deviceId, this.socketServer);
 
             /* Create and init BACnet Service Manager */
             this.serviceManager = new Managers.BACnetServiceManager(this.logger);
-            this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority);
-            BACnetAction.setBACnetServiceManager(this.serviceManager);
+            this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority, deviceId);
+            BACnetAction.setBACnetServiceManager(deviceId, this.serviceManager);
 
             /* Create and init BACnet Flow Manager */
-            this.flowManager = new Managers.BACnetFlowManager(this.logger);
+            this.flowManager = new Managers.BACnetFlowManager(this.logger, deviceId);
             this.flowManager.initManager(this.pluginConfig.manager.flow);
-            BACnetAction.setBACnetFlowManager(this.flowManager);
+            BACnetAction.setBACnetFlowManager(deviceId, this.flowManager);
         }).bind(this))
 };
 
@@ -417,8 +427,9 @@ BACNetDevice.prototype.subscribeToObject = function () {
             });
             // Create new instance of the 'service' manager
             this.serviceManager.destroy();
-            this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority);
-            BACnetAction.setBACnetServiceManager(this.serviceManager);
+            var deviceId = this.getObjectIdStringKey();
+            this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority, deviceId);
+            BACnetAction.setBACnetServiceManager(deviceId, this.serviceManager);
             // Create new instance of the API service
             this.apiService.destroy().catch((function(error) {
                 this.logger.logError(error);
@@ -436,8 +447,9 @@ BACNetDevice.prototype.subscribeToObject = function () {
         // Call 'init' method each actor
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Inits the TID units");
+        var deviceId = this.getObjectIdStringKey();
         Bluebird.map(this.actors, function (actor) {
-            return actor.initDevice();
+            return actor.initDevice(deviceId);
         }, { concurrency: 1 });
     }).bind(this), 
     (function (error) {
@@ -626,8 +638,8 @@ BACNetDevice.prototype.sendReadProperty = function (objectId, propId) {
  * @return {void}
  */
 BACNetDevice.prototype.sendSubscribeCOV = function (objectId) {
-
-    this.subManager.subscribe = store.select(['bacnet', 'covTimer'])
+    var deviceId = this.getObjectIdStringKey();
+    this.subManager.subscribe = store.select([ 'bacnet', deviceId, 'covTimer'])
         .subscribe((function (covTimer) {
             this.apiService.confirmedReq.subscribeCOV({
                 invokeId: 1,
