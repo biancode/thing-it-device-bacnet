@@ -1,8 +1,64 @@
+<style>
+    .custom-switch-toggle {
+        position: relative;
+        display: inline-block;
+        width: 45px;
+        height: 20px;
+    }
+
+    /* Hide default HTML checkbox */
+    .custom-switch-toggle input {display:none;}
+
+    /* The slider */
+    .custom-switch-toggle .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 10px;
+    }
+
+    .custom-switch-toggle .slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left:-1px;
+    bottom: -1px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow:  0px 0px 5px 2px rgba(0, 0, 0, 0.4)
+    }
+
+    .custom-switch-toggle input:checked + .slider {
+    background-color: #2f6ab4;
+    }
+
+    .custom-switch-toggle input:focus + .slider {
+    box-shadow: 0 0 1px #2f6ab4;
+    }
+
+    .custom-switch-toggle input:checked + .slider:before {
+    -webkit-transform: translateX(25px);
+    -ms-transform: translateX(25px);
+    transform: translateX(25px);
+    }
+</style>
+
 <div class="flexLayout flexAlignCenter flexAdjustCenter flexGrow1">
     <i ng-if="component._state.alarmValue == true" style="color: orange" class="fa fa-warning fa-2x"
        aria-hidden="true"></i>
     <div class="marginLeft0_5">
-        <ti-switch ti-model="component._state.presentValue">
-        </ti-switch>
+        <label class="custom-switch-toggle">
+            <input type="checkbox" ng-checked="component._state.presentValue" disabled>
+            <span class="slider"></span>
+        </label>
     </div>
 </div>
