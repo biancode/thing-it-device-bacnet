@@ -4,8 +4,15 @@ angular.module('testApp', ['ThingItMobile.PluginDirectives'])
             _state: {
                 presentValue: false,
                 alarmValue: false,
-                outOfService: true
-            }
+                outOfService: false
+            },
+            toggle: function() {
+                this._state = {
+                    alarmValue: this._state.alarmValue,
+                    outOfService: this._state.outOfService,
+                    presentValue: !this._state.presentValue
+                };
+            },
         };
 
         this.analog = {
