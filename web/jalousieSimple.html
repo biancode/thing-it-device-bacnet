@@ -1,66 +1,11 @@
-<div ng-if="true" class="flexLayout flexDirectionColumn flexJustifyCenter flexAlignCenter">
-    <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1 marginTop0_5">
-        <div class="flexGrow1">
-            <span ng-if="component._state.coolActive" class="lightPrimaryColor"><i class="fa fa-sun-o"></i></span>
-        </div>
-        <div class="flexLayout flexDirectionColumn flexJustifyCenter flexAlignCenter marginLeft0_5">
-            <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1 marginTop0_5">
-                <div class="circleButton marginLeft0_5" style="display: inline-block;"
-                     ng-click="panel.callActorService(component, 'positionDown')">
-                    <i class="fa fa-angle-double-down"></i>
-                </div>
-
-                <div class="flexGrow1 flexAlignTop marginLeft0_5">
-                    <span class="smallFont lightPrimaryColor">All</span>
-                </div>
-
-                <div class="circleButton marginLeft0_5" style="display: inline-block;"
-                     ng-click="panel.callActorService(component, 'positionUp')">
-                    <i class="fa fa-angle-double-up"></i>
-                </div>
-
-                <div class="flexGrow1 flexAlignTop marginLeft0_5">
-                    <span class="smallFont lightPrimaryColor">&nbsp;</span>
-                </div>
-
-                <div class="circleButton marginLeft0_5" style="display: inline-block;"
-                     ng-click="panel.callActorService(component, 'stopMotion')">
-                    <i class="fa fa-stop"></i>
-                </div>
-
-                <div class="flexGrow1 flexAlignTop marginLeft0_5">
-                    <span class="smallFont lightPrimaryColor">&nbsp;</span>
-                </div>
-
-                <div class="circleButton marginLeft0_5" style="display: inline-block;"
-                     ng-click="panel.callActorService(component, 'raisePosition')">
-                    <i class="fa fa-angle-up"></i>
-                </div>
-
-                <div class="flexGrow1 flexAlignTop marginLeft0_5">
-                    <span class="smallFont lightPrimaryColor">Step</span>
-                </div>
-
-                <div class="circleButton marginLeft0_5" style="display: inline-block;"
-                     ng-click="panel.callActorService(component, 'lowerPosition')">
-                    <i class="fa fa-angle-down"></i>
-                </div>
-            </div>
-            <div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1 marginTop0_5">
-                <div class="circleButton marginLeft0_5" style="display: inline-block;"
-                     ng-click="panel.callActorService(component, 'closeBlade')">
-                    <i class="fa fa-angle-down"></i>
-                </div>
-                <div class="flexGrow1 flexAlignTop marginLeft0_5">
-                    <span class="smallFont lightPrimaryColor">Rotate</span>
-                </div>
-                <div class="circleButton marginLeft0_5" style="display: inline-block;"
-                     ng-click="panel.callActorService(component, 'openBlade')">
-                    <i class="fa fa-angle-up"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<ti-jalousie ng-if="false" style="flex-grow: 1;" state="component._state" change="panel.callActorService(component, 'setState', component._state)"></ti-jalousie>
+<ti-jalousie state="component._state" 
+             options="{ display: {position: false, rotation: false}, stepControl: true, bladeControl: true, target: false}"
+             up="panel.callActorService(component, 'positionUp', null)"
+             stop="panel.callActorService(component, 'stopMotion', null)"
+             down="panel.callActorService(component, 'positionDown', null)"
+             (lowerPosition)="panel.callActorService(component, 'lowerPosition', null)"
+             (raisePosition)="panel.callActorService(component, 'raisePosition', null)"
+             (openBlade)="panel.callActorService(component, 'openBlade', null)"
+             (closeBlade)="panel.callActorService(component, 'closeBlade', null)"
+             change="panel.callActorService(component, 'setState', component._state)"></ti-jalousie>
 
