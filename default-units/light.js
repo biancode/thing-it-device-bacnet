@@ -465,7 +465,20 @@ Light.prototype.getState = function () {
  */
 Light.prototype.setState = function (state) {
     this.logDebug('setState', state);
-    this.state = _.isObjectLike(state) ? _.cloneDeep(state) : {};
+    if (_.isObjectLike(state)) {
+        if (this.state.dimmerLevel !== state.dimmerLevel) {
+            this.setDimmerLevelModification(state.dimmerLevel)
+        }
+        if (this.state.lightActive !== state.lightActive) {
+            var lightModification = state.lightActive
+                ? this.configuration.lightActiveModificationValueOn
+                : this.configuration.lightActiveModificationValueOff;
+            this.setLightActiveModification(lightModification);
+        }
+        this.state = _.cloneDeep(state);
+    } else {
+        this.state = {}
+    }
 };
 
 Light.prototype.createLogger = function () {
