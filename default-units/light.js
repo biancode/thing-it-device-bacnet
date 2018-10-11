@@ -466,7 +466,8 @@ Light.prototype.getState = function () {
 Light.prototype.setState = function (state) {
     this.logDebug('setState', state);
     if (_.isObjectLike(state)) {
-        if (this.state.dimmerLevel !== state.dimmerLevel) {
+        const dimmerLevel = +state.dimmerLevel;
+        if (this.state.dimmerLevel !== dimmerLevel) {
             this.setDimmerLevelModification(state.dimmerLevel)
         }
         if (this.state.lightActive !== state.lightActive) {
@@ -580,6 +581,6 @@ Light.prototype.changeDimmer = function (param) {
     if (_.isNil(paramValue)) {
         throw new APIError('LightActorDevice - changeDimmer: No value provided to change!');
     }
-    this.setDimmerLevelModification(paramValue);
+    this.setDimmerLevelModification(+paramValue);
     return Bluebird.resolve();
 };
