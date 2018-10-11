@@ -466,8 +466,8 @@ Light.prototype.getState = function () {
 Light.prototype.setState = function (state) {
     this.logDebug('setState', state);
     if (_.isObjectLike(state)) {
-        const dimmerLevel = +state.dimmerLevel;
-        if (this.state.dimmerLevel !== dimmerLevel && !_.isNil(dimmerLevel)) {
+        state.dimmerLevel = _.isNil(state.dimmerLevel) ? NaN : +state.dimmerLevel;
+        if (this.state.dimmerLevel !== state.dimmerLevel && !_.isNaN(state.dimmerLevel)) {
             this.setDimmerLevelModification(state.dimmerLevel)
         }
         if (this.state.lightActive !== state.lightActive) {
