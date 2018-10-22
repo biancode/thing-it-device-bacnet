@@ -1,16 +1,45 @@
-<div class="flexLayout flexAlignCenter flexJustifyCenter flexGrow1">
+<style>
+.ti-analog-value ::ng-deep .mat-slider .mat-slider-track-fill {
+  background-color: #82b0e0;
+  height: 6px!important;
+  top: calc(50% - 3px)!important;
+}
+
+.ti-analog-value ::ng-deep .mat-slider .mat-slider-track-background {
+  height: 4px!important;
+  top: calc(50% - 2px)!important;
+}
+
+.ti-analog-value ::ng-deep .mat-slider .mat-slider-track-wrapper {
+  height: 6px!important;
+}
+
+.ti-analog-value ::ng-deep .mat-slider .mat-slider-thumb-container {
+  top:calc(50% + 4px)!important;
+}
+
+.ti-analog-value ::ng-deep .mat-slider .mat-slider-thumb {
+  background-color: white;
+  border: 1px #195793 solid!important;
+  width: 25px;
+  height: 25px;
+}
+</style>
+
+<div *ngIf="component?._state" class="ti-analog-value flexLayout flexDirectionColumn flexAlignCenter flexJustifyCenter flexGrow1">
     <div class="marginRight1 marginBottom0_5" style="flex-grow: 0; flex-shrink: 0">
-        <i ng-if="component._state.alarmValue == true" style="color: orange"
+        <i *ngIf="component._state.alarmValue == true" style="color: orange"
            class="fa fa-warning fa-2x" aria-hidden="true"></i>&nbsp;
     </div>
     <div class="marginRight1 marginBottom0_5" style="flex-grow: 0; flex-shrink: 0">
-            <span ng-if="component.configuration.unit != ''"
-                  class="lighterSecondaryColor ">{{component.configuration.unit}}</span>
+      <span *ngIf="component._state.unit !== ''"
+            class="lighterSecondaryColor ">{{component._state.presentValue}} {{component._state.unit ? component._state.unit : component.configuration.unit}}</span>
     </div>
-    <div class="marginLeft0_5 flexGrow1">
-        <input ti-slider=""
-               ti-model="component._state.presentValue" ti-min="component._state.min"
-               ti-max="component._state.max"
-               ti-change="panel.callActorService(component, 'changeValue', {value: component._state.presentValue} )">
+    <div class="marginLeft0_5 flexGrow1" style="position: relative; width: 100%">
+      <mat-slider style="width: 100%"
+        [(ngModel)]="component._state.presentValue"
+        [min]="component._state.min ? component._state.min: component.configuration.min"
+        [max]="component._state.max ? component._state.max: component.configuration.max"
+        (change)="panel.callActorService(component, 'changeValue', {value: component._state.presentValue} )"></mat-slider>
     </div>
-</div>
+  </div>
