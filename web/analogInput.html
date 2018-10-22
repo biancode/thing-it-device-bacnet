@@ -8,7 +8,7 @@
             <span class="lighterSecondaryColor"
                   style="font-size: 2em;">{{component._state.presentValue | number: 1}}</span>
             <span ng-if="component.configuration.unit != ''"
-                  class="smallFont lighterSecondaryColor ">{{component.configuration.unit}}</span>
+                  class="smallFont lighterSecondaryColor ">{{component._state.unit ? component._state.unit : component.configuration.unit}}</span>
         </div>
     </div>
 </div>
