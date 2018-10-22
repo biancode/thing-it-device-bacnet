@@ -307,7 +307,7 @@ JalousieSimple.prototype.subscribeToProperty = function () {
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)));
-    // Gets the 'presentValue' (position) property
+    // Gets the 'presentValue' (motion direction) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.motionDirectionObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
@@ -317,7 +317,7 @@ JalousieSimple.prototype.subscribeToProperty = function () {
         _this.logger.logDebug("JalousieSimpleActorDevice - subscribeToProperty: "
             + ("Motion direction: " + bacnetProperty.value));
     });
-    // Gets the 'presentValue' (rotation) property
+    // Gets the 'presentValue' (stop value) property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.stopValueObjectId)), RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
