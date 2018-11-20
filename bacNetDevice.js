@@ -143,6 +143,13 @@ module.exports = {
                     id: 'boolean',
                 },
                 defaultValue: '',
+            }, {
+                label: 'Status Checks Interval',
+                id: 'statusChecksInterval',
+                type: {
+                    id: 'integer',
+                },
+                defaultValue: 60,
             }
         ]
     },
@@ -339,6 +346,9 @@ BACNetDevice.prototype.createPluginConfig = function () {
                             address: ipAddress,
                         },
                     },
+                },
+                statusTimer: {
+                    interval: this.config.statusChecksInterval * 1000
                 },
             });
         }).bind(this))
