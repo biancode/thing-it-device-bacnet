@@ -444,6 +444,9 @@ BACNetDevice.prototype.subscribeToObject = function () {
             this.apiService = this.serviceManager.createAPIService();
         }
         this.state.initialized = true;
+        this.operationalState.status = Enums.OperationalStatus.Ok;
+        this.operationalState.message = "BACnet device has successfully initialized";
+        this.publishOperationalStateChange();
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + ("State - " + JSON.stringify(this.state)));
         // Inits the BACnet properties
