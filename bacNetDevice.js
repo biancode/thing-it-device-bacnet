@@ -459,6 +459,10 @@ BACNetDevice.prototype.subscribeToObject = function () {
         }, { concurrency: 1 });
     }).bind(this), 
     (function (error) {
+        this.state.initialized = false;
+        this.operationalState.status = Enums.OperationalState.Error;
+        this.operationalState.message = "Unabele to init BACnet device";
+
         this.logError("BACNetDeviceControllerDevice - subscribeToObject: " + error);
     }).bind(this));
 };
