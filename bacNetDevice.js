@@ -247,6 +247,9 @@ BACNetDevice.prototype.stop = function () {
 BACNetDevice.prototype.initDevice = function () {
     // Init the default state
     this.setState(this.state);
+    if (!this.operationalState) {
+        this.operationalState = {};
+    }
 
     this.state.initialized = false;
 
@@ -299,6 +302,8 @@ BACNetDevice.prototype.initDevice = function () {
         }
 
         this.state.initialized = true;
+        this.operationalState.status = Enums.OperationalStatus.Pending;
+        this.operationalState.message = "Waiting for WhoIs confirmation...";
     }).bind(this))
 };
 
