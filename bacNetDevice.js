@@ -169,7 +169,6 @@ var Bluebird = require("bluebird");
 Bluebird.prototype.fail = Bluebird.prototype.catch;
 var Rx = require("rxjs");
 var RxOp = require("rxjs/operators");
-// var combineLatest = require("rxjs/observable/combineLatest");
 var store = require("./lib/redux").store;
 /* Plugin devices */
 var BACnetAction = require("./lib/redux/actions").BACnetAction;
@@ -313,16 +312,16 @@ BACNetDevice.prototype.initDevice = function () {
             _this.statusChecksTimer.start(function(interval) {
 
                 _this.getIAmFlow(interval)
-                .subscribe(function(resp) {
-                    _this.handleIAmResponse(resp);
-                    _this.statusChecksTimer.failsCounter = 0;
-                },
-                function (error) {
-                    _this.operationalState.status = Enums.OperationalStatus.Error;
-                    _this.operationalState.message = "Status check failed: remote device doesn't respond";
-                    _this.publishOperationalStateChange();
-            
-                    _this.logError("BACNetDeviceControllerDevice - statusCheck: " + error);
+                    .subscribe(function(resp) {
+                        _this.handleIAmResponse(resp);
+                        _this.statusChecksTimer.failsCounter = 0;
+                    },
+                    function (error) {
+                        _this.operationalState.status = Enums.OperationalStatus.Error;
+                        _this.operationalState.message = "Status check failed: remote device doesn't respond";
+                        _this.publishOperationalStateChange();
+                
+                        _this.logError("BACNetDeviceControllerDevice - statusCheck: " + error);
                     });
                 _this.sendWhoIs();
             });
