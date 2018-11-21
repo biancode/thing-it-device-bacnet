@@ -491,7 +491,7 @@ BACNetDevice.prototype.handleIAmResponse = function (resp) {
     this.operationalState.message = "Received iAm heartbeat";
     
     if (!this.state.initialized) {
-    this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
+        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
         + ("State - " + JSON.stringify(this.state)));
         this.operationalState.status = Enums.OperationalStatus.Pending;
         this.operationalState.message = "Received iAm response. Initializing properties...";
@@ -640,16 +640,16 @@ BACNetDevice.prototype.subscribeToProperty = function () {
             RxOp.timeout(Configs.AppConfig.response.readProperty.timeout),
             RxOp.first())
         .subscribe((function () {
-        this.logger.logDebug('BACNetDeviceControllerDevice - subscribeToProperty: '
-            + "Device properties were received");
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
-            + ("BACnet Device details: " + JSON.stringify(this.state)));
-
-        // Set `initialized` to 'true' only after all properties were received
-        this.state.initialized = true;
-        this.operationalState.status = Enums.OperationalStatus.Ok;
-        this.operationalState.message = "BACnet device has successfully initialized";
-        this.publishOperationalStateChange();
+            // Set `initialized` to 'true' only after all properties were received
+            this.state.initialized = true;
+            this.logger.logDebug('BACNetDeviceControllerDevice - subscribeToProperty: '
+                + "Device properties were received");
+            this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
+                + ("BACnet Device details: " + JSON.stringify(this.state)));
+            
+            this.operationalState.status = Enums.OperationalStatus.Ok;
+            this.operationalState.message = "BACnet device has successfully initialized";
+            this.publishOperationalStateChange();
     }).bind(this), 
     (function (error) {
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
