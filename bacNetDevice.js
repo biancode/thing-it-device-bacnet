@@ -519,6 +519,7 @@ BACNetDevice.prototype.subscribeToObject = function () {
         this.logger.logInfo('Initialized BACnet device successfully.');
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
         + ("State - " + JSON.stringify(this.state)));
+        this.statusChecksTimer.failsCounter = 0;
         // Call 'init' method each actor
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Inits the TID units");
