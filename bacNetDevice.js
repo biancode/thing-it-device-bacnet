@@ -181,6 +181,7 @@ var Helpers = require("./lib/helpers");
 var BACnet = require("tid-bacnet-logic");
 var Logger = require("./lib/utils").Logger;
 var Enums = require("./lib/enums");
+var Entities = require("./lib/entities");
 
 function BACNetDiscovery() {    
 }
@@ -307,6 +308,23 @@ BACNetDevice.prototype.initDevice = function () {
         _this.operationalState.status = Enums.OperationalStatus.Pending;
         _this.operationalState.message = "Waiting for WhoIs confirmation...";
 
+        // Init WhoIs heartbeats
+        _this.statusChecksTimer.start(function(interval) {
+
+            _this.getIAmFlow(interval)
+                .subscribe(function(resp) {
+                    _this.handleIAmResponse(resp);
+                    _this.statusChecksTimer.failsCounter = 0;
+                },
+                function (error) {
+                    _this.operationalState.status = Enums.OperationalStatus.Error;
+                    _this.operationalState.message = "Status check failed: remote device doesn't respond";
+                    _this.publishOperationalStateChange();
+            
+                    _this.logError("BACNetDeviceControllerDevice - statusCheck: " + error);
+                });
+            _this.sendWhoIs();
+        });
     });
 };
 
@@ -397,6 +415,9 @@ BACNetDevice.prototype.createPluginComponents = function () {
             this.flowManager = new Managers.BACnetFlowManager(this.logger, deviceId);
             this.flowManager.initManager(this.pluginConfig.manager.flow);
             BACnetAction.setBACnetFlowManager(deviceId, this.flowManager);
+
+            /* Create Status Checks Timer*/
+            this.statusChecksTimer = new Entities.StatusTimer(this.pluginConfig.statusTimer);
         }).bind(this))
 };
 
