@@ -453,9 +453,8 @@ BACNetDevice.prototype.subscribeToObject = function () {
             
             this.apiService = this.serviceManager.createAPIService();
         }
-        this.state.initialized = true;
-        this.operationalState.status = Enums.OperationalStatus.Ok;
-        this.operationalState.message = "BACnet device has successfully initialized";
+
+        this.operationalState.message = "Received iAm response. Initializing properties...";
         this.publishOperationalStateChange();
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + ("State - " + JSON.stringify(this.state)));
@@ -472,7 +471,6 @@ BACNetDevice.prototype.subscribeToObject = function () {
         }, { concurrency: 1 });
     }).bind(this), 
     (function (error) {
-        this.state.initialized = false;
         this.operationalState.status = Enums.OperationalState.Error;
         this.operationalState.message = "Unabele to init BACnet device";
         this.publishOperationalStateChange();
@@ -589,10 +587,19 @@ BACNetDevice.prototype.subscribeToProperty = function () {
             + "Device properties were received");
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
             + ("BACnet Device details: " + JSON.stringify(this.state)));
+
+        // Set `initialized` to 'true' only after all properties were received
+        this.state.initialized = true;
+        this.operationalState.status = Enums.OperationalStatus.Ok;
+        this.operationalState.message = "BACnet device has successfully initialized";
+        this.publishOperationalStateChange();
     }).bind(this), 
     (function (error) {
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
             + ("Device properties were not received " + error));
+            this.operationalState.status = Enums.OperationalState.Error;
+            this.operationalState.message = "Device properties were not received";
+            this.publishOperationalStateChange();
     }).bind(this));
 };
 
