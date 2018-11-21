@@ -491,7 +491,6 @@ BACNetDevice.prototype.handleIAmResponse = function (resp) {
  */
 BACNetDevice.prototype.subscribeToObject = function () {
 
-    var destAddrInfo = this.pluginConfig.manager.service.dest;
     this.subManager.subscribe = this.getIAmFlow(Configs.AppConfig.response.iAm.timeout)
         .subscribe((function (resp) {
         // Handles 'iAm' response
