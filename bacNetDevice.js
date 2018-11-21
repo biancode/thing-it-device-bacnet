@@ -302,17 +302,26 @@ BACNetDevice.prototype.initDevice = function () {
         // Send 'WhoIs' request
         this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
             + 'Send "WhoIs" request');
-        if (this.config.unicastWhoIsConfirmation) {
-            this.apiService.unconfirmedReq.whoIsUnicast({});
-        } else {
-            this.apiService.unconfirmedReq.whoIsBroadcast({});
-        }
+        this.sendWhoIs();
 
-        this.state.initialized = true;
         this.operationalState.status = Enums.OperationalStatus.Pending;
         this.operationalState.message = "Waiting for WhoIs confirmation...";
     }).bind(this))
 };
+
+/**
+ * Sends WhoIs request
+ *
+ * @return {void}
+ */
+BACNetDevice.prototype.sendWhoIs = function () {
+    if (this.config.unicastWhoIsConfirmation) {
+        this.apiService.unconfirmedReq.whoIsUnicast({});
+    } else {
+        this.apiService.unconfirmedReq.whoIsBroadcast({});
+    }
+};
+
 
 /**
  * Creates and inits params of the BACnet Device from plugin configuration.
@@ -391,14 +400,14 @@ BACNetDevice.prototype.createPluginComponents = function () {
 };
 
 /**
- * Creates 'subscribtion' to the BACnet 'whoIs' - 'iAm' flow.
+ * Creates 'iAm' responses flow.
  *
  * @return {void}
  */
-BACNetDevice.prototype.subscribeToObject = function () {
+BACNetDevice.prototype.getIAmFlow = function (interval) {
 
     var destAddrInfo = this.pluginConfig.manager.service.dest;
-    this.subManager.subscribe = this.flowManager.getResponseFlow()
+    return this.flowManager.getResponseFlow()
         .pipe(
             RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)),
             RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.iAm)),
@@ -408,60 +417,86 @@ BACNetDevice.prototype.subscribeToObject = function () {
                 Helpers.FlowFilter.isBACnetVendorId(this.config.vendorId), "vendor ID")),
             RxOp.filter(Helpers.FlowFilter.matchFilter(this.config.ipMatchRequired, 
                 Helpers.FlowFilter.isBACnetIPAddress(destAddrInfo.address), "IP Address")),
-            RxOp.timeout(Configs.AppConfig.response.iAm.timeout), RxOp.first()
-        )
+            RxOp.timeout(interval), RxOp.first()
+        );
+};
+
+/**
+ * Handles`iAm` response
+ *
+ * @return {void}
+ */
+BACNetDevice.prototype.handleIAmResponse = function (resp) {
+    this.logger.logInfo('Received iAm hertbeat');
+    var iAmService = resp.layer.apdu.service;
+    this.objectId = iAmService.objId;
+    
+    var curAddrInfo = this.pluginConfig.manager.service.dest;
+    var respAddrInfo = resp.socket.getAddressInfo();
+    if (curAddrInfo.address !== respAddrInfo.address) {
+        if (curAddrInfo.address.indexOf('GENERATED_') > -1) {
+            this.logger.logInfo("BACNetDeviceControllerDevice - handleIAmResponse: "
+                + ("Device IP not configured, found at " + respAddrInfo.address));
+        }
+        else {
+            this.logger.logInfo("BACNetDeviceControllerDevice - handleIAmResponse: "
+                + ("Device configured with " + curAddrInfo.address + " found at " + respAddrInfo.address));
+        }
+        // Sets IP from response to 'plugin' config
+        this.pluginConfig = _.merge({}, _.cloneDeep(this.pluginConfig), 
+        {
+            manager: { 
+                service: { 
+                    dest: { 
+                        address: respAddrInfo.address 
+                    } 
+                } 
+            },
+        });
+        // Create new instance of the 'service' manager
+        this.serviceManager.destroy();
+        var deviceId = this.getObjectIdStringKey();
+        this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority, deviceId);
+        BACnetAction.setBACnetServiceManager(deviceId, this.serviceManager);
+        // Create new instance of the API service
+        this.apiService.destroy().catch((function(error) {
+            this.logger.logError(error);
+        }).bind(this));
+        
+        this.apiService = this.serviceManager.createAPIService();
+    }
+    this.operationalState.status = Enums.OperationalStatus.Ok;
+    this.operationalState.message = "Received iAm heartbeat";
+    this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
+        + ("State - " + JSON.stringify(this.state)));
+    if (!this.state.initialized) {
+        this.operationalState.status = Enums.OperationalStatus.Pending;
+        this.operationalState.message = "Received iAm response. Initializing properties...";
+        // Creates 'subscribtion' to the BACnet device properties
+        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
+        + "Creates \"subscribtion\" to the BACnet device properties");
+        this.subscribeToProperty();
+        // Inits the BACnet properties
+        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
+        + "Inits the BACnet properties");
+        this.initProperties();
+    }
+    this.publishOperationalStateChange();
+};
+
+/**
+ * Creates 'subscribtion' to the BACnet 'whoIs' - 'iAm' flow.
+ *
+ * @return {void}
+ */
+BACNetDevice.prototype.subscribeToObject = function () {
+
+    var destAddrInfo = this.pluginConfig.manager.service.dest;
+    this.subManager.subscribe = this.getIAmFlow(Configs.AppConfig.response.iAm.timeout)
         .subscribe((function (resp) {
         // Handles 'iAm' response
         this.logger.logInfo('Initialized BACnet device successfully.');
-        var iAmService = resp.layer.apdu.service;
-        this.objectId = iAmService.objId;
-        // Creates 'subscribtion' to the BACnet device properties
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
-            + "Creates \"subscribtion\" to the BACnet device properties");
-        this.subscribeToProperty();
-        var curAddrInfo = this.pluginConfig.manager.service.dest;
-        var respAddrInfo = resp.socket.getAddressInfo();
-        if (curAddrInfo.address !== respAddrInfo.address) {
-            if (curAddrInfo.address.indexOf('GENERATED_') > -1) {
-                this.logger.logInfo("BACNetDeviceControllerDevice - subscribeToObject: "
-                    + ("Device IP not configured, found at " + respAddrInfo.address));
-            }
-            else {
-                this.logger.logInfo("BACNetDeviceControllerDevice - subscribeToObject: "
-                    + ("Device configured with " + curAddrInfo.address + " found at " + respAddrInfo.address));
-            }
-            // Sets IP from response to 'plugin' config
-            this.pluginConfig = _.merge({}, _.cloneDeep(this.pluginConfig), 
-            {
-                manager: { 
-                    service: { 
-                        dest: { 
-                            address: respAddrInfo.address 
-                        } 
-                    } 
-                },
-            });
-            // Create new instance of the 'service' manager
-            this.serviceManager.destroy();
-            var deviceId = this.getObjectIdStringKey();
-            this.serviceManager.initManager(this.pluginConfig.manager.service, this.config.priority, deviceId);
-            BACnetAction.setBACnetServiceManager(deviceId, this.serviceManager);
-            // Create new instance of the API service
-            this.apiService.destroy().catch((function(error) {
-                this.logger.logError(error);
-            }).bind(this));
-            
-            this.apiService = this.serviceManager.createAPIService();
-        }
-
-        this.operationalState.message = "Received iAm response. Initializing properties...";
-        this.publishOperationalStateChange();
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
-            + ("State - " + JSON.stringify(this.state)));
-        // Inits the BACnet properties
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
-            + "Inits the BACnet properties");
-        this.initProperties();
+        this.handleIAmResponse(resp);
         // Call 'init' method each actor
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Inits the TID units");
