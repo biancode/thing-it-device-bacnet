@@ -471,7 +471,7 @@ BACNetDevice.prototype.subscribeToObject = function () {
         }, { concurrency: 1 });
     }).bind(this), 
     (function (error) {
-        this.operationalState.status = Enums.OperationalState.Error;
+        this.operationalState.status = Enums.OperationalStatus.Error;
         this.operationalState.message = "Unabele to init BACnet device";
         this.publishOperationalStateChange();
 
@@ -597,7 +597,7 @@ BACNetDevice.prototype.subscribeToProperty = function () {
     (function (error) {
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
             + ("Device properties were not received " + error));
-            this.operationalState.status = Enums.OperationalState.Error;
+            this.operationalState.status = Enums.OperationalStatus.Error;
             this.operationalState.message = "Device properties were not received";
             this.publishOperationalStateChange();
     }).bind(this));
