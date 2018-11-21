@@ -281,32 +281,33 @@ BACNetDevice.prototype.initDevice = function () {
     this.logger.logDebug("BACNetDeviceControllerDevice - initDevice: "
         + "Creates the config for the plugin components");
     
-    return this.createPluginConfig().then((function(pluginConfig) {
-        this.pluginConfig = pluginConfig;
+    var _this = this;    
+    return this.createPluginConfig().then(function(pluginConfig) {
+        _this.pluginConfig = pluginConfig;
         // Creates instances of the plugin componets
-        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
             + 'Creates instances of the plugin componets');
-        return this.createPluginComponents();
-    }).bind(this))
-    .then((function() {
+        return _this.createPluginComponents();
+    })
+    .then(function() {
         // Creates instance of the API Service
-        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
             + 'Creates the instance of the API Service');
-        this.apiService = this.serviceManager.createAPIService();
+        _this.apiService = _this.serviceManager.createAPIService();
 
         // Creates 'subscribtion' to the BACnet 'whoIs' - 'iAm' flow
-        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
             + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
-        this.subscribeToObject();
+        _this.subscribeToObject();
 
         // Send 'WhoIs' request
-        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
             + 'Send "WhoIs" request');
-        this.sendWhoIs();
+        _this.sendWhoIs();
+        _this.operationalState.status = Enums.OperationalStatus.Pending;
+        _this.operationalState.message = "Waiting for WhoIs confirmation...";
 
-        this.operationalState.status = Enums.OperationalStatus.Pending;
-        this.operationalState.message = "Waiting for WhoIs confirmation...";
-    }).bind(this))
+    });
 };
 
 /**
