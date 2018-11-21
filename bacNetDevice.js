@@ -309,7 +309,7 @@ BACNetDevice.prototype.initDevice = function () {
         _this.operationalState.message = "Waiting for WhoIs confirmation...";
 
         // If status checks interval is more than zero, init WhoIs heartbeats
-        if (this.config.statusChecksInterval) {
+        if (_this.pluginConfig.statusTimer.interval === 0) {
             _this.statusChecksTimer.start(function(interval) {
 
                 _this.getIAmFlow(interval)
