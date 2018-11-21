@@ -468,9 +468,10 @@ BACNetDevice.prototype.handleIAmResponse = function (resp) {
     }
     this.operationalState.status = Enums.OperationalStatus.Ok;
     this.operationalState.message = "Received iAm heartbeat";
+    
+    if (!this.state.initialized) {
     this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
         + ("State - " + JSON.stringify(this.state)));
-    if (!this.state.initialized) {
         this.operationalState.status = Enums.OperationalStatus.Pending;
         this.operationalState.message = "Received iAm response. Initializing properties...";
         // Creates 'subscribtion' to the BACnet device properties
@@ -495,8 +496,8 @@ BACNetDevice.prototype.subscribeToObject = function () {
     this.subManager.subscribe = this.getIAmFlow(Configs.AppConfig.response.iAm.timeout)
         .subscribe((function (resp) {
         // Handles 'iAm' response
-        this.logger.logInfo('Initialized BACnet device successfully.');
         this.handleIAmResponse(resp);
+        this.logger.logInfo('Initialized BACnet device successfully.');
         // Call 'init' method each actor
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Inits the TID units");
