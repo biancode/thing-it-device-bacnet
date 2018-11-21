@@ -308,10 +308,11 @@ BACNetDevice.prototype.initDevice = function () {
         _this.operationalState.status = Enums.OperationalStatus.Pending;
         _this.operationalState.message = "Waiting for WhoIs confirmation...";
 
-        // Init WhoIs heartbeats
-        _this.statusChecksTimer.start(function(interval) {
+        // If status checks interval is more than zero, init WhoIs heartbeats
+        if (this.config.statusChecksInterval) {
+            _this.statusChecksTimer.start(function(interval) {
 
-            _this.getIAmFlow(interval)
+                _this.getIAmFlow(interval)
                 .subscribe(function(resp) {
                     _this.handleIAmResponse(resp);
                     _this.statusChecksTimer.failsCounter = 0;
@@ -322,9 +323,10 @@ BACNetDevice.prototype.initDevice = function () {
                     _this.publishOperationalStateChange();
             
                     _this.logError("BACNetDeviceControllerDevice - statusCheck: " + error);
-                });
-            _this.sendWhoIs();
-        });
+                    });
+                _this.sendWhoIs();
+            });
+        }
     });
 };
 
