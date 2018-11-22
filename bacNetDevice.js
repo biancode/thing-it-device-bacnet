@@ -517,7 +517,7 @@ BACNetDevice.prototype.handleIAmResponse = function (resp) {
  */
 BACNetDevice.prototype.subscribeToObject = function () {
 
-    this.subManager.subscribe = this.getIAmFlow(Configs.AppConfig.response.iAm.timeout)
+    this.subManager.subscribe = this.getIAmFlow(this.pluginConfig.statusTimer.interval)
         .subscribe((function (resp) {
         // Handles 'iAm' response
         this.handleIAmResponse(resp);
