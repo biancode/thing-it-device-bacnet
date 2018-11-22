@@ -256,7 +256,7 @@ BACNetDevice.prototype.stop = function () {
 BACNetDevice.prototype.initDevice = function () {
     // Init the default state
     this.setState(this.state);
-    if (!this.operationalState) {
+    if (!_.isObjectLike(this.operationalState)) {
         this.operationalState = {};
     }
 
