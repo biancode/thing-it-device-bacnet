@@ -391,7 +391,7 @@ BACNetDevice.prototype.createPluginConfig = function () {
  * @return {Promise<void>}
  */
 BACNetDevice.prototype.getObjectIdStringKey = function () {
-    const deviceId = this.objectId.value.type + ':' + this.objectId.value.instance;
+    var deviceId = this.objectId.value.type + ':' + this.objectId.value.instance;
     return deviceId;
 }
 
