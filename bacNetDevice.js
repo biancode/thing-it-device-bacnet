@@ -224,6 +224,8 @@ BACNetDevice.prototype.stop = function () {
 
     this.subManager.destroy();
     this.subManager = null;
+    this.statusChecksTimer.cancel();
+    this.statusChecksTimer = null;
     return this.socketServer.destroy()
     .catch((function(error) {
         throw new APIError('BACNetDeviceControllerDevice - stop: Socket Server - ' + error);
