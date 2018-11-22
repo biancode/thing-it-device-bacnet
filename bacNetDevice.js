@@ -302,15 +302,9 @@ BACNetDevice.prototype.initDevice = function () {
             + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
         _this.subscribeToObject();
 
-        // Send 'WhoIs' request
-        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
-            + 'Send "WhoIs" request');
-        _this.sendWhoIs();
-        _this.operationalState.status = Enums.OperationalStatus.Pending;
-        _this.operationalState.message = "Waiting for WhoIs confirmation...";
-
-        // If status checks interval is more than zero, init WhoIs heartbeats
+        // If status checks interval is more than zero, plan WhoIs heartbeats
         if (_this.pluginConfig.statusTimer.interval !== 0) {
+            _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: init status checks timer')
             _this.statusChecksTimer.start(function(interval) {
 
                 _this.getIAmFlow(interval)
@@ -328,6 +322,14 @@ BACNetDevice.prototype.initDevice = function () {
                 _this.sendWhoIs();
             });
         }
+
+        // Send 'WhoIs' request
+        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+        + 'Send "WhoIs" request');
+        _this.sendWhoIs();
+        _this.statusChecksTimer.failsCounter = 1;
+        _this.operationalState.status = Enums.OperationalStatus.Pending;
+        _this.operationalState.message = "Waiting for WhoIs confirmation...";
     });
 };
 
