@@ -299,23 +299,24 @@ BACNetDevice.prototype.initDevice = function () {
             + 'Creates the instance of the API Service');
         _this.apiService = _this.serviceManager.createAPIService();
 
-        // Creates 'subscribtion' to the BACnet 'whoIs' - 'iAm' flow
-        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
-            + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
-        _this.subscribeToObject(_this.pluginConfig.statusTimer.interval);
-
         // If status checks interval is more than zero, plan WhoIs heartbeats
         if (_this.pluginConfig.statusTimer.interval !== 0) {
-            _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: init status checks timer')
+            _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: init status checks timer');
+            // If polling interval is provided, make the initial WhoIs via status checks timer
             _this.statusChecksTimer.start(function(interval) {
-
+                _this.logger.logDebug('BACNetDeviceControllerDevice: '
+                + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
                 _this.subscribeToObject(interval);
                 _this.sendWhoIs();
             });
+        } else {
+            // If not, do it explicitly
+            _this.logger.logDebug('BACNetDeviceControllerDevice: '
+            + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
+            _this.subscribeToObject(_this.pluginConfig.statusTimer.interval);
+            _this.sendWhoIs();
         }
-        
-        _this.sendWhoIs();
-        _this.statusChecksTimer.failsCounter = 1;
+
     });
 };
 
