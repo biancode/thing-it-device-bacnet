@@ -491,8 +491,7 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
         if (!this.state.initialized) {
             this.state.initialized = true;
             this.logger.logInfo('Initialized BACnet device successfully.');
-            this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
-            + ("State - " + JSON.stringify(this.state)));
+            this.publishStateChange();
         }
 
         if (!this.propsReceived) {
