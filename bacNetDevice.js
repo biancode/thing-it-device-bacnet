@@ -448,10 +448,6 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
         // Handles 'iAm' response
         this.logger.logInfo('Received iAm response');
 
-        this.operationalState.status = Enums.OperationalStatus.Ok;
-        this.operationalState.message = "Received iAm heartbeat";
-        this.statusChecksTimer.reportSuccessfulCheck();
-
         var iAmService = resp.layer.apdu.service;
         this.objectId = iAmService.objId;
         
@@ -490,9 +486,13 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
             this.apiService = this.serviceManager.createAPIService();
         }
 
+        this.operationalState.status = Enums.OperationalStatus.Ok;
+        this.operationalState.message = "Received iAm heartbeat";
+        this.statusChecksTimer.reportSuccessfulCheck();
+
         if (!this.propsReceived) {
             this.operationalState.status = Enums.OperationalStatus.Pending;
-            this.operationalState.message = "Received iAm response. Initializing properties...";
+            this.operationalState.message = "Received iAm. Initializing properties...";
             // Creates 'subscribtion' to the BACnet device properties
             this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Creates \"subscribtion\" to the BACnet device properties");
