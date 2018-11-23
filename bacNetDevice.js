@@ -368,6 +368,9 @@ BACNetDevice.prototype.createPluginConfig = function () {
             var interval = _.isNil(this.config.statusChecksInterval) ? 
                 undefined : this.config.statusChecksInterval * 1000;
             return _.merge({}, _.cloneDeep(Configs.AppConfig), {
+                statusTimer: Configs.StatusTimer
+            },
+            {
                 server: {
                     port: port,
                 },
