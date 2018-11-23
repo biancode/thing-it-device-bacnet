@@ -448,7 +448,7 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
 
         this.operationalState.status = Enums.OperationalStatus.Ok;
         this.operationalState.message = "Received iAm heartbeat";
-        this.statusChecksTimer.failsCounter = 0;
+        this.statusChecksTimer.reportSuccessfulCheck();
 
         var iAmService = resp.layer.apdu.service;
         this.objectId = iAmService.objId;
