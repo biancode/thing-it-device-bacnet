@@ -458,11 +458,11 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
         var respAddrInfo = resp.socket.getAddressInfo();
         if (curAddrInfo.address !== respAddrInfo.address) {
             if (curAddrInfo.address.indexOf('GENERATED_') > -1) {
-                this.logger.logInfo("BACNetDeviceControllerDevice - handleIAmResponse: "
+                this.logger.logInfo("BACNetDeviceControllerDevice - subscribeToObject: "
                     + ("Device IP not configured, found at " + respAddrInfo.address));
             }
             else {
-                this.logger.logInfo("BACNetDeviceControllerDevice - handleIAmResponse: "
+                this.logger.logInfo("BACNetDeviceControllerDevice - subscribeToObject: "
                     + ("Device configured with " + curAddrInfo.address + " found at " + respAddrInfo.address));
             }
             // Sets IP from response to 'plugin' config
@@ -643,7 +643,6 @@ BACNetDevice.prototype.subscribeToProperty = function () {
             RxOp.timeout(Configs.AppConfig.response.readProperty.timeout),
             RxOp.first())
         .subscribe((function () {
-            // Set `initialized` to 'true' only after all properties were received
             this.propsReceived = true;
             this.logger.logDebug('BACNetDeviceControllerDevice - subscribeToProperty: '
                 + "Device properties were received");
