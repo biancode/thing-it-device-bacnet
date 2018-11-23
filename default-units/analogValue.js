@@ -160,6 +160,13 @@ module.exports = {
                     id: "decimal"
                 },
                 defaultValue: 100
+            } , {
+                label: 'Status Checks Interval',
+                id: 'statusChecksInterval',
+                type: {
+                    id: 'integer',
+                },
+                defaultValue: 60,
             }
         ]
     },
@@ -186,6 +193,8 @@ var Helpers = require("../lib/helpers");
 var BACnet = require("tid-bacnet-logic");
 var Logger = require("../lib/utils").Logger;
 var Enums = require("../lib/enums");
+var Entities = require("./lib/entities");
+var StatusTimerConfig = require("../lib/configs/status-timer.config")
 
 /**
  *
@@ -230,7 +239,9 @@ AnalogValue.prototype.stop = function () {
     }).bind(this));
 
     this.subManager.destroy();
-    this.subManager = null;    
+    this.subManager = null;
+    this.statusChecksTimer.cancel();
+    this.statusChecksTimer = null;    
 };
 
 AnalogValue.prototype.initDevice = function (deviceId) {
@@ -307,6 +318,13 @@ AnalogValue.prototype.createPluginComponents = function () {
     this.serviceManager = store.getState([ 'bacnet', this.deviceId, 'serviceManager' ]);
     // Creates instance of the API Service
     this.apiService = this.serviceManager.createAPIService(this.logger);
+    /* Create Status Checks Timer*/
+    var interval = _.isNil(this.config.statusChecksInterval) ? 
+        undefined : this.config.statusChecksInterval * 1000;
+    var statusTimerConfig = _.assign({}, StatusTimerConfig, {
+        interval: interval
+    })
+    this.statusChecksTimer = new Entities.StatusTimer(this.pluginConfig.statusTimer);
 };
 
 /**
