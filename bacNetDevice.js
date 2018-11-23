@@ -299,10 +299,9 @@ BACNetDevice.prototype.initDevice = function () {
             + 'Creates the instance of the API Service');
         _this.apiService = _this.serviceManager.createAPIService();
 
-        // If status checks interval is more than zero, plan WhoIs heartbeats
         if (_this.pluginConfig.statusTimer.interval !== 0) {
             _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: init status checks timer');
-            // If polling interval is provided, make the initial WhoIs via status checks timer
+            // If polling interval is provided, make the initial WhoIs via first status checks timer tick
             _this.statusChecksTimer.start(function(interval) {
                 _this.logger.logDebug('BACNetDeviceControllerDevice: '
                 + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
