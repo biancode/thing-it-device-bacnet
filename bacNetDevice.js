@@ -364,9 +364,9 @@ BACNetDevice.prototype.createPluginConfig = function () {
     return this.getDeviceIpAddress()
         .then((function(ipAddress) {
             var port = this.getDevicePort();
-            // Creates the config for the plugin components
             var interval = _.isNil(this.config.statusChecksInterval) ? 
                 undefined : this.config.statusChecksInterval * 1000;
+            // Creates the config for the plugin components            
             return _.merge({}, _.cloneDeep(Configs.AppConfig), {
                 statusTimer: Configs.StatusTimer
             },
