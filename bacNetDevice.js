@@ -322,14 +322,9 @@ BACNetDevice.prototype.initDevice = function () {
                 _this.sendWhoIs();
             });
         }
-
-        // Send 'WhoIs' request
-        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
-        + 'Send "WhoIs" request');
+        
         _this.sendWhoIs();
         _this.statusChecksTimer.failsCounter = 1;
-        _this.operationalState.status = Enums.OperationalStatus.Pending;
-        _this.operationalState.message = "Waiting for WhoIs confirmation...";
     });
 };
 
@@ -339,10 +334,18 @@ BACNetDevice.prototype.initDevice = function () {
  * @return {void}
  */
 BACNetDevice.prototype.sendWhoIs = function () {
+    // Send 'WhoIs' request
+    this.logger.logDebug('BACNetDeviceControllerDevice: '
+    + 'Send "WhoIs" request');
     if (this.config.unicastWhoIsConfirmation) {
         this.apiService.unconfirmedReq.whoIsUnicast({});
     } else {
         this.apiService.unconfirmedReq.whoIsBroadcast({});
+    }
+
+    if (!this.operationalState.status) {
+        this.operationalState.status = Enums.OperationalStatus.Pending;
+        this.operationalState.message = "Waiting for WhoIs confirmation...";
     }
 };
 
