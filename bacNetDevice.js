@@ -316,8 +316,8 @@ BACNetDevice.prototype.initDevice = function () {
             _this.sendWhoIs();
         }
 
-        this.state.initialized = true;
-        this.logger.logInfo('Initialized BACnet device successfully.');
+        _this.state.initialized = true;
+        _this.logger.logInfo('Initialized BACnet device successfully.');
     });
 };
 
