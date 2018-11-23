@@ -316,6 +316,8 @@ BACNetDevice.prototype.initDevice = function () {
             _this.sendWhoIs();
         }
 
+        this.state.initialized = true;
+        this.logger.logInfo('Initialized BACnet device successfully.');
     });
 };
 
@@ -486,12 +488,6 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
             }).bind(this));
             
             this.apiService = this.serviceManager.createAPIService();
-        }
-        
-        if (!this.state.initialized) {
-            this.state.initialized = true;
-            this.logger.logInfo('Initialized BACnet device successfully.');
-            this.publishStateChange();
         }
 
         if (!this.propsReceived) {
