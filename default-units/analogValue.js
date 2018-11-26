@@ -335,7 +335,7 @@ AnalogValue.prototype.createPluginComponents = function () {
     var statusTimerConfig = _.assign({}, StatusTimerConfig, {
         interval: interval
     })
-    this.statusChecksTimer = new Entities.StatusTimer(this.pluginConfig.statusTimer);
+    this.statusChecksTimer = new Entities.StatusTimer(statusTimerConfig);
 };
 
 /**
