@@ -30,7 +30,7 @@ module.exports = {
                 type: {
                     id: "decimal"
                 }
-            }, 
+            },
             // TODO: Remove this property from state when operational state will be fully implemented
             /**
              * @deprecated
@@ -45,7 +45,7 @@ module.exports = {
             // TODO: Remove this property from state when operational state will be fully implemented
             /**
              * @deprecated
-             */ 
+             */
             {
                 id: "outOfService",
                 label: "Out of Service",
@@ -104,7 +104,7 @@ module.exports = {
                     id: 'boolean',
                 },
                 defaultValue: '',
-            },            
+            },
             {
                 label: "Object Identifier",
                 id: "objectId",
@@ -175,7 +175,7 @@ module.exports = {
                     id: "decimal"
                 },
                 defaultValue: 100
-            } , {
+            }, {
                 label: 'Status Checks Interval',
                 id: 'statusChecksInterval',
                 type: {
@@ -252,7 +252,7 @@ AnalogValue.prototype.stop = function () {
     this.subManager.destroy();
     this.subManager = null;
     this.statusChecksTimer.cancel();
-    this.statusChecksTimer = null;    
+    this.statusChecksTimer = null;
 };
 
 AnalogValue.prototype.initDevice = function (deviceId) {
@@ -324,13 +324,13 @@ AnalogValue.prototype.initParamsFromConfig = function () {
  */
 AnalogValue.prototype.createPluginComponents = function () {
     /* Create and init BACnet Flow Manager */
-    this.flowManager = store.getState([ 'bacnet', this.deviceId, 'flowManager' ]);
+    this.flowManager = store.getState(['bacnet', this.deviceId, 'flowManager']);
     /* Create and init BACnet Service Manager */
-    this.serviceManager = store.getState([ 'bacnet', this.deviceId, 'serviceManager' ]);
+    this.serviceManager = store.getState(['bacnet', this.deviceId, 'serviceManager']);
     // Creates instance of the API Service
     this.apiService = this.serviceManager.createAPIService(this.logger);
     /* Create Status Checks Timer*/
-    var interval = _.isNil(this.config.statusChecksInterval) ? 
+    var interval = _.isNil(this.config.statusChecksInterval) ?
         undefined : this.config.statusChecksInterval * 1000;
     var statusTimerConfig = _.assign({}, StatusTimerConfig, {
         interval: interval
@@ -361,6 +361,43 @@ AnalogValue.prototype.initProperties = function () {
 
 /**
  * Creates 'subscribtion' to the BACnet object status flags.
+ * @param {BACnet.Types.StatusFlags} statusFlags - parsed 'statusFlags' property of the actor
+ *
+ * @return {void}
+ */
+AnalogValue.prototype.handleStausFlags = function (statusFlags) {
+    this.state.outOfService = statusFlags.value.outOfService;
+    this.state.alarmValue = statusFlags.value.inAlarm;
+    if (statusFlags.value.inAlarm) {
+        this.logger.logError("AnalogValueActorDevice - statusCheck: " +
+            "Actor alarm detected!");
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error,
+            message: "Alarm detected"
+        };
+    }
+    if (statusFlags.value.outOfService) {
+        this.logger.logError("AnalogValueActorDevice - statusCheck: " +
+            "Physical device is out of service!");
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error,
+            message: "Out of service"
+        };
+    }
+    if (statusFlags.value.fault) {
+        this.logger.logError("AnalogValueActorDevice - statusCheck: " +
+            "Fault detected!");
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error,
+            message: "Fault detected"
+        };
+    }
+
+}
+
+/**
+ * Creates 'subscribtion' to the BACnet object status flags.
+ * @param {number} interval - the lifetime of the 'subscription'
  *
  * @return {void}
  */
@@ -380,35 +417,12 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
                 message: "Status check successful"
             };
             var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
-            _this.state.outOfService = statusFlags.value.outOfService;
-            _this.state.alarmValue = statusFlags.value.inAlarm;
-            _this.logger.logDebug("AnalogValueActorDevice - statusCheck: "
-                + ("State " + JSON.stringify(_this.state)));
-            if (statusFlags.value.inAlarm) {
-                _this.logger.logError("AnalogValueActorDevice - statusCheck: "
-                + "Actor alarm detected!");
-                _this.operationalState = {
-                    status: Enums.OperationalStatus.Error,
-                    message: "Alarm detected"
-                };
-            }
-            if (statusFlags.value.outOfService) {
-                _this.logger.logError("AnalogValueActorDevice - statusCheck: "
-                + "Physical device is out of service!");
-                _this.operationalState = {
-                    status: Enums.OperationalStatus.Error,
-                    message: "Out of service"
-                };
-            }
-            if (statusFlags.value.fault) {
-                _this.logger.logError("AnalogValueActorDevice - statusCheck: "
-                + "Fault detected!");
-                _this.operationalState = {
-                    status: Enums.OperationalStatus.Error,
-                    message: "Fault detected"
-                };
-            }
+            _this.handleStausFlags(statusFlags);
+            _this.logger.logDebug("AnalogValueActorDevice - statusCheck: " +
+                ("State " + JSON.stringify(_this.state)));
+
             _this.publishOperationalStateChange();
+
         }, function (error) {
             _this.logger.logDebug("AnalogValueActorDevice - status check failed: " + error);
             _this.operationalState = {
@@ -431,21 +445,21 @@ AnalogValue.prototype.subscribeToProperty = function () {
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)))
         .subscribe(function (resp) {
-        var bacnetProperties = _this
-            .getCOVNotificationValues(resp);
-        _this.state.presentValue = bacnetProperties.presentValue.value;
+            var bacnetProperties = _this
+                .getCOVNotificationValues(resp);
+            _this.state.presentValue = bacnetProperties.presentValue.value;
         _this.state.outOfService = bacnetProperties.statusFlags.value.outOfService;
         _this.state.alarmValue = bacnetProperties.statusFlags.value.inAlarm;
-        _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
-            + ("presentValue " + JSON.stringify(_this.state.presentValue)));
-        _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
-            + ("State " + JSON.stringify(_this.state)));
-        _this.publishStateChange();
-    }, function (error) {
-        _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
-            + ("Analog Input COV notification was not received " + error));
-        _this.publishStateChange();
-    });
+            _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
+                + ("presentValue " + JSON.stringify(_this.state.presentValue)));
+            _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
+                + ("State " + JSON.stringify(_this.state)));
+            _this.publishStateChange();
+        }, function (error) {
+            _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
+                + ("Analog Input COV notification was not received " + error));
+            _this.publishStateChange();
+        });
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)));
@@ -453,69 +467,69 @@ AnalogValue.prototype.subscribeToProperty = function () {
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.maxPresValue)))
         .subscribe(function (resp) {
-        var bacnetProperty = BACnet.Helpers.Layer
-            .getPropertyValue(resp.layer);
-        _this.state.max = bacnetProperty.value;
-        _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
-            + ("Max value for 'Present Value' property retrieved: " + _this.state.max));
-        _this.publishStateChange();
-    });
+            var bacnetProperty = BACnet.Helpers.Layer
+                .getPropertyValue(resp.layer);
+            _this.state.max = bacnetProperty.value;
+            _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
+                + ("Max value for 'Present Value' property retrieved: " + _this.state.max));
+            _this.publishStateChange();
+        });
     // Gets the 'minPresValue' property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.minPresValue)))
         .subscribe(function (resp) {
-        var bacnetProperty = BACnet.Helpers.Layer
-            .getPropertyValue(resp.layer);
-        _this.state.min = bacnetProperty.value;
+            var bacnetProperty = BACnet.Helpers.Layer
+                .getPropertyValue(resp.layer);
+            _this.state.min = bacnetProperty.value;
         _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
             + ("Min value for 'Present Value' property retrieved: " + _this.state.min));
-        _this.publishStateChange();
-    });
+            _this.publishStateChange();
+        });
     // Gets the 'objectName' property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.objectName)))
         .subscribe(function (resp) {
-        var bacnetProperty = BACnet.Helpers.Layer
-            .getPropertyValue(resp.layer);
-        _this.state.objectName = bacnetProperty.value;
+            var bacnetProperty = BACnet.Helpers.Layer
+                .getPropertyValue(resp.layer);
+            _this.state.objectName = bacnetProperty.value;
         _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
             + ("Object Name retrieved: " + _this.state.objectName));
-        _this.publishStateChange();
-    });
+            _this.publishStateChange();
+        });
     // Gets the 'description' property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.description)))
         .subscribe(function (resp) {
-        var bacnetProperty = BACnet.Helpers.Layer
-            .getPropertyValue(resp.layer);
-        _this.state.description = bacnetProperty.value;
+            var bacnetProperty = BACnet.Helpers.Layer
+                .getPropertyValue(resp.layer);
+            _this.state.description = bacnetProperty.value;
         _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
             + ("Object Description retrieved: " + _this.state.description));
-        _this.publishStateChange();
-    });
+            _this.publishStateChange();
+        });
     // Gets the 'units' property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.units)))
         .subscribe(function (resp) {
-        var bacnetProperty = BACnet.Helpers.Layer
-            .getPropertyValue(resp.layer);
-        var unit = BACnet.Enums.EngineeringUnits[bacnetProperty.value];
-        _this.state.unit = _.isNil(unit) ? 'none' : unit;
+            var bacnetProperty = BACnet.Helpers.Layer
+                .getPropertyValue(resp.layer);
+            var unit = BACnet.Enums.EngineeringUnits[bacnetProperty.value];
+            _this.state.unit = _.isNil(unit) ? 'none' : unit;
         _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
             + ("Object Unit retrieved: " + _this.state.unit));
-        _this.publishStateChange();
-    });
+            _this.publishStateChange();
+        });
     // Gets the 'presentValue' property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
-        var bacnetProperty = BACnet.Helpers.Layer
-            .getPropertyValue(resp.layer);
-        _this.state.presentValue = bacnetProperty.value;
+            var bacnetProperty = BACnet.Helpers.Layer
+                .getPropertyValue(resp.layer);
+            _this.state.presentValue = bacnetProperty.value;
         _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
             + ("Object Present Value retrieved: " + _this.state.presentValue));
-        _this.publishStateChange();
-    });
+            _this.publishStateChange();
+        });
 };
 
 /**
