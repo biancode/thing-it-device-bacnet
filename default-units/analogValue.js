@@ -18,13 +18,15 @@ module.exports = {
 
         state: [
             {
-                id: 'initialized', label: 'Initialized',
+                id: 'initialized', 
+                label: 'Initialized',
                 type: {
                     id: 'boolean',
                 },
             },
             {
-                id: "presentValue", label: "Present Value",
+                id: "presentValue", 
+                label: "Present Value",
                 type: {
                     id: "decimal"
                 }
@@ -34,7 +36,8 @@ module.exports = {
              * @deprecated
              */
             {
-                id: "alarmValue", label: "Alarm Value",
+                id: "alarmValue", 
+                label: "Alarm Value",
                 type: {
                     id: "boolean"
                 }
@@ -44,17 +47,20 @@ module.exports = {
              * @deprecated
              */ 
             {
-                id: "outOfService", label: "Out of Service",
+                id: "outOfService",
+                label: "Out of Service",
                 type: {
                     id: "boolean"
                 }
             }, {
-                id: "min", label: "Min",
+                id: "min",
+                label: "Min",
                 type: {
                     id: "float"
                 }
             }, {
-                id: "max", label: "Max",
+                id: "max",
+                label: "Max",
                 type: {
                     id: "float"
                 }
@@ -83,8 +89,7 @@ module.exports = {
                 defaultValue: '',
             },
         ],
-        configuration: [
-            {
+        configuration: [{
                 label: 'Read-only',
                 id: 'readonly',
                 type: {
@@ -209,17 +214,13 @@ var StatusTimerConfig = require("../lib/configs/status-timer.config")
 /**
  *
  */
-function AnalogValue() { 
-}
+function AnalogValue() {}
 
-function AnalogValueDiscovery() {   
-}
+function AnalogValueDiscovery() {}
 
-AnalogValueDiscovery.prototype.start = function () {
-}
+AnalogValueDiscovery.prototype.start = function () {}
 
-AnalogValueDiscovery.prototype.stop = function () {
-}
+AnalogValueDiscovery.prototype.stop = function () {}
 
 AnalogValue.prototype.className = 'AnalogValueActorDevice';
 /**
@@ -535,7 +536,10 @@ AnalogValue.prototype.getCOVNotificationValues = function (resp) {
     // Get instances of property values
     var presentValue = presentValueProp.values[0];
     var statusFlags = statusFlagsProp.values[0];
-    return { presentValue: presentValue, statusFlags: statusFlags };
+    return {
+        presentValue: presentValue,
+        statusFlags: statusFlags
+    };
 };
 
 /**
@@ -660,5 +664,3 @@ AnalogValue.prototype.changeValue = function (parameters) {
     this.setPresentValue(parameters.value);
     return Bluebird.resolve();
 };
-
-
