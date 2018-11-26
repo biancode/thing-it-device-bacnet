@@ -457,7 +457,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
             _this.publishStateChange();
         }, function (error) {
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
-                + ("Analog Input COV notification was not received " + error));
+                + ("Analog Value COV notification was not received " + error));
             _this.publishStateChange();
         });
     // Read Property Flow
