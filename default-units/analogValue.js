@@ -360,7 +360,7 @@ AnalogValue.prototype.initProperties = function () {
 };
 
 /**
- * Creates 'subscribtion' to the BACnet object status flags.
+ * Maps status flags to operational state if they are presented.
  * @param {BACnet.Types.StatusFlags} statusFlags - parsed 'statusFlags' property of the actor
  *
  * @return {void}
