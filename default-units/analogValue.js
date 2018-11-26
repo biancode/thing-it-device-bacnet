@@ -349,6 +349,67 @@ AnalogValue.prototype.initProperties = function () {
 };
 
 /**
+ * Creates 'subscribtion' to the BACnet object status flags.
+ *
+ * @return {void}
+ */
+AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
+    var _this = this;
+    this.subManager.subscribe = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+            RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+            RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.objectId)),
+            RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.statusFlags)),
+            RxOp.timeout(interval),
+            RxOp.first())
+        .subscribe(function (resp) {
+            _this.logger.logDebug("AnalogValueActorDevice - statusCheck successful");
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Ok,
+                message: "Status check successful"
+            };
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.state.outOfService = statusFlags.value.outOfService;
+            _this.state.alarmValue = statusFlags.value.inAlarm;
+            _this.logger.logDebug("AnalogValueActorDevice - statusCheck: "
+                + ("State " + JSON.stringify(_this.state)));
+            if (statusFlags.value.inAlarm) {
+                _this.logger.logError("AnalogValueActorDevice - statusCheck: "
+                + "Actor alarm detected!");
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Error,
+                    message: "Alarm detected"
+                };
+            }
+            if (statusFlags.value.outOfService) {
+                _this.logger.logError("AnalogValueActorDevice - statusCheck: "
+                + "Physical device is out of service!");
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Error,
+                    message: "Out of service"
+                };
+            }
+            if (statusFlags.value.fault) {
+                _this.logger.logError("AnalogValueActorDevice - statusCheck: "
+                + "Fault detected!");
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Error,
+                    message: "Fault detected"
+                };
+            }
+            _this.publishOperationalStateChange();
+        }, function (error) {
+            _this.logger.logDebug("AnalogValueActorDevice - status check failed: " + error);
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Error,
+                message: "Status check failed - device unreachable"
+            };
+            _this.publishOperationalStateChange();
+        });
+
+};
+
+/**
  * Creates 'subscribtion' to the BACnet object properties.
  *
  * @return {void}
