@@ -28,12 +28,22 @@ module.exports = {
                 type: {
                     id: "decimal"
                 }
-            }, {
+            }, 
+            // TODO: Remove this property from state when operational state will be fully implemented
+            /**
+             * @deprecated
+             */
+            {
                 id: "alarmValue", label: "Alarm Value",
                 type: {
                     id: "boolean"
                 }
-            }, {
+            },
+            // TODO: Remove this property from state when operational state will be fully implemented
+            /**
+             * @deprecated
+             */ 
+            {
                 id: "outOfService", label: "Out of Service",
                 type: {
                     id: "boolean"
