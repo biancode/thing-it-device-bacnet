@@ -412,6 +412,7 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
             RxOp.first())
         .subscribe(function (resp) {
             _this.logger.logDebug("AnalogValueActorDevice - statusCheck successful");
+            _this.statusChecksTimer.reportSuccessfulCheck()
             _this.operationalState = {
                 status: Enums.OperationalStatus.Ok,
                 message: "Status check successful"
@@ -453,6 +454,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
                 + ("presentValue " + JSON.stringify(_this.state.presentValue)));
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + ("State " + JSON.stringify(_this.state)));
+            _this.statusChecksTimer.reportSuccessfulCheck();
             _this.publishOperationalStateChange();
             _this.publishStateChange();
         }, function (error) {
