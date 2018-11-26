@@ -449,6 +449,10 @@ AnalogValue.prototype.subscribeToProperty = function () {
             var bacnetProperties = _this
                 .getCOVNotificationValues(resp);
             _this.state.presentValue = bacnetProperties.presentValue.value;
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Ok,
+                message: "Received COV Notification"
+            };
             _this.handleStausFlags(bacnetProperties.statusFlags);
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + ("presentValue " + JSON.stringify(_this.state.presentValue)));
