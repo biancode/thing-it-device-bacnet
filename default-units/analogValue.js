@@ -261,6 +261,8 @@ AnalogValue.prototype.initDevice = function (deviceId) {
 
     this.operationalState = {};
 
+    this.propsReceived = false;
+
     this.state.initialized = false;
 
     this.config = this.configuration;
@@ -509,7 +511,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
             _this.publishStateChange();
         });
     // Gets the 'objectName' property
-    this.subManager.subscribe = readPropertyFlow
+    var ovObjectName = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.objectName)))
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
@@ -519,8 +521,9 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Name retrieved: " + _this.state.objectName));
             _this.publishStateChange();
         });
+    this.subManager.subscribe = ovObjectName;
     // Gets the 'description' property
-    this.subManager.subscribe = readPropertyFlow
+    var ovDescription = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.description)))
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
@@ -530,6 +533,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Description retrieved: " + _this.state.description));
             _this.publishStateChange();
         });
+    this.subManager.subscribe = ovDescription;
     // Gets the 'units' property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.units)))
@@ -543,7 +547,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
             _this.publishStateChange();
         });
     // Gets the 'presentValue' property
-    this.subManager.subscribe = readPropertyFlow
+    var ovUnits = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
@@ -553,6 +557,17 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Present Value retrieved: " + _this.state.presentValue));
             _this.publishStateChange();
         });
+    this.subManager.subscribe = ovUnits;
+    // Min and max present value properties are optional and may be missing
+    this.subManager.subscribe = Rx.combineLatest( ovObjectName, ovDescription, ovUnits)
+        .pipe(RxOp.first())
+        .subscribe(function() {
+            _this.propsReceived = true;
+            _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
+                + "main properties were received");
+            _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
+                + ("Actor details: " + JSON.stringify(this.state)));
+        })
 };
 
 /**
