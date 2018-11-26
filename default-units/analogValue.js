@@ -437,8 +437,10 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
             _this.handleStausFlags(statusFlags);
             _this.logger.logDebug("AnalogValueActorDevice - statusCheck: " +
                 ("State " + JSON.stringify(_this.state)));
-
             _this.publishOperationalStateChange();
+            if (!_this.propsReceived && _this.operationalState.status === Enums.OperationalStatus.Ok) {
+                _this.initProperties()
+            }
 
         }, function (error) {
             _this.logger.logDebug("AnalogValueActorDevice - status check failed: " + error);
@@ -558,7 +560,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
             _this.publishStateChange();
         });
     this.subManager.subscribe = ovUnits;
-    // Min and max present value properties are optional and may be missing
+    // 'Min' and 'max' present value properties are optional and may be missing
     this.subManager.subscribe = Rx.combineLatest( ovObjectName, ovDescription, ovUnits)
         .pipe(RxOp.first())
         .subscribe(function() {
