@@ -448,12 +448,12 @@ AnalogValue.prototype.subscribeToProperty = function () {
             var bacnetProperties = _this
                 .getCOVNotificationValues(resp);
             _this.state.presentValue = bacnetProperties.presentValue.value;
-        _this.state.outOfService = bacnetProperties.statusFlags.value.outOfService;
-        _this.state.alarmValue = bacnetProperties.statusFlags.value.inAlarm;
+            _this.handleStausFlags(bacnetProperties.statusFlags);
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + ("presentValue " + JSON.stringify(_this.state.presentValue)));
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + ("State " + JSON.stringify(_this.state)));
+            _this.publishOperationalStateChange();
             _this.publishStateChange();
         }, function (error) {
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
