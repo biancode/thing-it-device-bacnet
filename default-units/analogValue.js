@@ -259,6 +259,8 @@ AnalogValue.prototype.initDevice = function (deviceId) {
     // Init the default state
     this.setState(this.state);
 
+    this.operationalState = {};
+
     this.state.initialized = false;
 
     this.config = this.configuration;
@@ -285,6 +287,18 @@ AnalogValue.prototype.initDevice = function (deviceId) {
 
     // Inits the BACnet object properties
     this.initProperties();
+
+    // Init status checks timer if polling time is provided
+    if (this.statusChecksTimer.config.interval !== 0) {
+        this.statusChecksTimer.start(function(interval) {
+            this.subscribeToStatusCheck(interval);
+            this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.statusFlags);
+        }.bind(this));
+        this.operationalState = {
+            status: Enums.OperationalStatus.Pending,
+            message: "Waiting for Status Flags..."
+        }
+    }
 
     this.state.initialized = true;
     this.publishStateChange();
