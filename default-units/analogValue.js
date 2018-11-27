@@ -569,10 +569,15 @@ AnalogValue.prototype.subscribeToProperty = function () {
         .pipe(RxOp.first())
         .subscribe(function() {
             _this.propsReceived = true;
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Ok,
+                message: 'Major properties successfully initialized'
+            };
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + "main properties were received");
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + ("Actor details: " + JSON.stringify(this.state)));
+            _this.publishOperationalStateChange();
         })
 };
 
