@@ -292,12 +292,14 @@ AnalogValue.prototype.initDevice = function (deviceId) {
     if (this.statusChecksTimer.config.interval !== 0) {
         this.statusChecksTimer.start(function(interval) {
             this.subscribeToStatusCheck(interval);
+            this.logger.logDebug("AnalogValueActorDevice - statusCheck: sending request" );
             this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.statusFlags);
         }.bind(this));
         this.operationalState = {
             status: Enums.OperationalStatus.Pending,
             message: "Waiting for Status Flags..."
-        }
+        };
+        this.logger.logDebug("AnalogValueActorDevice - operationalState: " + JSON.stringify(this.operationalState));
     }
 
     this.state.initialized = true;
