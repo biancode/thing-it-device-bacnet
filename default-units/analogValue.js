@@ -199,6 +199,7 @@ module.exports = {
 var _ = require("lodash");
 var Bluebird = require("bluebird");
 Bluebird.prototype.fail = Bluebird.prototype.catch;
+var Rx = require("rxjs");
 var RxOp = require("rxjs/operators");
 var store = require("../lib/redux").store;
 /* Plugin devices */
