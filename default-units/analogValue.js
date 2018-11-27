@@ -208,7 +208,7 @@ var Helpers = require("../lib/helpers");
 var BACnet = require("tid-bacnet-logic");
 var Logger = require("../lib/utils").Logger;
 var Enums = require("../lib/enums");
-var Entities = require("./lib/entities");
+var Entities = require("../lib/entities");
 var StatusTimerConfig = require("../lib/configs/status-timer.config")
 
 /**
