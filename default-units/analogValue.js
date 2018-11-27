@@ -523,7 +523,8 @@ AnalogValue.prototype.subscribeToProperty = function () {
         });
     // Gets the 'objectName' property
     var ovObjectName = readPropertyFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.objectName)))
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.objectName)));
+    this.subManager.subscribe = ovObjectName
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
                 .getPropertyValue(resp.layer);
@@ -532,10 +533,10 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Name retrieved: " + _this.state.objectName));
             _this.publishStateChange();
         });
-    this.subManager.subscribe = ovObjectName;
     // Gets the 'description' property
     var ovDescription = readPropertyFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.description)))
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.description)));
+    this.subManager.subscribe = ovDescription        
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
                 .getPropertyValue(resp.layer);
@@ -544,10 +545,10 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Description retrieved: " + _this.state.description));
             _this.publishStateChange();
         });
-    this.subManager.subscribe = ovDescription;
     // Gets the 'units' property
     var ovUnits = readPropertyFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.units)))
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.units)));
+    this.subManager.subscribe = ovUnits
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
                 .getPropertyValue(resp.layer);
@@ -557,7 +558,6 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Unit retrieved: " + _this.state.unit));
             _this.publishStateChange();
         });
-    this.subManager.subscribe = ovUnits;
     // Gets the 'presentValue' property
     this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
