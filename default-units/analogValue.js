@@ -434,7 +434,7 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
             _this.logger.logDebug("AnalogValueActorDevice - statusCheck: " +
                 ("State " + JSON.stringify(_this.state)));
             _this.publishOperationalStateChange();
-            if (!_this.propsReceived && _this.operationalState.status === Enums.OperationalStatus.Ok) {
+            if (!_this.propsReceived && _this.operationalState.status !== Enums.OperationalStatus.Error) {
                 _this.operationalState = {
                     status: Enums.OperationalStatus.Pending,
                     message: 'Status check successful. Receiving properties...'
