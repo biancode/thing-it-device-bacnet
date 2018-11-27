@@ -581,7 +581,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + "main properties were received");
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
-                + ("Actor details: " + JSON.stringify(this.state)));
+                + ("Actor details: " + JSON.stringify(_this.state)));
             _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
         })
