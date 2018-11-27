@@ -444,7 +444,7 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
                 // Inits the BACnet object properties
                 _this.initProperties();
             }
-            _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + _this.operationalState);
+            _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
 
         }, function (error) {
@@ -453,7 +453,7 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
                 status: Enums.OperationalStatus.Error,
                 message: "Status check failed - device unreachable"
             };
-            _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + _this.operationalState);
+            _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
         });
 
@@ -486,7 +486,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
                 _this.statusChecksTimer.reportSuccessfulCheck();
                 _this.statusChecksTimer.reset();
             }
-            _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + _this.operationalState);
+            _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
             _this.publishStateChange();
         }, function (error) {
@@ -580,7 +580,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
                 + "main properties were received");
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + ("Actor details: " + JSON.stringify(this.state)));
-            _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + _this.operationalState);
+            _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
         })
 };
