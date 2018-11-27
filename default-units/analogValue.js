@@ -435,6 +435,10 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
                 ("State " + JSON.stringify(_this.state)));
             _this.publishOperationalStateChange();
             if (!_this.propsReceived && _this.operationalState.status === Enums.OperationalStatus.Ok) {
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Pending,
+                    message: 'Status check successful. Receiving properties...'
+                };
                 // Creates 'subscribtion' to the BACnet object properties
                 _this.subscribeToProperty();
 
