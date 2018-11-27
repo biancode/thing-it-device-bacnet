@@ -312,7 +312,7 @@ BACNetDevice.prototype.initDevice = function () {
             // If not, do it explicitly
             _this.logger.logDebug('BACNetDeviceControllerDevice: '
             + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
-            _this.subscribeToObject(_this.pluginConfig.statusTimer.interval);
+            _this.subscribeToObject(Configs.AppConfig.response.iAm.timeout);
             _this.sendWhoIs();
         }
 
