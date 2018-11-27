@@ -285,12 +285,6 @@ AnalogValue.prototype.initDevice = function (deviceId) {
     + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Creates 'subscribtion' to the BACnet object properties
-    this.subscribeToProperty();
-
-    // Inits the BACnet object properties
-    this.initProperties();
-
     // Init status checks timer if polling time is provided
     if (this.statusChecksTimer.config.interval !== 0) {
         this.statusChecksTimer.start(function(interval) {
@@ -440,6 +434,10 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
                 ("State " + JSON.stringify(_this.state)));
             _this.publishOperationalStateChange();
             if (!_this.propsReceived && _this.operationalState.status === Enums.OperationalStatus.Ok) {
+                // Creates 'subscribtion' to the BACnet object properties
+                _this.subscribeToProperty();
+
+                // Inits the BACnet object properties
                 _this.initProperties();
             }
 
