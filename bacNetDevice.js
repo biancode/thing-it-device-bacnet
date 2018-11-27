@@ -143,6 +143,13 @@ module.exports = {
                     id: 'boolean',
                 },
                 defaultValue: '',
+            }, {
+                label: 'Status Checks Interval',
+                id: 'statusChecksInterval',
+                type: {
+                    id: 'integer',
+                },
+                defaultValue: 60,
             }
         ]
     },
@@ -162,7 +169,6 @@ var Bluebird = require("bluebird");
 Bluebird.prototype.fail = Bluebird.prototype.catch;
 var Rx = require("rxjs");
 var RxOp = require("rxjs/operators");
-// var combineLatest = require("rxjs/observable/combineLatest");
 var store = require("./lib/redux").store;
 /* Plugin devices */
 var BACnetAction = require("./lib/redux/actions").BACnetAction;
@@ -174,6 +180,7 @@ var Helpers = require("./lib/helpers");
 var BACnet = require("tid-bacnet-logic");
 var Logger = require("./lib/utils").Logger;
 var Enums = require("./lib/enums");
+var Entities = require("./lib/entities");
 
 function BACNetDiscovery() {    
 }
@@ -217,6 +224,8 @@ BACNetDevice.prototype.stop = function () {
 
     this.subManager.destroy();
     this.subManager = null;
+    this.statusChecksTimer.cancel();
+    this.statusChecksTimer = null;
     return this.socketServer.destroy()
     .catch((function(error) {
         throw new APIError('BACNetDeviceControllerDevice - stop: Socket Server - ' + error);
@@ -248,7 +257,12 @@ BACNetDevice.prototype.initDevice = function () {
     // Init the default state
     this.setState(this.state);
 
+    this.operationalState = {};
+    
+
     this.state.initialized = false;
+    this.propsReceived = false;
+    this.actorsInitialized = false;
 
     this.config = this.configuration;
 
@@ -271,36 +285,65 @@ BACNetDevice.prototype.initDevice = function () {
     this.logger.logDebug("BACNetDeviceControllerDevice - initDevice: "
         + "Creates the config for the plugin components");
     
-    return this.createPluginConfig().then((function(pluginConfig) {
-        this.pluginConfig = pluginConfig;
+    var _this = this;    
+    return this.createPluginConfig().then(function(pluginConfig) {
+        _this.pluginConfig = pluginConfig;
         // Creates instances of the plugin componets
-        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
             + 'Creates instances of the plugin componets');
-        return this.createPluginComponents();
-    }).bind(this))
-    .then((function() {
+        return _this.createPluginComponents();
+    })
+    .then(function() {
         // Creates instance of the API Service
-        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
+        _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
             + 'Creates the instance of the API Service');
-        this.apiService = this.serviceManager.createAPIService();
+        _this.apiService = _this.serviceManager.createAPIService();
 
-        // Creates 'subscribtion' to the BACnet 'whoIs' - 'iAm' flow
-        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
-            + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
-        this.subscribeToObject();
-
-        // Send 'WhoIs' request
-        this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: '
-            + 'Send "WhoIs" request');
-        if (this.config.unicastWhoIsConfirmation) {
-            this.apiService.unconfirmedReq.whoIsUnicast({});
+        if (_this.pluginConfig.statusTimer.interval !== 0) {
+            _this.logger.logDebug('BACNetDeviceControllerDevice - initDevice: init status checks timer');
+            // If polling interval is provided, make the initial WhoIs via first status checks timer tick
+            _this.statusChecksTimer.start(function(interval) {
+                _this.logger.logDebug('BACNetDeviceControllerDevice: '
+                + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
+                _this.subscribeToObject(interval);
+                _this.sendWhoIs();
+            });
         } else {
-            this.apiService.unconfirmedReq.whoIsBroadcast({});
+            // If not, do it explicitly
+            _this.logger.logDebug('BACNetDeviceControllerDevice: '
+            + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
+            _this.subscribeToObject(Configs.AppConfig.response.iAm.timeout);
+            _this.sendWhoIs();
         }
 
-        this.state.initialized = true;
-    }).bind(this))
+        _this.state.initialized = true;
+        _this.logger.logInfo('Initialized BACnet device successfully.');
+    });
 };
+
+/**
+ * Sends WhoIs request
+ *
+ * @return {void}
+ */
+BACNetDevice.prototype.sendWhoIs = function () {
+    // Send 'WhoIs' request
+    this.logger.logDebug('BACNetDeviceControllerDevice: '
+    + 'Send "WhoIs" request');
+    if (this.config.unicastWhoIsConfirmation) {
+        this.apiService.unconfirmedReq.whoIsUnicast({});
+    } else {
+        this.apiService.unconfirmedReq.whoIsBroadcast({});
+    }
+
+    if (this.operationalState.status === Enums.OperationalStatus.NA) {
+        this.operationalState = {
+            status: Enums.OperationalStatus.Pending,
+            message: "Waiting for WhoIs confirmation..."
+        };
+    }
+};
+
 
 /**
  * Creates and inits params of the BACnet Device from plugin configuration.
@@ -323,8 +366,13 @@ BACNetDevice.prototype.createPluginConfig = function () {
     return this.getDeviceIpAddress()
         .then((function(ipAddress) {
             var port = this.getDevicePort();
-            // Creates the config for the plugin components
+            var interval = _.isNil(this.config.statusChecksInterval) ? 
+                undefined : this.config.statusChecksInterval * 1000;
+            // Creates the config for the plugin components            
             return _.merge({}, _.cloneDeep(Configs.AppConfig), {
+                statusTimer: Configs.StatusTimer
+            },
+            {
                 server: {
                     port: port,
                 },
@@ -334,6 +382,9 @@ BACNetDevice.prototype.createPluginConfig = function () {
                             address: ipAddress,
                         },
                     },
+                },
+                statusTimer: {
+                    interval: interval
                 },
             });
         }).bind(this))
@@ -345,7 +396,7 @@ BACNetDevice.prototype.createPluginConfig = function () {
  * @return {Promise<void>}
  */
 BACNetDevice.prototype.getObjectIdStringKey = function () {
-    const deviceId = this.objectId.value.type + ':' + this.objectId.value.instance;
+    var deviceId = this.objectId.value.type + ':' + this.objectId.value.instance;
     return deviceId;
 }
 
@@ -372,6 +423,9 @@ BACNetDevice.prototype.createPluginComponents = function () {
             this.flowManager = new Managers.BACnetFlowManager(this.logger, deviceId);
             this.flowManager.initManager(this.pluginConfig.manager.flow);
             BACnetAction.setBACnetFlowManager(deviceId, this.flowManager);
+
+            /* Create Status Checks Timer*/
+            this.statusChecksTimer = new Entities.StatusTimer(this.pluginConfig.statusTimer);
         }).bind(this))
 };
 
@@ -380,7 +434,7 @@ BACNetDevice.prototype.createPluginComponents = function () {
  *
  * @return {void}
  */
-BACNetDevice.prototype.subscribeToObject = function () {
+BACNetDevice.prototype.subscribeToObject = function (interval) {
 
     var destAddrInfo = this.pluginConfig.manager.service.dest;
     this.subManager.subscribe = this.flowManager.getResponseFlow()
@@ -393,17 +447,15 @@ BACNetDevice.prototype.subscribeToObject = function () {
                 Helpers.FlowFilter.isBACnetVendorId(this.config.vendorId), "vendor ID")),
             RxOp.filter(Helpers.FlowFilter.matchFilter(this.config.ipMatchRequired, 
                 Helpers.FlowFilter.isBACnetIPAddress(destAddrInfo.address), "IP Address")),
-            RxOp.timeout(Configs.AppConfig.response.iAm.timeout), RxOp.first()
+            RxOp.timeout(interval), RxOp.first()
         )
         .subscribe((function (resp) {
         // Handles 'iAm' response
-        this.logger.logInfo('Initialized BACnet device successfully.');
+        this.logger.logInfo('Received iAm response');
+
         var iAmService = resp.layer.apdu.service;
         this.objectId = iAmService.objId;
-        // Creates 'subscribtion' to the BACnet device properties
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
-            + "Creates \"subscribtion\" to the BACnet device properties");
-        this.subscribeToProperty();
+        
         var curAddrInfo = this.pluginConfig.manager.service.dest;
         var respAddrInfo = resp.socket.getAddressInfo();
         if (curAddrInfo.address !== respAddrInfo.address) {
@@ -438,23 +490,55 @@ BACNetDevice.prototype.subscribeToObject = function () {
             
             this.apiService = this.serviceManager.createAPIService();
         }
-        this.state.initialized = true;
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
-            + ("State - " + JSON.stringify(this.state)));
-        // Inits the BACnet properties
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
+
+        this.operationalState = {
+            status: Enums.OperationalStatus.Ok,
+            message: "Received iAm heartbeat"
+        };
+        this.statusChecksTimer.reportSuccessfulCheck();
+
+        if (!this.propsReceived) {
+            this.operationalState = {
+                status: Enums.OperationalStatus.Pending,
+                message: "Received iAm. Initializing properties..."
+            };
+            // Creates 'subscribtion' to the BACnet device properties
+            this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
+            + "Creates \"subscribtion\" to the BACnet device properties");
+            this.subscribeToProperty();
+            // Inits the BACnet properties
+            this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Inits the BACnet properties");
-        this.initProperties();
-        // Call 'init' method each actor
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
+            this.initProperties();
+        }
+        this.publishOperationalStateChange();
+        
+        if (!this.actorsInitialized) {
+            // Call 'init' method each actor
+            this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Inits the TID units");
-        var deviceId = this.getObjectIdStringKey();
-        Bluebird.map(this.actors, function (actor) {
-            return actor.initDevice(deviceId);
-        }, { concurrency: 1 });
+            var deviceId = this.getObjectIdStringKey();
+            Bluebird.map(this.actors, function (actor) {
+                if(!actor.state.initialized) {
+                    return actor.initDevice(deviceId);
+                }
+            }, { concurrency: 1 })
+                .then(function() {
+                    this.actorsInitialized = true;
+                }.bind(this))
+        }
     }).bind(this), 
     (function (error) {
-        this.logError("BACNetDeviceControllerDevice - subscribeToObject: " + error);
+        this.operationalState.status = Enums.OperationalStatus.Error;
+        if (this.state.initialized) {
+            this.operationalState.message = "Status check failed: remote device doesn't respond";
+            this.logError("BACNetDeviceControllerDevice - subscribeToObject - statusCheck: " + error);
+        } else {
+            this.operationalState.message = "Unabele to init BACnet device";
+            this.logError("BACNetDeviceControllerDevice - subscribeToObject: " + error);
+        }
+        
+        this.publishOperationalStateChange();
     }).bind(this));
 };
 
@@ -562,14 +646,26 @@ BACNetDevice.prototype.subscribeToProperty = function () {
             RxOp.timeout(Configs.AppConfig.response.readProperty.timeout),
             RxOp.first())
         .subscribe((function () {
-        this.logger.logDebug('BACNetDeviceControllerDevice - subscribeToProperty: '
-            + "Device properties were received");
-        this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
-            + ("BACnet Device details: " + JSON.stringify(this.state)));
+            this.propsReceived = true;
+            this.logger.logDebug('BACNetDeviceControllerDevice - subscribeToProperty: '
+                + "Device properties were received");
+            this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
+                + ("BACnet Device details: " + JSON.stringify(this.state)));
+            
+            this.operationalState = {
+                status: Enums.OperationalStatus.Ok,
+                message: "BACnet device has successfully initialized"
+            };
+            this.publishOperationalStateChange();
     }).bind(this), 
     (function (error) {
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
             + ("Device properties were not received " + error));
+            this.operationalState = {
+                status: Enums.OperationalStatus.Error,
+                message: "Device properties were not received"
+            };
+            this.publishOperationalStateChange();
     }).bind(this));
 };
 
