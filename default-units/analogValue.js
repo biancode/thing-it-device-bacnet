@@ -349,9 +349,9 @@ AnalogValue.prototype.createPluginComponents = function () {
     /* Create Status Checks Timer*/
     var interval = _.isNil(this.config.statusChecksInterval) ?
         undefined : this.config.statusChecksInterval * 1000;
-    var statusTimerConfig = _.assign({}, StatusTimerConfig, {
+    var statusTimerConfig = _.merge({}, StatusTimerConfig, {
         interval: interval
-    })
+    });
     this.statusChecksTimer = new Entities.StatusTimer(statusTimerConfig);
 };
 
