@@ -285,6 +285,9 @@ AnalogValue.prototype.initDevice = function (deviceId) {
     + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
+    // Creates the 'presentValue|statusFlags' property subscription
+    this.sendSubscribeCOV(this.objectId);
+
     // Init status checks timer if polling time is provided
     if (this.statusChecksTimer.config.interval !== 0) {
         this.statusChecksTimer.start(function(interval) {
@@ -366,8 +369,6 @@ AnalogValue.prototype.initProperties = function () {
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.description);
     // Gets the 'units' property
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.units);
-    // Gets the 'presentValue|statusFlags' property
-    this.sendSubscribeCOV(this.objectId);
 };
 
 /**
