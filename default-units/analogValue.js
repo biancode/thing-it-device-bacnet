@@ -546,7 +546,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
         });
     this.subManager.subscribe = ovDescription;
     // Gets the 'units' property
-    this.subManager.subscribe = readPropertyFlow
+    var ovUnits = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.units)))
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
@@ -557,8 +557,9 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Unit retrieved: " + _this.state.unit));
             _this.publishStateChange();
         });
+    this.subManager.subscribe = ovUnits;
     // Gets the 'presentValue' property
-    var ovUnits = readPropertyFlow
+    this.subManager.subscribe = readPropertyFlow
         .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
@@ -568,7 +569,6 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Present Value retrieved: " + _this.state.presentValue));
             _this.publishStateChange();
         });
-    this.subManager.subscribe = ovUnits;
     // 'Min' and 'max' present value properties are optional and may be missing
     this.subManager.subscribe = Rx.combineLatest( ovObjectName, ovDescription, ovUnits)
         .pipe(RxOp.first())
