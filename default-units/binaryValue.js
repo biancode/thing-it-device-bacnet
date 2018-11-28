@@ -449,7 +449,7 @@ BinaryValue.prototype.subscribeToCOV = function () {
             _this.publishStateChange();
         }, function (error) {
             _this.logger.logDebug("BinaryValueActorDevice - subscribeToCOV: "
-                + ("Analog Value COV notification was not received " + error));
+                + ("BinaryValue COV notification was not received " + error));
             _this.publishStateChange();
         });
 }
