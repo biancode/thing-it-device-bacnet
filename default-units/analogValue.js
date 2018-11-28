@@ -252,8 +252,11 @@ AnalogValue.prototype.stop = function () {
 
     this.subManager.destroy();
     this.subManager = null;
-    this.statusChecksTimer.cancel();
-    this.statusChecksTimer = null;
+
+    if (this.statusChecksTimer) {
+        this.statusChecksTimer.cancel();
+        this.statusChecksTimer = null;
+    }
 };
 
 AnalogValue.prototype.initDevice = function (deviceId) {
