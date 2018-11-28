@@ -210,7 +210,7 @@ var BACnet = require("tid-bacnet-logic");
 var Logger = require("../lib/utils").Logger;
 var Enums = require("../lib/enums");
 var Entities = require("../lib/entities");
-var StatusTimerConfig = require("../lib/configs/status-timer.config")
+var StatusTimerConfig = require("../lib/configs/status-timer.config");
 
 /**
  *
@@ -289,6 +289,7 @@ AnalogValue.prototype.initDevice = function (deviceId) {
     this.createPluginComponents();
 
     // Creates the 'presentValue|statusFlags' property subscription
+    this.subscribeToCOV()
     this.sendSubscribeCOV(this.objectId);
 
     // Init status checks timer if polling time is provided
@@ -465,11 +466,11 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
 };
 
 /**
- * Creates 'subscribtion' to the BACnet object properties.
+ * Creates 'subscribtion' to the BACnet COV notifications.
  *
  * @return {void}
  */
-AnalogValue.prototype.subscribeToProperty = function () {
+AnalogValue.prototype.subscribeToCOV = function () {
     var _this = this;
     // Handle 'Present Value' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
@@ -499,6 +500,15 @@ AnalogValue.prototype.subscribeToProperty = function () {
                 + ("Analog Value COV notification was not received " + error));
             _this.publishStateChange();
         });
+}
+
+/**
+ * Creates 'subscribtion' to the BACnet object properties.
+ *
+ * @return {void}
+ */
+AnalogValue.prototype.subscribeToProperty = function () {
+    var _this = this;
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)));
@@ -587,7 +597,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
                 + ("Actor details: " + JSON.stringify(_this.state)));
             _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
-        })
+        });
 };
 
 /**
