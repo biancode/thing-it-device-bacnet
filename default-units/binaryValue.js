@@ -506,10 +506,10 @@ BinaryValue.prototype.subscribeToProperty = function () {
             _this.propsReceived = true;
             _this.operationalState = {
                 status: Enums.OperationalStatus.Ok,
-                message: 'Major properties successfully initialized'
+                message: 'Actor\'s properties successfully initialized'
             };
             _this.logger.logDebug("BinaryValueActorDevice - subscribeToProperty: "
-                + "main properties were received");
+                + "actor's properties were received");
             _this.logger.logDebug("BinaryValueActorDevice - subscribeToProperty: "
                 + ("Actor details: " + JSON.stringify(_this.state)));
             _this.logger.logDebug("BinaryValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));

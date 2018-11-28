@@ -481,7 +481,7 @@ BinaryInput.prototype.subscribeToProperty = function () {
                 message: 'Actor\'s properties successfully initialized'
             };
             _this.logger.logDebug("BinaryInputActorDevice - subscribeToProperty: "
-                + "main properties were received");
+                + "actor's properties were received");
             _this.logger.logDebug("BinaryInputActorDevice - subscribeToProperty: "
                 + ("Actor details: " + JSON.stringify(_this.state)));
             _this.logger.logDebug("BinaryInputActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
