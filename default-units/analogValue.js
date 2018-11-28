@@ -182,6 +182,13 @@ module.exports = {
                     id: 'integer',
                 },
                 defaultValue: 60,
+            }, {
+                label: 'Subscribe To COV Notifications',
+                id: 'subscribeToCOV',
+                type: {
+                    id: 'boolean',
+                },
+                defaultValue: false,
             }
         ]
     },
@@ -288,9 +295,11 @@ AnalogValue.prototype.initDevice = function (deviceId) {
     + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Creates the 'presentValue|statusFlags' property subscription
-    this.subscribeToCOV()
-    this.sendSubscribeCOV(this.objectId);
+    // Creates the 'presentValue|statusFlags' property subscription if it is enabled
+    if (this.config.subscribeToCOV) {
+        this.subscribeToCOV()
+        this.sendSubscribeCOV(this.objectId);
+    }
 
     // Init status checks timer if polling time is provided
     if (this.statusChecksTimer.config.interval !== 0) {
@@ -382,6 +391,10 @@ AnalogValue.prototype.initProperties = function () {
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.description);
     // Gets the 'units' property
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.units);
+    // Gets 'presentValue' property if COV subscriptions are disabled
+    if (!this.config.subscribeToCOV) {
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.presentValue);
+    }
 };
 
 /**
@@ -579,8 +592,9 @@ AnalogValue.prototype.subscribeToProperty = function () {
             _this.publishStateChange();
         });
     // Gets the 'presentValue' property
-    this.subManager.subscribe = readPropertyFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
+    var ovPresentValue = readPropertyFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)));
+    this.subManager.subscribe = ovPresentValue
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
                 .getPropertyValue(resp.layer);
@@ -589,9 +603,18 @@ AnalogValue.prototype.subscribeToProperty = function () {
             + ("Object Present Value retrieved: " + _this.state.presentValue));
             _this.publishStateChange();
         });
+    var ovPropsReceived;
     // 'Min' and 'max' present value properties are optional and may be missing
-    this.subManager.subscribe = Rx.combineLatest( ovObjectName, ovDescription, ovUnits)
-        .pipe(RxOp.first())
+    if (!this.config.subscribeToCOV) {
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovUnits, ovPresentValue)
+        .pipe(RxOp.first());
+    } else {
+        // If COV subscriptions are presented, we don't need to wait for 'presentValue' - it will be received by COV anyway
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovUnits)
+        .pipe(RxOp.first());
+    }
+    
+    this.subManager.subscribe = ovPropsReceived
         .subscribe(function() {
             _this.propsReceived = true;
             _this.operationalState = {
