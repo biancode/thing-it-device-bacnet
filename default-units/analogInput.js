@@ -449,9 +449,9 @@ AnalogInput.prototype.subscribeToCOV = function () {
                 message: "Received COV Notification"
             };
             _this.handleStausFlags(bacnetProperties.statusFlags);
-            _this.logger.logDebug("AnalogInputActorDevice - subscribeToProperty: "
+            _this.logger.logDebug("AnalogInputActorDevice - subscribeToCOV: "
                 + ("presentValue " + JSON.stringify(_this.state.presentValue)));
-            _this.logger.logDebug("AnalogInputActorDevice - subscribeToProperty: "
+            _this.logger.logDebug("AnalogInputActorDevice - subscribeToCOV: "
                 + ("State " + JSON.stringify(_this.state)));
             if (_this.statusChecksTimer.started) {
                 _this.statusChecksTimer.reportSuccessfulCheck();
@@ -461,7 +461,7 @@ AnalogInput.prototype.subscribeToCOV = function () {
             _this.publishOperationalStateChange();
             _this.publishStateChange();
         }, function (error) {
-            _this.logger.logDebug("AnalogInputActorDevice - subscribeToProperty: "
+            _this.logger.logDebug("AnalogInputActorDevice - subscribeToCOV: "
                 + ("AnalogInput COV notification was not received " + error));
             _this.publishStateChange();
         });
