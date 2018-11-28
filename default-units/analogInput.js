@@ -268,6 +268,7 @@ AnalogInput.prototype.initDevice = function (deviceId) {
             message: "Waiting for Status Flags..."
         };
         this.logger.logDebug("AnalogInputActorDevice - operationalState: " + JSON.stringify(this.operationalState));
+        this.publishOperationalStateChange();
     }
 
     this.state.initialized = true;

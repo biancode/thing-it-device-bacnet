@@ -225,6 +225,7 @@ BinaryInput.prototype.initDevice = function (deviceId) {
             message: "Waiting for Status Flags..."
         };
         this.logger.logDebug("BinaryInputActorDevice - operationalState: " + JSON.stringify(this.operationalState));
+        this.publishOperationalStateChange();
     }
 
     this.state.initialized = true;
