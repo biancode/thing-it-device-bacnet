@@ -226,6 +226,12 @@ BinaryInput.prototype.initDevice = function (deviceId) {
         };
         this.logger.logDebug("BinaryInputActorDevice - operationalState: " + JSON.stringify(this.operationalState));
         this.publishOperationalStateChange();
+    } else {
+        // Creates 'subscribtion' to the BACnet object properties
+        this.subscribeToProperty();
+
+        // Inits the BACnet object properties
+        this.initProperties();
     }
 
     this.state.initialized = true;
