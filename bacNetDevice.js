@@ -256,9 +256,9 @@ BACNetDevice.prototype.stop = function () {
 BACNetDevice.prototype.initDevice = function () {
     // Init the default state
     this.setState(this.state);
-    if (!_.isObjectLike(this.operationalState)) {
-        this.operationalState = {};
-    }
+
+    this.operationalState = {};
+    
 
     this.state.initialized = false;
     this.propsReceived = false;
@@ -312,7 +312,7 @@ BACNetDevice.prototype.initDevice = function () {
             // If not, do it explicitly
             _this.logger.logDebug('BACNetDeviceControllerDevice: '
             + 'Creates "subscribtion" to the BACnet "whoIs" - "iAm" flow');
-            _this.subscribeToObject(_this.pluginConfig.statusTimer.interval);
+            _this.subscribeToObject(Configs.AppConfig.response.iAm.timeout);
             _this.sendWhoIs();
         }
 
@@ -336,9 +336,11 @@ BACNetDevice.prototype.sendWhoIs = function () {
         this.apiService.unconfirmedReq.whoIsBroadcast({});
     }
 
-    if (!this.operationalState.status) {
-        this.operationalState.status = Enums.OperationalStatus.Pending;
-        this.operationalState.message = "Waiting for WhoIs confirmation...";
+    if (this.operationalState.status === Enums.OperationalStatus.NA) {
+        this.operationalState = {
+            status: Enums.OperationalStatus.Pending,
+            message: "Waiting for WhoIs confirmation..."
+        };
     }
 };
 
@@ -364,9 +366,9 @@ BACNetDevice.prototype.createPluginConfig = function () {
     return this.getDeviceIpAddress()
         .then((function(ipAddress) {
             var port = this.getDevicePort();
-            // Creates the config for the plugin components
             var interval = _.isNil(this.config.statusChecksInterval) ? 
                 undefined : this.config.statusChecksInterval * 1000;
+            // Creates the config for the plugin components            
             return _.merge({}, _.cloneDeep(Configs.AppConfig), {
                 statusTimer: Configs.StatusTimer
             },
@@ -489,13 +491,17 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
             this.apiService = this.serviceManager.createAPIService();
         }
 
-        this.operationalState.status = Enums.OperationalStatus.Ok;
-        this.operationalState.message = "Received iAm heartbeat";
+        this.operationalState = {
+            status: Enums.OperationalStatus.Ok,
+            message: "Received iAm heartbeat"
+        };
         this.statusChecksTimer.reportSuccessfulCheck();
 
         if (!this.propsReceived) {
-            this.operationalState.status = Enums.OperationalStatus.Pending;
-            this.operationalState.message = "Received iAm. Initializing properties...";
+            this.operationalState = {
+                status: Enums.OperationalStatus.Pending,
+                message: "Received iAm. Initializing properties..."
+            };
             // Creates 'subscribtion' to the BACnet device properties
             this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToObject: "
             + "Creates \"subscribtion\" to the BACnet device properties");
@@ -646,15 +652,19 @@ BACNetDevice.prototype.subscribeToProperty = function () {
             this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
                 + ("BACnet Device details: " + JSON.stringify(this.state)));
             
-            this.operationalState.status = Enums.OperationalStatus.Ok;
-            this.operationalState.message = "BACnet device has successfully initialized";
+            this.operationalState = {
+                status: Enums.OperationalStatus.Ok,
+                message: "BACnet device has successfully initialized"
+            };
             this.publishOperationalStateChange();
     }).bind(this), 
     (function (error) {
         this.logger.logDebug("BACNetDeviceControllerDevice - subscribeToProperty: "
             + ("Device properties were not received " + error));
-            this.operationalState.status = Enums.OperationalStatus.Error;
-            this.operationalState.message = "Device properties were not received";
+            this.operationalState = {
+                status: Enums.OperationalStatus.Error,
+                message: "Device properties were not received"
+            };
             this.publishOperationalStateChange();
     }).bind(this));
 };
