@@ -238,6 +238,8 @@ BinaryValue.prototype.initDevice = function (deviceId) {
     + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
+    // Creates 'subscribtion' to the BACnet object properties
+    this.subscribeToProperty();
     // Creates the 'presentValue|statusFlags' property subscription
     this.subscribeToCOV()
     this.sendSubscribeCOV(this.objectId);
@@ -256,9 +258,6 @@ BinaryValue.prototype.initDevice = function (deviceId) {
         this.logger.logDebug("BinaryValueActorDevice - operationalState: " + JSON.stringify(this.operationalState));
         this.publishOperationalStateChange();
     } else {
-        // Creates 'subscribtion' to the BACnet object properties
-        this.subscribeToProperty();
-
         // Inits the BACnet object properties
         this.initProperties();
     }

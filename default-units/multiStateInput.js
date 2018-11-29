@@ -227,6 +227,9 @@ MultiStateInput.prototype.initDevice = function (deviceId) {
     + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
+    // Creates 'subscribtion' to the BACnet object properties
+    this.subscribeToProperty();
+
     // For this actor, we need to receive 'stateText' array, and only then subscribe to notifications
 
     // Init status checks timer if polling time is provided
@@ -243,9 +246,6 @@ MultiStateInput.prototype.initDevice = function (deviceId) {
         this.logger.logDebug("MultiStateInputActorDevice - operationalState: " + JSON.stringify(this.operationalState));
         this.publishOperationalStateChange();
     } else {
-        // Creates 'subscribtion' to the BACnet object properties
-        this.subscribeToProperty();
-
         // Inits the BACnet object properties
         this.initProperties();
     }
