@@ -402,7 +402,7 @@ BinaryInput.prototype.subscribeToCOV = function () {
         .subscribe(function (resp) {
             var bacnetProperties = _this
                 .getCOVNotificationValues(resp);
-            _this.state.presentValue = bacnetProperties.presentValue.value;
+            _this.state.presentValue = bacnetProperties.presentValue.value === 1;
             _this.operationalState = {
                 status: Enums.OperationalStatus.Ok,
                 message: "Received COV Notification"
