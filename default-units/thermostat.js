@@ -108,7 +108,14 @@ module.exports = {
                     id: 'string',
                 },
                 defaultValue: '',
-            },
+            }, {
+                label: 'Status Checks Interval',
+                id: 'statusChecksInterval',
+                type: {
+                    id: 'integer',
+                },
+                defaultValue: 60,
+            }
         ]
     },
     create: function () {
@@ -123,6 +130,7 @@ module.exports = {
 var _ = require("lodash");
 var Bluebird = require("bluebird");
 Bluebird.prototype.fail = Bluebird.prototype.catch;
+var Rx = require("rxjs");
 var RxOp = require("rxjs/operators");
 var store = require("../lib/redux").store;
 /* Plugin devices */
@@ -132,6 +140,8 @@ var Helpers = require("../lib/helpers");
 var BACnet = require("tid-bacnet-logic");
 var Logger = require("../lib/utils").Logger;
 var Enums = require("../lib/enums");
+var Entities = require("../lib/entities");
+var StatusTimerConfig = require("../lib/configs/status-timer.config");
 
 /**
  *
@@ -176,12 +186,20 @@ Thermostat.prototype.stop = function () {
     }).bind(this));
 
     this.subManager.destroy();
-    this.subManager = null;    
+    this.subManager = null;
+    if (this.statusChecksTimer) {
+        this.statusChecksTimer.cancel();
+        this.statusChecksTimer = null;
+    }
 };
 
 Thermostat.prototype.initDevice = function (deviceId) {
     // Init the default state
     this.setState(this.state);
+
+    this.operationalState = {};
+
+    this.propsReceived = false;
 
     this.state.initialized = false;
 
@@ -206,9 +224,35 @@ Thermostat.prototype.initDevice = function (deviceId) {
 
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
+    // Subscribes to COV Notifications messages flows for 'setpoint', 'temperature' and 'mode'
+    this.subscribeToCOV()
+    // Creates the 'presentValue|statusFlags' property subscription for 'setpoint'
+    this.sendSubscribeCOV(this.setpointFeedbackObjectId);
 
-    // Inits the BACnet object properties
-    this.initProperties();
+    // Creates the 'presentValue|statusFlags' property subscription for 'temperature'
+    this.sendSubscribeCOV(this.temperatureObjectId);
+    // For 'mode', we need to receive mode actor's 'stateText' array, and only then subscribe to 'mode' notifications
+
+    // Init status checks timer if polling time is provided
+    if (this.statusChecksTimer.config.interval !== 0) {
+        this.statusChecksTimer.start(function(interval) {
+            this.subscribeToStatusCheck(interval);
+            this.logger.logDebug("ThermostatActorDevice - statusCheck: sending request" );
+            this.sendReadProperty(this.setpointFeedbackObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.setpointModificationObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.temperatureObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.modeObjectId, BACnet.Enums.PropertyId.statusFlags);
+        }.bind(this));
+        this.operationalState = {
+            status: Enums.OperationalStatus.Pending,
+            message: "Waiting for Status Flags..."
+        };
+        this.logger.logDebug("ThermostatActorDevice - operationalState: " + JSON.stringify(this.operationalState));
+        this.publishOperationalStateChange();
+    } else {
+        // Inits the BACnet object properties
+        this.initProperties();
+    }
 
     this.state.initialized = true;
     this.publishStateChange();
@@ -268,6 +312,13 @@ Thermostat.prototype.createPluginComponents = function () {
     this.serviceManager = store.getState([ 'bacnet', this.deviceId, 'serviceManager' ]);
     // Creates instance of the API Service
     this.apiService = this.serviceManager.createAPIService(this.logger);
+    /* Create Status Checks Timer*/
+    var interval = _.isNil(this.config.statusChecksInterval) ?
+        undefined : this.config.statusChecksInterval * 1000;
+    var statusTimerConfig = _.merge({}, StatusTimerConfig, {
+        interval: interval
+    });
+    this.statusChecksTimer = new Entities.StatusTimer(statusTimerConfig);
 };
 
 /**
@@ -277,21 +328,153 @@ Thermostat.prototype.createPluginComponents = function () {
  */
 Thermostat.prototype.initProperties = function () {
 
-   // Gets the 'presentValue|statusFlags' property for 'setpoint'
-   this.sendSubscribeCOV(this.setpointFeedbackObjectId);
-
-   // Gets the 'presentValue|statusFlags' property for 'temperature'
-   this.sendSubscribeCOV(this.temperatureObjectId);
-
    this.sendReadProperty(this.modeObjectId, BACnet.Enums.PropertyId.stateText);
 };
 
 /**
- * Creates 'subscribtion' to the BACnet object properties.
+ * Maps status flags to operational state if they are presented.
+ * @param {BACnet.Types.StatusFlags} statusFlags - parsed 'statusFlags' property of the actor
  *
  * @return {void}
  */
-Thermostat.prototype.subscribeToProperty = function () {
+Thermostat.prototype.handleStausFlags = function (statusFlags, object) {
+    var message = _.isArray(this.operationalState.message) ?
+        _.concat(this.operationalState.message, (object + ": status check successful")) 
+        : [object + ": status check successful"];
+    if (statusFlags.value.inAlarm) {
+        this.logger.logError("ThermostatActorDevice - " + object + " - statusCheck: Alarm detected!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Alarm detected")) 
+            : [object + ": Alarm detected"];
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    if (statusFlags.value.outOfService) {
+        this.logger.logError("ThermostatActorDevice - " + object + " - statusCheck: Physical device is out of service!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Out of service"))
+            : [object + ": Out of service"];          
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    if (statusFlags.value.fault) {
+        this.logger.logError("ThermostatActorDevice - " + object + " - statusCheck: Fault detected!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Fault detected"))
+            : [object + ": Fault detected"]; 
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    this.operationalState.message = message;
+};
+
+/**
+ * Creates 'subscribtion' to the BACnet object status flags.
+ * @param {number} interval - the lifetime of the 'subscription'
+ *
+ * @return {void}
+ */
+Thermostat.prototype.subscribeToStatusCheck = function (interval) {
+    var _this = this;
+    var statusFlagsFlow = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+            RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+            RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.statusFlags)));
+    // Handle 'setpointFeedbackObject' status flags
+    var ovSetFeedbackFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.setpointFeedbackObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovSetFeedbackFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'setpointFeedbackObject');
+            _this.logger.logDebug("ThermostatActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'setpointModificationObject' status flags
+    var ovSetModFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.setpointModificationObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovSetModFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'setpointModificationObject');
+            _this.logger.logDebug("ThermostatActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'temperatureObject' status flags
+    var ovTempFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.temperatureObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovTempFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'temperatureObject');
+            _this.logger.logDebug("ThermostatActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'modeObject' status flags
+    var ovModeFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.modeObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovModeFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'modeObject');
+            _this.logger.logDebug("ThermostatActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    this.subManager.subscribe = Rx.combineLatest(ovSetFeedbackFlags, ovSetModFlags, ovTempFlags, ovModeFlags)
+        .pipe(RxOp.timeout(interval))
+        .subscribe(function() {
+            _this.logger.logDebug("ThermostatActorDevice - statusCheck: received status messages from all objects");
+            _this.statusChecksTimer.reportSuccessfulCheck();
+            if (_this.operationalState.status === Enums.OperationalStatus.Error) {
+                _this.operationalState.message = _this.operationalState.message.join(', ')
+            } else {
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Ok,
+                    message: "Status check successful"
+                }
+            }
+            _this.logger.logDebug("ThermostatActorDevice - statusCheck: " +
+                ("State " + JSON.stringify(_this.state)));
+            if (!_this.propsReceived && _this.operationalState.status !== Enums.OperationalStatus.Error) {
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Pending,
+                    message: 'Status check successful. Receiving properties...'
+                };
+
+                // Inits the BACnet object properties
+                _this.initProperties();
+            }
+            _this.logger.logDebug("ThermostatActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+        }, function (error) {
+            _this.logger.logDebug("ThermostatActorDevice - status check failed: " + error);
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Error,
+                message: "Status check failed - device unreachable"
+            };
+            _this.logger.logDebug("ThermostatActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+
+            /*
+            We are setting operational status to 'OK' by default here,
+            cause we can't set it to 'OK' by default at the begining of every object's status flags
+            - 'ERROR' status from the check of other objects may be lost.
+            As it set to 'OK' in case of successful status check of all objects anyway,
+            we just reset it to 'OK' here, after the publishing of 'ERROR' status
+            */
+            _this.operationalState.status = Enums.OperationalStatus.Ok;
+        });
+};
+
+/**
+ * Creates 'subscribtion' to the BACnet COV notifications.
+ *
+ * @return {void}
+ */
+Thermostat.prototype.subscribeToCOV = function () {
     var _this = this;
     // Handle 'Setpoint' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
@@ -300,13 +483,13 @@ Thermostat.prototype.subscribeToProperty = function () {
         var bacnetProperties = _this
             .getCOVNotificationValues(resp);
         _this.state.setpoint = bacnetProperties.presentValue.value;
-        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("Setpoint " + JSON.stringify(_this.state.setpoint)));
-        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("State " + JSON.stringify(_this.state)));
         _this.publishStateChange();
     }, function (error) {
-        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("Setpoint COV notification was not received " + error));
         _this.publishStateChange();
     });
@@ -317,18 +500,18 @@ Thermostat.prototype.subscribeToProperty = function () {
         var bacnetProperties = _this
             .getCOVNotificationValues(resp);
         _this.state.temperature = bacnetProperties.presentValue.value;
-        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("Temperature " + JSON.stringify(_this.state.temperature)));
-        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("State " + JSON.stringify(_this.state)));
         _this.publishStateChange();
     }, function (error) {
-        _this.logger.logDebug("RoomControlActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("Temperature COV notification was not received " + error));
         _this.publishStateChange();
     });
 
-    // Handle COV Notifications Flow. Sets the 'mode', 'heatActive', 'coolActive'
+    // Handle 'Mode 'COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.modeObjectId)))
         .subscribe(function (resp) {
@@ -350,16 +533,26 @@ Thermostat.prototype.subscribeToProperty = function () {
                 _this.state.coolActive = false;
                 break;
         }
-        _this.logger.logDebug("ThermostatActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("Mode " + JSON.stringify(_this.state.mode)));
-        _this.logger.logDebug("ThermostatActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("State " + JSON.stringify(_this.state)));
         _this.publishStateChange();
     }, function (error) {
-        _this.logger.logDebug("ThermostatActorDevice - subscribeToProperty: "
+        _this.logger.logDebug("ThermostatActorDevice - subscribeToCOV: "
             + ("Mode COV notification was not received " + error));
         _this.publishStateChange();
     });
+}
+
+/**
+ * Creates 'subscribtion' to the BACnet object properties.
+ *
+ * @return {void}
+ */
+Thermostat.prototype.subscribeToProperty = function () {
+    var _this = this;
+    
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)));
@@ -377,6 +570,13 @@ Thermostat.prototype.subscribeToProperty = function () {
         _this.publishStateChange();
         // Gets the 'presentValue|statusFlags' property
         _this.sendSubscribeCOV(_this.modeObjectId);
+        _this.propsReceived = true;
+        _this.operationalState = {
+            status: Enums.OperationalStatus.Ok,
+            message: 'Thermostat\'s properties successfully initialized'
+        };
+        _this.logger.logDebug("ThermostatActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        _this.publishOperationalStateChange();
     });
 
     // Gets the 'presentValue' (setpoint) property
