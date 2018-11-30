@@ -292,10 +292,11 @@ Jalousie.prototype.initDevice = function (deviceId) {
         this.statusChecksTimer.start(function(interval) {
             this.subscribeToStatusCheck(interval);
             this.logger.logDebug("JalousieActorDevice - statusCheck: sending request" );
-            this.sendReadProperty(this.setpointFeedbackObjectId, BACnet.Enums.PropertyId.statusFlags);
-            this.sendReadProperty(this.setpointModificationObjectId, BACnet.Enums.PropertyId.statusFlags);
-            this.sendReadProperty(this.temperatureObjectId, BACnet.Enums.PropertyId.statusFlags);
-            this.sendReadProperty(this.modeObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.positionFeedbackObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.positionModificationObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.rotationFeedbackObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.rotationModificationObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.actionObjectId, BACnet.Enums.PropertyId.statusFlags);
         }.bind(this));
         this.operationalState = {
             status: Enums.OperationalStatus.Pending,
@@ -453,7 +454,7 @@ Jalousie.prototype.subscribeToStatusCheck = function (interval) {
             RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.statusFlags)));
     // Handle 'positionFeedbackObject' status flags
     var ovPosFeedbackFlags = statusFlagsFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.setpointFeedbackObjectId)),
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.positionFeedbackObjectId)),
             RxOp.first());
     this.subManager.subscribe = ovPosFeedbackFlags
         .subscribe(function (resp) {
@@ -463,7 +464,7 @@ Jalousie.prototype.subscribeToStatusCheck = function (interval) {
         });
     // Handle 'positionModificationObject' status flags
     var ovPosModFlags = statusFlagsFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.setpointModificationObjectId)),
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.positionModificationObjectId)),
             RxOp.first());
     this.subManager.subscribe = ovPosModFlags
         .subscribe(function (resp) {
@@ -473,7 +474,7 @@ Jalousie.prototype.subscribeToStatusCheck = function (interval) {
         });
     // Handle 'rotationFeedbackObject' status flags
     var ovRotFeedbackFlags = statusFlagsFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.temperatureObjectId)),
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.rotationFeedbackObjectId)),
             RxOp.first());
     this.subManager.subscribe = ovRotFeedbackFlags
         .subscribe(function (resp) {
@@ -483,7 +484,7 @@ Jalousie.prototype.subscribeToStatusCheck = function (interval) {
         });
     // Handle 'rotationModificationObject' status flags
     var ovRotModFlags = statusFlagsFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.modeObjectId)),
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.rotationModificationObjectId)),
             RxOp.first());
     this.subManager.subscribe = ovRotModFlags
         .subscribe(function (resp) {
@@ -493,7 +494,7 @@ Jalousie.prototype.subscribeToStatusCheck = function (interval) {
         });
     // Handle 'actionObject' status flags
     var ovActionFlags = statusFlagsFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.modeObjectId)),
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.actionObjectId)),
             RxOp.first());
     this.subManager.subscribe = ovActionFlags
         .subscribe(function (resp) {
