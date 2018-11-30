@@ -114,6 +114,13 @@ module.exports = {
                     id: "integer"
                 },
                 defaultValue: ""
+            }, {
+                label: 'Status Checks Interval',
+                id: 'statusChecksInterval',
+                type: {
+                    id: 'integer',
+                },
+                defaultValue: 60,
             }
 
         ]
@@ -130,6 +137,7 @@ module.exports = {
 var _ = require("lodash");
 var Bluebird = require("bluebird");
 Bluebird.prototype.fail = Bluebird.prototype.catch;
+var Rx = require("rxjs");
 var RxOp = require("rxjs/operators");
 var store = require("../lib/redux").store;
 /* Plugin devices */
@@ -139,6 +147,8 @@ var Helpers = require("../lib/helpers");
 var BACnet = require("tid-bacnet-logic");
 var Logger = require("../lib/utils").Logger;
 var Enums = require("../lib/enums");
+var Entities = require("../lib/entities");
+var StatusTimerConfig = require("../lib/configs/status-timer.config");
 
 /**
  *
@@ -183,12 +193,20 @@ Light.prototype.stop = function () {
     }).bind(this));
 
     this.subManager.destroy();
-    this.subManager = null;    
+    this.subManager = null;
+    if (this.statusChecksTimer) {
+        this.statusChecksTimer.cancel();
+        this.statusChecksTimer = null;
+    }
 };
 
 Light.prototype.initDevice = function (deviceId) {
     // Init the default state
     this.setState(this.state);
+
+    this.operationalState = {};
+
+    this.propsReceived = false;
 
     this.state.initialized = false;
 
@@ -213,9 +231,31 @@ Light.prototype.initDevice = function (deviceId) {
 
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
+    // Subscribes to COV Notifications messages flows for 'setpoint', 'temperature' and 'mode'
+    this.subscribeToCOV()
+    // Inits COV subscriptions
+    this.initCOVSubscriptions();
 
-    // Inits the BACnet object properties
-    this.initProperties();
+    // Init status checks timer if polling time is provided
+    if (this.statusChecksTimer.config.interval !== 0) {
+        this.statusChecksTimer.start(function(interval) {
+            this.subscribeToStatusCheck(interval);
+            this.logger.logDebug("LightActorDevice - statusCheck: sending request" );
+            this.sendReadProperty(this.levelFeedbackObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.levelModificationObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.lightActiveFeedbackObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.lightActiveModificationObjectId, BACnet.Enums.PropertyId.statusFlags);
+        }.bind(this));
+        this.operationalState = {
+            status: Enums.OperationalStatus.Pending,
+            message: "Waiting for Status Flags..."
+        };
+        this.logger.logDebug("LightActorDevice - operationalState: " + JSON.stringify(this.operationalState));
+        this.publishOperationalStateChange();
+    } else {
+        // Inits the BACnet object properties
+        this.initProperties();
+    }
 
     this.state.initialized = true;
     this.publishStateChange();
@@ -275,6 +315,13 @@ Light.prototype.createPluginComponents = function () {
     this.serviceManager = store.getState([ 'bacnet', this.deviceId, 'serviceManager' ]);
     // Creates instance of the API Service
     this.apiService = this.serviceManager.createAPIService(this.logger);
+    /* Create Status Checks Timer*/
+    var interval = _.isNil(this.config.statusChecksInterval) ?
+        undefined : this.config.statusChecksInterval * 1000;
+    var statusTimerConfig = _.merge({}, StatusTimerConfig, {
+        interval: interval
+    });
+    this.statusChecksTimer = new Entities.StatusTimer(statusTimerConfig);
 };
 
 /**
@@ -284,19 +331,167 @@ Light.prototype.createPluginComponents = function () {
  */
 Light.prototype.initProperties = function () {
 
-    // Gets the 'StateText' property for 'light state'
+    // Gets the 'StateText' property for 'lightActiveFeedbackObject'
     this.sendReadProperty(this.lightActiveFeedbackObjectId, BACnet.Enums.PropertyId.stateText);
-
-    // Gets the 'presentValue|statusFlags' property for 'dimmer level'
-    this.sendSubscribeCOV(this.levelFeedbackObjectId);
 };
 
 /**
- * Creates 'subscribtion' to the BACnet object properties.
+ *  Sends 'subscribeCOV' for the BACnet objects.
+ *
+ * @return {Promise<void>}
+ */
+Light.prototype.initCOVSubscriptions = function () {
+
+    // Gets the 'presentValue|statusFlags' property for 'dimmer level'
+    this.sendSubscribeCOV(this.levelFeedbackObjectId);
+
+    // For 'lightActiveFeedbackObject', we need to receive mode actor's 'stateText' array, and only then subscribe to notifications
+ };
+
+/**
+ * Maps status flags to operational state if they are presented.
+ * @param {BACnet.Types.StatusFlags} statusFlags - parsed 'statusFlags' property of the actor
  *
  * @return {void}
  */
-Light.prototype.subscribeToProperty = function () {
+Light.prototype.handleStausFlags = function (statusFlags, object) {
+    var message = _.isArray(this.operationalState.message) ?
+        _.concat(this.operationalState.message, (object + ": status check successful")) 
+        : [object + ": status check successful"];
+    if (statusFlags.value.inAlarm) {
+        this.logger.logError("LightActorDevice - " + object + " - statusCheck: Alarm detected!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Alarm detected")) 
+            : [object + ": Alarm detected"];
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    if (statusFlags.value.outOfService) {
+        this.logger.logError("LightActorDevice - " + object + " - statusCheck: Physical device is out of service!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Out of service"))
+            : [object + ": Out of service"];          
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    if (statusFlags.value.fault) {
+        this.logger.logError("LightActorDevice - " + object + " - statusCheck: Fault detected!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Fault detected"))
+            : [object + ": Fault detected"]; 
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    this.operationalState.message = message;
+};
+
+/**
+ * Creates 'subscribtion' to the BACnet object status flags.
+ * @param {number} interval - the lifetime of the 'subscription'
+ *
+ * @return {void}
+ */
+Light.prototype.subscribeToStatusCheck = function (interval) {
+    var _this = this;
+    var statusFlagsFlow = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+            RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+            RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.statusFlags)));
+    // Handle 'levelFeedbackObject' status flags
+    var ovLvlFeedbackFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.levelFeedbackObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovLvlFeedbackFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'levelFeedbackObject');
+            _this.logger.logDebug("LightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'levelModificationObject' status flags
+    var ovLvlModFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.levelModificationObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovLvlModFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'levelModificationObject');
+            _this.logger.logDebug("LightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'lightActiveFeedbackObject' status flags
+    var ovLAFeedbackFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.lightActiveFeedbackObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovLAFeedbackFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'lightActiveFeedbackObject');
+            _this.logger.logDebug("LightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'lightActiveModificationObject' status flags
+    var ovLAModFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.lightActiveModificationObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovLAModFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'lightActiveModificationObject');
+            _this.logger.logDebug("LightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    this.subManager.subscribe = Rx.combineLatest(ovLvlFeedbackFlags, ovLvlModFlags, ovLAFeedbackFlags, ovLAModFlags)
+        .pipe(RxOp.timeout(interval))
+        .subscribe(function() {
+            _this.logger.logDebug("LightActorDevice - statusCheck: received status messages from all objects");
+            _this.statusChecksTimer.reportSuccessfulCheck();
+            if (_this.operationalState.status === Enums.OperationalStatus.Error) {
+                _this.operationalState.message = _this.operationalState.message.join(', ')
+            } else {
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Ok,
+                    message: "Status check successful"
+                }
+            }
+            _this.logger.logDebug("LightActorDevice - statusCheck: " +
+                ("State " + JSON.stringify(_this.state)));
+            if (!_this.propsReceived && _this.operationalState.status !== Enums.OperationalStatus.Error) {
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Pending,
+                    message: 'Status check successful. Receiving properties...'
+                };
+
+                // Inits the BACnet object properties
+                _this.initProperties();
+            }
+            _this.logger.logDebug("LightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+        }, function (error) {
+            _this.logger.logDebug("LightActorDevice - status check failed: " + error);
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Error,
+                message: "Status check failed - device unreachable"
+            };
+            _this.logger.logDebug("LightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+
+            /*
+            We are setting operational status to 'OK' by default here,
+            cause we can't set it to 'OK' by default at the begining of every object's status flags
+            - 'ERROR' status from the check of other objects may be lost.
+            As it set to 'OK' in case of successful status check of all objects anyway,
+            we just reset it to 'OK' here, after the publishing of 'ERROR' status
+            */
+            _this.operationalState.status = Enums.OperationalStatus.Ok;
+        });
+};
+
+/**
+ * Creates 'subscribtion' to the BACnet COV notifications.
+ *
+ * @return {void}
+ */
+Light.prototype.subscribeToCOV = function () {
     var _this = this;
     // Handle 'Dimmer Level' COVNotifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
@@ -332,6 +527,15 @@ Light.prototype.subscribeToProperty = function () {
             + ("Light Active COV notification was not received " + error));
         _this.publishStateChange();
     });
+}
+
+/**
+ * Creates 'subscribtion' to the BACnet object properties.
+ *
+ * @return {void}
+ */
+Light.prototype.subscribeToProperty = function () {
+    var _this = this;
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)));
@@ -348,6 +552,13 @@ Light.prototype.subscribeToProperty = function () {
         _this.logger.logDebug("LightActorDevice - subscribeToProperty: "
             + ("Light States: " + JSON.stringify(_this.stateText)));
         _this.sendSubscribeCOV(_this.lightActiveFeedbackObjectId);
+        _this.propsReceived = true;
+        _this.operationalState = {
+            status: Enums.OperationalStatus.Ok,
+            message: 'Light\'s properties successfully initialized'
+        };
+        _this.logger.logDebug("LightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        _this.publishOperationalStateChange();
     });
     // Gets the 'presentValue' (light mode) property
     this.subManager.subscribe = readPropertyFlow
