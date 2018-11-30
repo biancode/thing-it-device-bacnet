@@ -205,11 +205,13 @@ JalousieSimple.prototype.initDevice = function (deviceId) {
     + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
+    // Subscribes to COV Notifications messages flows for 'motionDirection' and 'stopValue'
+    this.subscribeToCOV();
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
-    // Inits the BACnet object properties
-    this.initProperties();
+    // Inits COV subscriptions
+    this.initCOVSubscriptions();
 
     // Init status checks timer if polling time is provided
     if (this.statusChecksTimer.config.interval !== 0) {
@@ -290,6 +292,14 @@ JalousieSimple.prototype.createPluginComponents = function () {
  * @return {Promise<void>}
  */
 JalousieSimple.prototype.initProperties = function () {
+};
+
+/**
+ * Sends 'subscribeCOV' for the BACnet objects
+ *
+ * @return {Promise<void>}
+ */
+JalousieSimple.prototype.initCOVSubscriptions = function () {
 
     // Gets the 'presentValue|statusFlags' property for 'motionDirection'
     this.sendSubscribeCOV(this.motionDirectionObjectId);
@@ -411,11 +421,11 @@ JalousieSimple.prototype.subscribeToStatusCheck = function (interval) {
 };
 
 /**
- * Creates 'subscribtion' to the BACnet object properties.
+ * Creates 'subscribtion' to the BACnet object COV Notifications.
  *
  * @return {void}
  */
-JalousieSimple.prototype.subscribeToProperty = function () {
+JalousieSimple.prototype.subscribeToCOV = function () {
     var _this = this;
     // Handle 'Motion Direction' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
@@ -451,6 +461,16 @@ JalousieSimple.prototype.subscribeToProperty = function () {
             + ("Stop value COV notification was not received " + error));
         _this.publishStateChange();
     });
+}
+
+/**
+ * Creates 'subscribtion' to the BACnet object properties.
+ *
+ * @return {void}
+ */
+JalousieSimple.prototype.subscribeToProperty = function () {
+    var _this = this;
+    
     // Read Property Flow
     var readPropertyFlow = this.flowManager.getResponseFlow()
         .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)));

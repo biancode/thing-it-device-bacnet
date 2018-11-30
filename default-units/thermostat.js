@@ -226,12 +226,8 @@ Thermostat.prototype.initDevice = function (deviceId) {
     this.subscribeToProperty();
     // Subscribes to COV Notifications messages flows for 'setpoint', 'temperature' and 'mode'
     this.subscribeToCOV()
-    // Creates the 'presentValue|statusFlags' property subscription for 'setpoint'
-    this.sendSubscribeCOV(this.setpointFeedbackObjectId);
-
-    // Creates the 'presentValue|statusFlags' property subscription for 'temperature'
-    this.sendSubscribeCOV(this.temperatureObjectId);
-    // For 'mode', we need to receive mode actor's 'stateText' array, and only then subscribe to 'mode' notifications
+    // Inits COV subscriptions
+    this.initCOVSubscriptions();
 
     // Init status checks timer if polling time is provided
     if (this.statusChecksTimer.config.interval !== 0) {
@@ -330,6 +326,22 @@ Thermostat.prototype.initProperties = function () {
 
    this.sendReadProperty(this.modeObjectId, BACnet.Enums.PropertyId.stateText);
 };
+
+/**
+ *  Sends 'subscribeCOV' for the BACnet objects.
+ *
+ * @return {Promise<void>}
+ */
+Thermostat.prototype.initCOVSubscriptions = function () {
+
+    // Creates the 'presentValue|statusFlags' property subscription for 'setpoint'
+    this.sendSubscribeCOV(this.setpointFeedbackObjectId);
+
+    // Creates the 'presentValue|statusFlags' property subscription for 'temperature'
+    this.sendSubscribeCOV(this.temperatureObjectId);
+
+    // For 'mode', we need to receive mode actor's 'stateText' array, and only then subscribe to 'mode' notifications
+ };
 
 /**
  * Maps status flags to operational state if they are presented.
