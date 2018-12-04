@@ -261,7 +261,7 @@ AnalogInput.prototype.initDevice = function (deviceId) {
 
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
-    // Creates the 'presentValue|statusFlags' property subscription if it is enabled
+    // Creates the 'presentValue|statusFlags' property subscription if COV messaging is enabled
     if (this.config.subscribeToCOV) {
         this.subscribeToCOV()
         this.sendSubscribeCOV(this.objectId);
@@ -415,6 +415,7 @@ AnalogInput.prototype.subscribeToStatusCheck = function (interval) {
         .subscribe(function (resp) {
             _this.logger.logDebug("AnalogInputActorDevice - statusCheck successful");
             _this.statusChecksTimer.reportSuccessfulCheck();
+            // Saving previous operational state for reconnect detection
             var lastOperationalState = _this.operationalState;
             _this.operationalState = {
                 status: Enums.OperationalStatus.Ok,
