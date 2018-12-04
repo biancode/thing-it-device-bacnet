@@ -450,6 +450,7 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
         .subscribe(function (resp) {
             _this.logger.logDebug("AnalogValueActorDevice - statusCheck successful");
             _this.statusChecksTimer.reportSuccessfulCheck();
+            var lastOperationalState = _this.operationalState;
             _this.operationalState = {
                 status: Enums.OperationalStatus.Ok,
                 message: "Status check successful"
@@ -469,6 +470,12 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
                 // Inits the BACnet object properties
                 _this.initProperties();
             }
+
+            if (!_this.config.subscribeToCOV &&
+                lastOperationalState.status === Enums.OperationalStatus.Error
+                && _this.operationalState.status === Enums.OperationalStatus.Ok) {
+                    _this.update();
+                }
             _this.logger.logDebug("AnalogValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
 
