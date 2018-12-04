@@ -471,6 +471,7 @@ AnalogValue.prototype.subscribeToStatusCheck = function (interval) {
                 _this.initProperties();
             }
 
+            // If COV Notefications are disabled, we want to update the 'presentValue' after succesful reconnect
             if (!_this.config.subscribeToCOV &&
                 lastOperationalState.status === Enums.OperationalStatus.Error
                 && _this.operationalState.status === Enums.OperationalStatus.Ok) {
