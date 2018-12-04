@@ -209,6 +209,8 @@ BinaryInput.prototype.initDevice = function (deviceId) {
     + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
+    // Creates 'subscribtion' to the BACnet object properties
+    this.subscribeToProperty();
     // Creates the 'presentValue|statusFlags' property subscription
     this.subscribeToCOV()
     this.sendSubscribeCOV(this.objectId);
@@ -227,9 +229,6 @@ BinaryInput.prototype.initDevice = function (deviceId) {
         this.logger.logDebug("BinaryInputActorDevice - operationalState: " + JSON.stringify(this.operationalState));
         this.publishOperationalStateChange();
     } else {
-        // Creates 'subscribtion' to the BACnet object properties
-        this.subscribeToProperty();
-
         // Inits the BACnet object properties
         this.initProperties();
     }
@@ -402,7 +401,7 @@ BinaryInput.prototype.subscribeToCOV = function () {
         .subscribe(function (resp) {
             var bacnetProperties = _this
                 .getCOVNotificationValues(resp);
-            _this.state.presentValue = bacnetProperties.presentValue.value;
+            _this.state.presentValue = bacnetProperties.presentValue.value === 1;
             _this.operationalState = {
                 status: Enums.OperationalStatus.Ok,
                 message: "Received COV Notification"
@@ -481,7 +480,7 @@ BinaryInput.prototype.subscribeToProperty = function () {
                 message: 'Actor\'s properties successfully initialized'
             };
             _this.logger.logDebug("BinaryInputActorDevice - subscribeToProperty: "
-                + "main properties were received");
+                + "actor's properties were received");
             _this.logger.logDebug("BinaryInputActorDevice - subscribeToProperty: "
                 + ("Actor details: " + JSON.stringify(_this.state)));
             _this.logger.logDebug("BinaryInputActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
