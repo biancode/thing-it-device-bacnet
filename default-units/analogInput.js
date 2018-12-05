@@ -415,8 +415,6 @@ AnalogInput.prototype.subscribeToStatusCheck = function (interval) {
                     status: Enums.OperationalStatus.Pending,
                     message: 'Status check successful. Receiving properties...'
                 };
-                // Creates 'subscribtion' to the BACnet object properties
-                _this.subscribeToProperty();
 
                 // Inits the BACnet object properties
                 _this.initProperties();
