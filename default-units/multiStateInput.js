@@ -498,6 +498,17 @@ MultiStateInput.prototype.subscribeToProperty = function () {
             _this.subscribeToCOV()
             _this.sendSubscribeCOV(_this.objectId);
         });
+    // Gets the 'presentValue' property
+    var ovPresentValue = readPropertyFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)));
+    this.subManager.subscribe = ovPresentValue
+    .subscribe(function (resp) {
+        var bacnetProperty = BACnet.Helpers.Layer
+            .getPropertyValue(resp.layer);
+        _this.state.presentValue = bacnetProperty.value;
+        var stateIndex = bacnetProperty.value - 1;
+        _this.state.presentValueText = _this.state.stateText[stateIndex];
+    });
     // Change the operational state and 'propsReceived' flag if all props are received
     this.subManager.subscribe = Rx.combineLatest( ovObjectName, ovDescription, ovStateText)
         .pipe(RxOp.first())
