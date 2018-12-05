@@ -165,6 +165,13 @@ module.exports = {
                     id: "integer"
                 },
                 defaultValue: ""
+            }, {
+                label: 'Status Checks Interval',
+                id: 'statusChecksInterval',
+                type: {
+                    id: 'integer',
+                },
+                defaultValue: 60,
             }
         ]
     },
@@ -181,6 +188,7 @@ module.exports = {
 var _ = require("lodash");
 var Bluebird = require("bluebird");
 Bluebird.prototype.fail = Bluebird.prototype.catch;
+var Rx = require("rxjs");
 var RxOp = require("rxjs/operators");
 var store = require("../lib/redux").store;
 /* Plugin devices */
@@ -190,6 +198,9 @@ var Helpers = require("../lib/helpers");
 var BACnet = require("tid-bacnet-logic");
 var Logger = require("../lib/utils").Logger;
 var Enums = require("../lib/enums");
+var Entities = require("../lib/entities");
+var StatusTimerConfig = require("../lib/configs/status-timer.config");
+
 
 /**
  *
@@ -234,12 +245,18 @@ Jalousie.prototype.stop = function () {
     }).bind(this));
 
     this.subManager.destroy();
-    this.subManager = null;    
+    this.subManager = null;
+    if (this.statusChecksTimer) {
+        this.statusChecksTimer.cancel();
+        this.statusChecksTimer = null;
+    }
 };
 
 Jalousie.prototype.initDevice = function (deviceId) {
     // Init the default state
     this.setState(this.state);
+
+    this.operationalState = {};
 
     this.state.initialized = false;
 
@@ -265,8 +282,29 @@ Jalousie.prototype.initDevice = function (deviceId) {
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
-    // Inits the BACnet object properties
-    this.initProperties();
+    // Subscribes to COV Notifications messages flows for 'motionDirection' and 'stopValue'
+    this.subscribeToCOV();
+    // Inits COV subscriptions
+    this.initCOVSubscriptions();
+
+    // Init status checks timer if polling time is provided
+    if (this.statusChecksTimer.config.interval !== 0) {
+        this.statusChecksTimer.start(function(interval) {
+            this.subscribeToStatusCheck(interval);
+            this.logger.logDebug("JalousieActorDevice - statusCheck: sending request" );
+            this.sendReadProperty(this.positionFeedbackObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.positionModificationObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.rotationFeedbackObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.rotationModificationObjectId, BACnet.Enums.PropertyId.statusFlags);
+            this.sendReadProperty(this.actionObjectId, BACnet.Enums.PropertyId.statusFlags);
+        }.bind(this));
+        this.operationalState = {
+            status: Enums.OperationalStatus.Pending,
+            message: "Waiting for Status Flags..."
+        };
+        this.logger.logDebug("JalousieActorDevice - operationalState: " + JSON.stringify(this.operationalState));
+        this.publishOperationalStateChange();
+    }
 
     this.state.initialized = true;
     this.publishStateChange();
@@ -331,6 +369,13 @@ Jalousie.prototype.createPluginComponents = function () {
     this.serviceManager = store.getState([ 'bacnet', this.deviceId, 'serviceManager' ]);
     // Creates instance of the API Service
     this.apiService = this.serviceManager.createAPIService(this.logger);
+    /* Create Status Checks Timer*/
+    var interval = _.isNil(this.config.statusChecksInterval) ?
+        undefined : this.config.statusChecksInterval * 1000;
+    var statusTimerConfig = _.merge({}, StatusTimerConfig, {
+        interval: interval
+    });
+    this.statusChecksTimer = new Entities.StatusTimer(statusTimerConfig);
 };
 
 /**
@@ -339,6 +384,14 @@ Jalousie.prototype.createPluginComponents = function () {
  * @return {Promise<void>}
  */
 Jalousie.prototype.initProperties = function () {
+};
+
+/**
+ * Sends 'subscribeCOV' for the BACnet objects
+ *
+ * @return {Promise<void>}
+ */
+Jalousie.prototype.initCOVSubscriptions = function () {
 
     // Gets the 'presentValue|statusFlags' property for 'position'
     this.sendSubscribeCOV(this.positionFeedbackObjectId);
@@ -348,11 +401,153 @@ Jalousie.prototype.initProperties = function () {
 };
 
 /**
- * Creates 'subscribtion' to the BACnet object properties.
+ * Maps status flags to operational state if they are presented.
+ * @param {BACnet.Types.StatusFlags} statusFlags - parsed 'statusFlags' property of the actor
  *
  * @return {void}
  */
-Jalousie.prototype.subscribeToProperty = function () {
+Jalousie.prototype.handleStausFlags = function (statusFlags, object) {
+    var message = _.isArray(this.operationalState.message) ?
+        _.concat(this.operationalState.message, (object + ": status check successful")) 
+        : [object + ": status check successful"];
+    if (statusFlags.value.inAlarm) {
+        this.logger.logError("JalousieActorDevice - " + object + " - statusCheck: Alarm detected!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Alarm detected")) 
+            : [object + ": Alarm detected"];
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    if (statusFlags.value.outOfService) {
+        this.logger.logError("JalousieActorDevice - " + object + " - statusCheck: Physical device is out of service!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Out of service"))
+            : [object + ": Out of service"];          
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    if (statusFlags.value.fault) {
+        this.logger.logError("JalousieActorDevice - " + object + " - statusCheck: Fault detected!");
+        message = _.isArray(this.operationalState.message) ?
+            _.concat(this.operationalState.message, (object + ": Fault detected"))
+            : [object + ": Fault detected"]; 
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error
+        };
+    }
+    this.operationalState.message = message;
+};
+
+/**
+ * Creates 'subscribtion' to the BACnet object status flags.
+ * @param {number} interval - the lifetime of the 'subscription'
+ *
+ * @return {void}
+ */
+Jalousie.prototype.subscribeToStatusCheck = function (interval) {
+    var _this = this;
+    var statusFlagsFlow = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+            RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+            RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.statusFlags)));
+    // Handle 'positionFeedbackObject' status flags
+    var ovPosFeedbackFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.positionFeedbackObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovPosFeedbackFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'positionFeedbackObject');
+            _this.logger.logDebug("JalousieActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'positionModificationObject' status flags
+    var ovPosModFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.positionModificationObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovPosModFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'positionModificationObject');
+            _this.logger.logDebug("JalousieActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'rotationFeedbackObject' status flags
+    var ovRotFeedbackFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.rotationFeedbackObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovRotFeedbackFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'rotationFeedbackObject');
+            _this.logger.logDebug("JalousieActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'rotationModificationObject' status flags
+    var ovRotModFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.rotationModificationObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovRotModFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'rotationModificationObject');
+            _this.logger.logDebug("JalousieActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    // Handle 'actionObject' status flags
+    var ovActionFlags = statusFlagsFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.actionObjectId)),
+            RxOp.first());
+    this.subManager.subscribe = ovActionFlags
+        .subscribe(function (resp) {
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags, 'actionObject');
+            _this.logger.logDebug("JalousieActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        });
+    this.subManager.subscribe = Rx.combineLatest(ovPosFeedbackFlags, ovPosModFlags, ovRotFeedbackFlags, ovRotModFlags, ovActionFlags)
+        .pipe(RxOp.timeout(interval))
+        .subscribe(function() {
+            _this.logger.logDebug("JalousieActorDevice - statusCheck: received status messages from all objects");
+            _this.statusChecksTimer.reportSuccessfulCheck();
+            if (_this.operationalState.status === Enums.OperationalStatus.Error) {
+                _this.operationalState.message = _this.operationalState.message.join(', ')
+            } else {
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Ok,
+                    message: "Status check successful"
+                }
+            }
+            _this.logger.logDebug("JalousieActorDevice - statusCheck: " +
+                ("State " + JSON.stringify(_this.state)));
+
+            // There is no props to receive
+
+            _this.logger.logDebug("JalousieActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+        }, function (error) {
+            _this.logger.logDebug("JalousieActorDevice - status check failed: " + error);
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Error,
+                message: "Status check failed - device unreachable"
+            };
+            _this.logger.logDebug("JalousieActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+
+            /*
+            We are setting operational status to 'OK' by default here,
+            cause we can't set it to 'OK' by default at the begining of every object's status flags
+            - 'ERROR' status from the check of other objects may be lost.
+            As it set to 'OK' in case of successful status check of all objects anyway,
+            we just reset it to 'OK' here, after the publishing of 'ERROR' status
+            */
+            _this.operationalState.status = Enums.OperationalStatus.Ok;
+        });
+};
+
+/**
+ * Creates 'subscribtion' to the BACnet object COV notifications flow.
+ *
+ * @return {void}
+ */
+Jalousie.prototype.subscribeToCOV = function () {
     var _this = this;
     // Handle 'Position' COV Notifications Flow
     this.subManager.subscribe = this.flowManager.getResponseFlow()
@@ -388,6 +583,14 @@ Jalousie.prototype.subscribeToProperty = function () {
             + ("Rotation COV notification was not received " + error));
         _this.publishStateChange();
     });
+}
+
+/**
+ * Creates 'subscribtion' to the BACnet object properties.
+ *
+ * @return {void}
+ */
+Jalousie.prototype.subscribeToProperty = function () {
 };
 
 /**

@@ -48,6 +48,13 @@ module.exports = {
                     id: "string"
                 },
                 defaultValue: ""
+            }, {
+                label: 'Status Checks Interval',
+                id: 'statusChecksInterval',
+                type: {
+                    id: 'integer',
+                },
+                defaultValue: 60,
             }
 
         ]
@@ -61,6 +68,7 @@ module.exports = {
 var _ = require("lodash");
 var Bluebird = require("bluebird");
 Bluebird.prototype.fail = Bluebird.prototype.catch;
+var Rx = require("rxjs");
 var RxOp = require("rxjs/operators");
 var store = require("../lib/redux").store;
 /* Plugin devices */
@@ -70,6 +78,8 @@ var Helpers = require("../lib/helpers");
 var BACnet = require("tid-bacnet-logic");
 var Logger = require("../lib/utils").Logger;
 var Enums = require("../lib/enums");
+var Entities = require("../lib/entities");
+var StatusTimerConfig = require("../lib/configs/status-timer.config");
 
 /**
  *
@@ -114,12 +124,20 @@ BinaryLight.prototype.stop = function () {
     }).bind(this));
 
     this.subManager.destroy();
-    this.subManager = null;    
+    this.subManager = null;
+    if (this.statusChecksTimer) {
+        this.statusChecksTimer.cancel();
+        this.statusChecksTimer = null;
+    }
 };
 
 BinaryLight.prototype.initDevice = function (deviceId) {
     // Init the default state
     this.setState(this.state);
+
+    this.operationalState = {};
+
+    this.propsReceived = false;
 
     this.state.initialized = false;
 
@@ -144,9 +162,27 @@ BinaryLight.prototype.initDevice = function (deviceId) {
 
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
+    // Creates the 'presentValue|statusFlags' property subscription
+    this.subscribeToCOV()
+    this.sendSubscribeCOV(this.objectId);
 
-    // Inits the BACnet object properties
-    this.initProperties();
+    // Init status checks timer if polling time is provided
+    if (this.statusChecksTimer.config.interval !== 0) {
+        this.statusChecksTimer.start(function(interval) {
+            this.subscribeToStatusCheck(interval);
+            this.logger.logDebug("BinaryLightActorDevice - statusCheck: sending request" );
+            this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.statusFlags);
+        }.bind(this));
+        this.operationalState = {
+            status: Enums.OperationalStatus.Pending,
+            message: "Waiting for Status Flags..."
+        };
+        this.logger.logDebug("BinaryLightActorDevice - operationalState: " + JSON.stringify(this.operationalState));
+        this.publishOperationalStateChange();
+    } else {
+        // Inits the BACnet object properties
+        this.initProperties();
+    }
 
     this.state.initialized = true;
     this.publishStateChange();
@@ -191,6 +227,13 @@ BinaryLight.prototype.createPluginComponents = function () {
     this.serviceManager = store.getState([ 'bacnet', this.deviceId, 'serviceManager' ]);
     // Creates instance of the API Service
     this.apiService = this.serviceManager.createAPIService(this.logger);
+    /* Create Status Checks Timer*/
+    var interval = _.isNil(this.config.statusChecksInterval) ?
+        undefined : this.config.statusChecksInterval * 1000;
+    var statusTimerConfig = _.merge({}, StatusTimerConfig, {
+        interval: interval
+    });
+    this.statusChecksTimer = new Entities.StatusTimer(statusTimerConfig);
 };
 
 /**
@@ -201,8 +244,131 @@ BinaryLight.prototype.createPluginComponents = function () {
 BinaryLight.prototype.initProperties = function () {
 
     // Gets the 'presentValue|statusFlags' property
-    this.sendSubscribeCOV(this.objectId);
+    this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.presentValue);
 };
+
+
+/**
+ * Maps status flags to operational state if they are presented.
+ * @param {BACnet.Types.StatusFlags} statusFlags - parsed 'statusFlags' property of the actor
+ *
+ * @return {void}
+ */
+BinaryLight.prototype.handleStausFlags = function (statusFlags) {
+    this.state.outOfService = statusFlags.value.outOfService;
+    this.state.alarmValue = statusFlags.value.inAlarm;
+    if (statusFlags.value.inAlarm) {
+        this.logger.logError("BinaryLightActorDevice - statusCheck: " +
+            "Actor alarm detected!");
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error,
+            message: "Alarm detected"
+        };
+    }
+    if (statusFlags.value.outOfService) {
+        this.logger.logError("BinaryLightActorDevice - statusCheck: " +
+            "Physical device is out of service!");
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error,
+            message: "Out of service"
+        };
+    }
+    if (statusFlags.value.fault) {
+        this.logger.logError("BinaryLightActorDevice - statusCheck: " +
+            "Fault detected!");
+        this.operationalState = {
+            status: Enums.OperationalStatus.Error,
+            message: "Fault detected"
+        };
+    }
+
+}
+
+/**
+ * Creates 'subscribtion' to the BACnet object status flags.
+ * @param {number} interval - the lifetime of the 'subscription'
+ *
+ * @return {void}
+ */
+BinaryLight.prototype.subscribeToStatusCheck = function (interval) {
+    var _this = this;
+    this.subManager.subscribe = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)),
+            RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)),
+            RxOp.filter(Helpers.FlowFilter.isBACnetObject(_this.objectId)),
+            RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.statusFlags)),
+            RxOp.timeout(interval),
+            RxOp.first())
+        .subscribe(function (resp) {
+            _this.logger.logDebug("BinaryLightActorDevice - statusCheck successful");
+            _this.statusChecksTimer.reportSuccessfulCheck();
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Ok,
+                message: "Status check successful"
+            };
+            var statusFlags = BACnet.Helpers.Layer.getPropertyValue(resp.layer);
+            _this.handleStausFlags(statusFlags);
+            _this.logger.logDebug("BinaryLightActorDevice - statusCheck: " +
+                ("State " + JSON.stringify(_this.state)));           
+            if (!_this.propsReceived && _this.operationalState.status !== Enums.OperationalStatus.Error) {
+                _this.operationalState = {
+                    status: Enums.OperationalStatus.Pending,
+                    message: 'Status check successful. Receiving properties...'
+                };
+                // Inits the BACnet object properties
+                _this.initProperties();
+            }
+            _this.logger.logDebug("BinaryLightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+
+        }, function (error) {
+            _this.logger.logDebug("BinaryLightActorDevice - status check failed: " + error);
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Error,
+                message: "Status check failed - device unreachable"
+            };
+            _this.logger.logDebug("BinaryLightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+        });
+
+};
+
+/**
+ * Creates 'subscribtion' to the BACnet COV notifications.
+ *
+ * @return {void}
+ */
+BinaryLight.prototype.subscribeToCOV = function () {
+    var _this = this;
+    // Handle 'Present Value' COV Notifications Flow
+    this.subManager.subscribe = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)))
+        .subscribe(function (resp) {
+            var bacnetProperties = _this
+                .getCOVNotificationValues(resp);
+            _this.state.lightActive = bacnetProperties.presentValue.value === 1;
+            _this.operationalState = {
+                status: Enums.OperationalStatus.Ok,
+                message: "Received COV Notification"
+            };
+            _this.handleStausFlags(bacnetProperties.statusFlags);
+            _this.logger.logDebug("BinaryLightActorDevice - subscribeToCOV: "
+                + ("presentValue " + JSON.stringify(_this.state.lightActive)));
+            _this.logger.logDebug("BinaryLightActorDevice - subscribeToCOV: "
+                + ("State " + JSON.stringify(_this.state)));
+            if (_this.statusChecksTimer.started) {
+                _this.statusChecksTimer.reportSuccessfulCheck();
+                _this.statusChecksTimer.reset();
+            }
+            _this.logger.logDebug("BinaryLightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+            _this.publishOperationalStateChange();
+            _this.publishStateChange();
+        }, function (error) {
+            _this.logger.logDebug("BinaryLightActorDevice - subscribeToCOV: "
+                + ("BinaryLight COV notification was not received " + error));
+            _this.publishStateChange();
+        });
+}
 
 /**
  * Creates 'subscribtion' to the BACnet object properties.
@@ -211,37 +377,29 @@ BinaryLight.prototype.initProperties = function () {
  */
 BinaryLight.prototype.subscribeToProperty = function () {
     var _this = this;
-    // Handle 'Present Value' COV Notifications Flow
-    this.subManager.subscribe = this.flowManager.getResponseFlow()
-            .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.UnconfirmedReqPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.UnconfirmedServiceChoice.covNotification)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)))
-            .subscribe(function (resp) {
-            var bacnetProperties = _this
-                .getCOVNotificationValues(resp);
-            _this.state.lightActive = bacnetProperties.presentValue.value === 1;
-            _this.logger.logDebug("BinaryLightActorDevice - subscribeToProperty: "
-                + ("presentValue " + JSON.stringify(_this.state.lightActive)));
-            _this.logger.logDebug("BinaryLightActorDevice - subscribeToProperty: "
-                + ("State " + JSON.stringify(_this.state)));
-            _this.publishStateChange();
-        }, function (error) {
-            _this.logger.logDebug("BinaryLightActorDevice - subscribeToProperty: "
-                + ("Binary Light Actor COV notification was not received " + error));
-            _this.publishStateChange();
-        });
-        // Read Property Flow
-        var readPropertyFlow = this.flowManager.getResponseFlow()
-            .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)));
-        // Gets the 'presentValue' property
-        this.subManager.subscribe = readPropertyFlow
-            .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
-            .subscribe(function (resp) {
-            var bacnetProperty = BACnet.Helpers.Layer
-                .getPropertyValue(resp.layer);
-            _this.state.lightActive = bacnetProperty.value === 1;
-            _this.logger.logDebug("BinaryLightActorDevice - subscribeToProperty: "
-                + ("Object Present Value retrieved: " + _this.state.lightActive));
-            _this.publishStateChange();
-        });
+    // Read Property Flow
+    var readPropertyFlow = this.flowManager.getResponseFlow()
+        .pipe(RxOp.filter(Helpers.FlowFilter.isServiceType(BACnet.Enums.ServiceType.ComplexACKPDU)), RxOp.filter(Helpers.FlowFilter.isServiceChoice(BACnet.Enums.ConfirmedServiceChoice.ReadProperty)), RxOp.filter(Helpers.FlowFilter.isBACnetObject(this.objectId)));
+    // Gets the 'presentValue' property
+    this.subManager.subscribe = readPropertyFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
+        .subscribe(function (resp) {
+        var bacnetProperty = BACnet.Helpers.Layer
+            .getPropertyValue(resp.layer);
+        _this.state.lightActive = bacnetProperty.value === 1;
+        _this.logger.logDebug("BinaryLightActorDevice - subscribeToProperty: "
+            + ("Object Present Value retrieved: " + _this.state.lightActive));
+        _this.propsReceived = true;
+        _this.operationalState = {
+            status: Enums.OperationalStatus.Ok,
+            message: 'Actor\'s properties successfully initialized'
+        };
+        _this.logger.logDebug("BinaryLightActorDevice - subscribeToProperty: "
+            + "actor's properties were received");
+        _this.logger.logDebug("BinaryLightActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
+        _this.publishOperationalStateChange();
+        _this.publishStateChange();
+    });
 };
 
 /**
