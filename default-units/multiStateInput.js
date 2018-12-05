@@ -516,9 +516,9 @@ MultiStateInput.prototype.subscribeToProperty = function () {
             _this.logger.logDebug("MultiStateInputActorDevice - subscribeToProperty: "
                 + ("States: " + JSON.stringify(_this.state.stateText)));
             _this.publishStateChange();
-            if (!this.config.subscribeToCOV) {
+            if (!_this.config.subscribeToCOV) {
                 // Gets 'presentValue' property if COV subscriptions are disabled
-                this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.presentValue);
+                _this.sendReadProperty(_this.objectId, BACnet.Enums.PropertyId.presentValue);
             } else {
                 // Creates the 'presentValue|statusFlags' property subscription if COV notifications are enabled
                 _this.sendSubscribeCOV(_this.objectId);
@@ -543,7 +543,6 @@ MultiStateInput.prototype.subscribeToProperty = function () {
         // If COV subscriptions are presented, we don't need to wait for 'presentValue' - it will be received by COV anyway
         ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovStateText);
     }
-    // Change the operational state and 'propsReceived' flag if all props are received
     this.subManager.subscribe = ovPropsReceived
         .pipe(RxOp.first())
         .subscribe(function() {
