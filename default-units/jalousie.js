@@ -279,11 +279,11 @@ Jalousie.prototype.initDevice = function (deviceId) {
     + 'Creates instances of the plugin componets');
     this.createPluginComponents();
 
-    // Subscribes to COV Notifications messages flows for 'motionDirection' and 'stopValue'
-    this.subscribeToCOV();
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
+    // Subscribes to COV Notifications messages flows for 'motionDirection' and 'stopValue'
+    this.subscribeToCOV();
     // Inits COV subscriptions
     this.initCOVSubscriptions();
 
