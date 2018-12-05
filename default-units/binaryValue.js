@@ -129,6 +129,13 @@ module.exports = {
                     id: 'integer',
                 },
                 defaultValue: 60,
+            }, {
+                label: 'Subscribe To COV Notifications',
+                id: 'subscribeToCOV',
+                type: {
+                    id: 'boolean',
+                },
+                defaultValue: false,
             }
         ]
     },
@@ -240,9 +247,11 @@ BinaryValue.prototype.initDevice = function (deviceId) {
 
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
-    // Creates the 'presentValue|statusFlags' property subscription
-    this.subscribeToCOV()
-    this.sendSubscribeCOV(this.objectId);
+    // Creates the 'presentValue|statusFlags' property subscription if if COV messaging is enabled
+    if (this.config.subscribeToCOV) {
+        this.subscribeToCOV()
+        this.sendSubscribeCOV(this.objectId);
+    }
 
     // Init status checks timer if polling time is provided
     if (this.statusChecksTimer.config.interval !== 0) {
@@ -326,6 +335,10 @@ BinaryValue.prototype.initProperties = function () {
 
     // Gets the 'description' property
     this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.description);
+    // Gets 'presentValue' property if COV subscriptions are disabled
+    if (!this.config.subscribeToCOV) {
+        this.sendReadProperty(this.objectId, BACnet.Enums.PropertyId.presentValue);
+    }
 };
 
 /**
@@ -382,6 +395,8 @@ BinaryValue.prototype.subscribeToStatusCheck = function (interval) {
         .subscribe(function (resp) {
             _this.logger.logDebug("BinaryValueActorDevice - statusCheck successful");
             _this.statusChecksTimer.reportSuccessfulCheck();
+            // Saving previous operational state for reconnect detection
+            var lastOperationalState = _this.operationalState;
             _this.operationalState = {
                 status: Enums.OperationalStatus.Ok,
                 message: "Status check successful"
@@ -400,6 +415,13 @@ BinaryValue.prototype.subscribeToStatusCheck = function (interval) {
 
                 // Inits the BACnet object properties
                 _this.initProperties();
+            }
+
+            // If COV Notefications are disabled, we want to update the 'presentValue' after succesful reconnect
+            if (!_this.config.subscribeToCOV
+                && lastOperationalState.status === Enums.OperationalStatus.Error
+                && _this.operationalState.status === Enums.OperationalStatus.Ok) {
+                    _this.update();
             }
             _this.logger.logDebug("BinaryValueActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
@@ -488,8 +510,9 @@ BinaryValue.prototype.subscribeToProperty = function () {
         _this.publishStateChange();
     });
     // Gets the 'presentValue' property
-    this.subManager.subscribe = readPropertyFlow
-        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)))
+    var ovPresentValue = readPropertyFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)));
+    this.subManager.subscribe = ovPresentValue
         .subscribe(function (resp) {
         var bacnetProperty = BACnet.Helpers.Layer
             .getPropertyValue(resp.layer);
@@ -499,7 +522,14 @@ BinaryValue.prototype.subscribeToProperty = function () {
         _this.publishStateChange();
     });
     // Change the operational state and 'propsReceived' flag if all props are received
-    this.subManager.subscribe = Rx.combineLatest( ovObjectName, ovDescription)
+    var ovPropsReceived;
+    if (!this.config.subscribeToCOV) {
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovPresentValue);
+    } else {
+        // If COV subscriptions are presented, we don't need to wait for 'presentValue' - it will be received by COV anyway
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription);
+    }
+    this.subManager.subscribe = ovPropsReceived
         .pipe(RxOp.first())
         .subscribe(function() {
             _this.propsReceived = true;

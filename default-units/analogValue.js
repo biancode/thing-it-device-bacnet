@@ -614,7 +614,7 @@ AnalogValue.prototype.subscribeToProperty = function () {
     var ovPropsReceived;
     // 'Min' and 'max' present value properties are optional and may be missing
     if (!this.config.subscribeToCOV) {
-        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovUnits, ovPresentValue));
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovUnits, ovPresentValue);
     } else {
         // If COV subscriptions are presented, we don't need to wait for 'presentValue' - it will be received by COV anyway
         ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovUnits);
