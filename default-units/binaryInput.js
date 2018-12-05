@@ -497,12 +497,10 @@ BinaryInput.prototype.subscribeToProperty = function () {
     // Change the operational state and 'propsReceived' flag if all props are received
     var ovPropsReceived;
     if (!this.config.subscribeToCOV) {
-        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovPresentValue)
-        .pipe(RxOp.first());
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovPresentValue);
     } else {
         // If COV subscriptions are presented, we don't need to wait for 'presentValue' - it will be received by COV anyway
-        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription)
-        .pipe(RxOp.first());
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription);
     }
     this.subManager.subscribe = ovPropsReceived
         .pipe(RxOp.first())
