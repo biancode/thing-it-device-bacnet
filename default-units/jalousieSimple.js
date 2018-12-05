@@ -234,12 +234,12 @@ JalousieSimple.prototype.initDevice = function (deviceId) {
 }
 
 /**
- * initSubManager - initializes actor subscription manager and
+ * preInit -  creates actor subscription manager and
  * covObjectIds array.
  *
  * @return {Promise<any>}
  */
-JalousieSimple.prototype.initSubManager = function () {
+JalousieSimple.prototype.preInit = function () {
 
     this.covObjectIds = [];
     this.subManager = new Managers.SubscriptionManager();

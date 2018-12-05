@@ -200,7 +200,7 @@ BACNetDevice.prototype.start = function () {
     this.isDestroyed = false;
 
     return Bluebird.map(this.actors, function (actor) {
-        return actor.initSubManager();
+        return actor.preInit();
     }, { concurrency: 1 })
     .then((function() {
         return this.initDevice()

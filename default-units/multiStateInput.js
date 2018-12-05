@@ -255,12 +255,12 @@ MultiStateInput.prototype.initDevice = function (deviceId) {
 }
 
 /**
- * initSubManager - initializes actor subscription manager and
+ * preInit -  creates actor subscription manager and
  * covObjectIds array.
  *
  * @return {Promise<any>}
  */
-MultiStateInput.prototype.initSubManager = function () {
+MultiStateInput.prototype.preInit = function () {
 
     this.covObjectIds = [];
     this.subManager = new Managers.SubscriptionManager();

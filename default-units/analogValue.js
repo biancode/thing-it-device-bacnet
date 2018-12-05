@@ -317,12 +317,12 @@ AnalogValue.prototype.initDevice = function (deviceId) {
 }
 
 /**
- * initSubManager - initializes actor subscription manager and
+ * preInit -  creates actor subscription manager and
  * covObjectIds array.
  *
  * @return {Promise<any>}
  */
-AnalogValue.prototype.initSubManager = function () {
+AnalogValue.prototype.preInit = function () {
 
     this.covObjectIds = [];
     this.subManager = new Managers.SubscriptionManager();
