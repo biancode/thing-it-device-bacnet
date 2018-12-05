@@ -149,7 +149,7 @@ module.exports = {
                 type: {
                     id: 'boolean',
                 },
-                defaultValue: false,
+                defaultValue: true,
             }
         ]
     },
