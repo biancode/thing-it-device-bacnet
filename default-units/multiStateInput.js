@@ -118,6 +118,13 @@ module.exports = {
                     id: 'integer',
                 },
                 defaultValue: 60,
+            }, {
+                label: 'Subscribe To COV Notifications',
+                id: 'subscribeToCOV',
+                type: {
+                    id: 'boolean',
+                },
+                defaultValue: true,
             }
         ]
     },
@@ -230,7 +237,11 @@ MultiStateInput.prototype.initDevice = function (deviceId) {
     // Creates 'subscribtion' to the BACnet object properties
     this.subscribeToProperty();
 
-    // For this actor, we need to receive 'stateText' array, and only then subscribe to notifications
+    // For this actor, we need to receive 'stateText' array, and only then send subscribeCOV|readProperty for 'PresentValue'
+    if (this.config.subscribeToCOV) {
+        // Subscribe to future COV Notifications flow processing if COV messaging is enabled
+        this.subscribeToCOV()
+    }
 
     // Init status checks timer if polling time is provided
     if (this.statusChecksTimer.config.interval !== 0) {
@@ -374,6 +385,8 @@ MultiStateInput.prototype.subscribeToStatusCheck = function (interval) {
         .subscribe(function (resp) {
             _this.logger.logDebug("MultiStateInputActorDevice - statusCheck successful");
             _this.statusChecksTimer.reportSuccessfulCheck();
+            // Saving previous operational state for reconnect detection
+            var lastOperationalState = _this.operationalState;
             _this.operationalState = {
                 status: Enums.OperationalStatus.Ok,
                 message: "Status check successful"
@@ -389,6 +402,15 @@ MultiStateInput.prototype.subscribeToStatusCheck = function (interval) {
                 };
                 // Inits the BACnet object properties
                 _this.initProperties();
+            }
+
+            // If COV Notefications are disabled, we want to update the 'presentValue' after succesful reconnect
+            // add 'propsReceived' flag to the conditions, to be sure that 'stateText' property is received,
+            // and we can correctly process 'presentValue'
+            if (!_this.config.subscribeToCOV && _this.propsReceived
+                && lastOperationalState.status === Enums.OperationalStatus.Error
+                && _this.operationalState.status === Enums.OperationalStatus.Ok) {
+                    _this.update();
             }
             _this.logger.logDebug("MultiStateInputActorDevice - operationalState: " + JSON.stringify(_this.operationalState));
             _this.publishOperationalStateChange();
@@ -491,12 +513,34 @@ MultiStateInput.prototype.subscribeToProperty = function () {
             _this.logger.logDebug("MultiStateInputActorDevice - subscribeToProperty: "
                 + ("States: " + JSON.stringify(_this.state.stateText)));
             _this.publishStateChange();
-            // Creates the 'presentValue|statusFlags' property subscription
-            _this.subscribeToCOV()
-            _this.sendSubscribeCOV(_this.objectId);
+            if (!_this.config.subscribeToCOV) {
+                // Gets 'presentValue' property if COV subscriptions are disabled
+                _this.sendReadProperty(_this.objectId, BACnet.Enums.PropertyId.presentValue);
+            } else {
+                // Creates the 'presentValue|statusFlags' property subscription if COV notifications are enabled
+                _this.sendSubscribeCOV(_this.objectId);
+            }
+        });
+    // Gets the 'presentValue' property
+    var ovPresentValue = readPropertyFlow
+        .pipe(RxOp.filter(Helpers.FlowFilter.isBACnetProperty(BACnet.Enums.PropertyId.presentValue)));
+    this.subManager.subscribe = ovPresentValue
+        .subscribe(function (resp) {
+            var bacnetProperty = BACnet.Helpers.Layer
+                .getPropertyValue(resp.layer);
+            _this.state.presentValue = bacnetProperty.value;
+            var stateIndex = bacnetProperty.value - 1;
+            _this.state.presentValueText = _this.state.stateText[stateIndex];
         });
     // Change the operational state and 'propsReceived' flag if all props are received
-    this.subManager.subscribe = Rx.combineLatest( ovObjectName, ovDescription, ovStateText)
+    var ovPropsReceived;
+    if (!this.config.subscribeToCOV) {
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovStateText, ovPresentValue);
+    } else {
+        // If COV subscriptions are presented, we don't need to wait for 'presentValue' - it will be received by COV anyway
+        ovPropsReceived = Rx.combineLatest(ovObjectName, ovDescription, ovStateText);
+    }
+    this.subManager.subscribe = ovPropsReceived
         .pipe(RxOp.first())
         .subscribe(function() {
             _this.propsReceived = true;
