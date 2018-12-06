@@ -454,7 +454,14 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
         this.logger.logInfo('Received iAm response');
 
         var iAmService = resp.layer.apdu.service;
+        var prevObjId = this.objectId;
         this.objectId = iAmService.objId;
+        if (this.objectId !== prevObjId) {
+            var deviseIdKey = this.getObjectIdStringKey()
+            BACnetAction.setBACnetServer(deviseIdKey, this.socketServer);
+            BACnetAction.setBACnetServiceManager(deviceIdKey, this.serviceManager);
+            BACnetAction.setBACnetFlowManager(deviceIdKey, this.flowManager);
+        }
         
         var curAddrInfo = this.pluginConfig.manager.service.dest;
         var respAddrInfo = resp.socket.getAddressInfo();
