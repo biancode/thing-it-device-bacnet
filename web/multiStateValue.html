@@ -7,7 +7,7 @@
 
         <select [(ngModel)]="component._state.presentValue"
                 (change)="panel.callActorService(component, 'setPresentValue', {value: component._state.presentValue})">
-            <option *ngFor="let state in component._state.stateText; let i = index" [value]="i + 1">{{state}}</option>
+            <option *ngFor="let state of component._state.stateText; let i = index" [value]="i + 1">{{state}}</option>
         </select>
     </div>
 </div>

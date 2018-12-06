@@ -1,7 +1,7 @@
 <div class="flexLayout flexDirectionColumn" style="width: 100%">
     <div class="flexLayout flexAlignCenter" style="justify-content: center;">
         <div class="marginRight1 marginBottom0_5" style="flex-grow: 0; flex-shrink: 0">
-            <i ng-if="component._state.alarmValue == true" style="color: orange"
+            <i *ngIf="component._state.alarmValue == true" style="color: orange"
                class="fa fa-warning fa-2x" aria-hidden="true"></i>&nbsp;
         </div>
         <div class="marginRight1 marginBottom0_5" style="flex-grow: 0; flex-shrink: 0">

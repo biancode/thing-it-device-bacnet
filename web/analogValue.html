@@ -24,6 +24,15 @@
   width: 25px;
   height: 25px;
 }
+
+.ti-analog-value ::ng-deep .mat-slider .mat-slider-thumb-label {
+  background-color: white;
+  border: 1px #195793 solid;
+}
+
+.ti-analog-value ::ng-deep .mat-slider .mat-slider-thumb-label-text {
+  color: #195793;
+}
 </style>
 
 <div *ngIf="component?._state" class="ti-analog-value flexLayout flexDirectionColumn flexAlignCenter flexJustifyCenter flexGrow1">
@@ -33,7 +42,7 @@
     </div>
     <div class="marginRight1 marginBottom0_5" style="flex-grow: 0; flex-shrink: 0">
       <span *ngIf="component._state.unit !== ''"
-            class="lighterSecondaryColor ">{{component._state.presentValue | number: 1}} {{component._state.unit ? component._state.unit : component.configuration.unit}}</span>
+            class="lighterSecondaryColor ">{{component._state.presentValue | number:'1.2-2'}} {{component._state.unit ? component._state.unit : ''}}</span>
     </div>
     <div class="marginLeft0_5 flexGrow1" style="position: relative; width: 100%">
       <mat-slider style="width: 100%"
