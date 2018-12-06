@@ -1,30 +1,32 @@
-<div class="wrapper">
+<div class="ui-wrapper">
   <h1>BACnet UI templates test bed</h1>
-  <div>
+  <div class="ui-container">
       <h2>BACnet Device</h2>
       <bacnet-device [component]="bacnetDevice" [panel]="panel"></bacnet-device>
     </div>
-  <div>
+  <div class="ui-container">
     <h2>Analog Input</h2>
     <analog-input [component]="analogInput" [panel]="panel"></analog-input>
   </div>
-  <div>
+  <div class="ui-container">
     <h2>Analog Value</h2>
-    <analog-value [component]="analogValue" [panel]="panel"></analog-value>
+    <div>
+      <analog-value [component]="analogValue" [panel]="panel"></analog-value>
+    </div>
   </div>
-  <div>
+  <div class="ui-container">
     <h2>Binary Input</h2>
     <binary-input [component]="binaryInput" [panel]="panel"></binary-input>
   </div>
-  <div>
+  <div class="ui-container">
     <h2>Binary Value</h2>
     <binary-value [component]="binaryValue" [panel]="panel"></binary-value>
   </div>
-  <div>
+  <div class="ui-container">
     <h2>MultiState Input</h2>
     <multi-state-input [component]="multiStateInput" [panel]="panel"></multi-state-input>
   </div>
-  <div>
+  <div class="ui-container">
     <h2>MultiState Value</h2>
     <multi-state-value [component]="multiStateValue" [panel]="panel"></multi-state-value>
   </div>

@@ -1,4 +1,10 @@
-.wrapper {
+.ui-wrapper {
   padding: 10px;
   text-align: center;
+}
+
+.ui-container {
+  width: 100%!important;
+  max-width: 800px;
+  margin: 0 auto;
 }
