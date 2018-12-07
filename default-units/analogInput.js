@@ -315,6 +315,9 @@ AnalogInput.prototype.initParamsFromConfig = function () {
         this.config.objectType, 
         BACnet.Enums.ObjectType.AnalogInput
     );
+    if (_.isNil(this.config.subscribeToCOV)) {
+        this.config.subscribeToCOV = true;
+    }
 };
 
 /**

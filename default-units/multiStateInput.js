@@ -291,6 +291,9 @@ MultiStateInput.prototype.initParamsFromConfig = function () {
         this.config.objectType,
         BACnet.Enums.ObjectType.MultiStateInput
     );
+    if (_.isNil(this.config.subscribeToCOV)) {
+        this.config.subscribeToCOV = true;
+    }
 };
 
 /**

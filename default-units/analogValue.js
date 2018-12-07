@@ -350,6 +350,9 @@ AnalogValue.prototype.initParamsFromConfig = function () {
         this.config.objectId,
         BACnet.Enums.ObjectType.AnalogValue
     );
+    if (_.isNil(this.config.subscribeToCOV)) {
+        this.config.subscribeToCOV = true;
+    }
 };
 
 /**

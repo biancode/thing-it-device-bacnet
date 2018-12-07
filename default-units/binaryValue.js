@@ -300,6 +300,9 @@ BinaryValue.prototype.initParamsFromConfig = function () {
         this.config.objectId,
         BACnet.Enums.ObjectType.BinaryValue
     );
+    if (_.isNil(this.config.subscribeToCOV)) {
+        this.config.subscribeToCOV = true;
+    }
 };
 
 /**

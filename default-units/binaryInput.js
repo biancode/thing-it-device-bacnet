@@ -272,6 +272,9 @@ BinaryInput.prototype.initParamsFromConfig = function () {
         this.config.objectType, 
         BACnet.Enums.ObjectType.BinaryInput
     );
+    if (_.isNil(this.config.subscribeToCOV)) {
+        this.config.subscribeToCOV = true;
+    }
 };
 
 /**
