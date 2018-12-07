@@ -5,13 +5,12 @@
   "main": "",
   "scripts": {
     "test": "mocha ./tests/bacNetDevice.spec.js"
-
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AndreyShuleiko/thing-it-device-bacnet.git"
   },
-  "author": "Andrey Shuleiko",
+  "author": "Andrey Shuleiko, Nikita Mikhaliuk",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/AndreyShuleiko/thing-it-device-bacnet/issues"
