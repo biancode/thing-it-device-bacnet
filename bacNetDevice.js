@@ -456,9 +456,9 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
         var iAmService = resp.layer.apdu.service;
         var prevObjId = this.objectId;
         this.objectId = iAmService.objId;
-        if (this.objectId !== prevObjId) {
-            var deviseIdKey = this.getObjectIdStringKey()
-            BACnetAction.setBACnetServer(deviseIdKey, this.socketServer);
+        if (!this.objectId.isEqual(prevObjId)) {
+            var deviceIdKey = this.getObjectIdStringKey();
+            BACnetAction.setBACnetServer(deviceIdKey, this.socketServer);
             BACnetAction.setBACnetServiceManager(deviceIdKey, this.serviceManager);
             BACnetAction.setBACnetFlowManager(deviceIdKey, this.flowManager);
         }
@@ -526,7 +526,7 @@ BACNetDevice.prototype.subscribeToObject = function (interval) {
             + "Inits the TID units");
             var deviceId = this.getObjectIdStringKey();
             Bluebird.map(this.actors, function (actor) {
-                if(!actor.state.initialized) {
+                if(!actor.state || !actor.state.initialized) {
                     return actor.initDevice(deviceId);
                 }
             }, { concurrency: 1 })
