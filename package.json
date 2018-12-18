@@ -1,6 +1,6 @@
 {
   "name": "thing-it-device-bacnet",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "[thing-it-node] Device Plugin for BACnet networks.",
   "main": "",
   "scripts": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AndreyShuleiko/thing-it-device-bacnet.git"
+    "url": "git+https://github.com/thing-it/thing-it-device-bacnet.git"
   },
   "author": "Andrey Shuleiko, Nikita Mikhaliuk",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AndreyShuleiko/thing-it-device-bacnet/issues"
+    "url": "https://github.com/thing-it/thing-it-device-bacnet/issues"
   },
-  "homepage": "https://github.com/AndreyShuleiko/thing-it-device-bacnet#readme",
+  "homepage": "https://github.com/thing-it/thing-it-device-bacnet#readme",
   "devDependencies": {
     "chai": "^4.1.2",
     "mocha": "^5.1.1",
@@ -30,6 +30,6 @@
     "moment": "^2.22.1",
     "redux": "^4.0.0",
     "rxjs": "^6.1.0",
-    "tid-bacnet-logic": "git+https://github.com/NikitaMikhaliuk/tid-bacnet-logic.git"
+    "tid-bacnet-logic": "git+https://github.com/thing-it/tid-bacnet-logic.git"
   }
 }
