@@ -1,6 +1,6 @@
 {
   "name": "thing-it-device-bacnet",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "[thing-it-node] Device Plugin for BACnet networks.",
   "main": "",
   "scripts": {
