@@ -560,8 +560,9 @@ AnalogInput.prototype.subscribeToProperty = function () {
         .subscribe(function (resp) {
         var bacnetProperty = BACnet.Helpers.Layer
             .getPropertyValue(resp.layer);
-        var unit = BACnet.Enums.EngineeringUnits[bacnetProperty.value];
-        _this.state.unit = _.isNil(unit) ? 'none' : unit;
+        var unit = bacnetProperty.value === BACnet.Enums.EngineeringUnits.noUnits ?
+            '' :  BACnet.Enums.EngineeringUnits[bacnetProperty.value];
+        _this.state.unit = _.isNil(unit) ? '' : unit;
         _this.logger.logDebug("AnalogInputActorDevice - subscribeToProperty: "
             + ("Object Unit retrieved: " + _this.state.unit));
         _this.publishStateChange();
