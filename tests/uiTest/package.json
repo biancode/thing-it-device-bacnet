@@ -7,7 +7,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^7.0.4",
+    "@angular/animations": "~7.0.4",
     "@angular/cdk": "^7.1.1",
     "@angular/common": "~7.0.0",
     "@angular/compiler": "~7.0.0",
@@ -18,8 +18,10 @@
     "@angular/platform-browser": "~7.0.0",
     "@angular/platform-browser-dynamic": "~7.0.0",
     "@angular/router": "~7.0.0",
+    "@mobiscroll/angular": "file:./src/lib/mobiscroll-package/mobiscroll-angular-4.4.3.tgz",
     "core-js": "^2.5.4",
     "rxjs": "~6.3.3",
+    "rxjs-compat": "~6.3.3",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {

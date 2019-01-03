@@ -21,7 +21,8 @@
             "assets": [
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "./node_modules/@mobiscroll/angular/dist/css/mobiscroll.angular.min.css"
             ],
             "scripts": []
           },
