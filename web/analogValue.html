@@ -1,37 +1,53 @@
 <style>
-.ti-analog-value ::ng-deep .mat-slider .mat-slider-track-fill {
-  background-color: #82b0e0;
-  height: 6px!important;
-  top: calc(50% - 3px)!important;
+
+.ti-analog-value .ti-slider ::ng-deep .mbsc-slider.mbsc-progress {
+  width: 100%; /* Full-width */
+  padding: 0 8px;
 }
 
-.ti-analog-value ::ng-deep .mat-slider .mat-slider-track-background {
+.ti-analog-value .ti-slider ::ng-deep .mbsc-input-wrap {
+  padding: 0;
+}
+
+.ti-analog-value .ti-slider ::ng-deep .mbsc-progress-cont  {
+  height: 6px!important;
+  padding: 0;
+  width: calc(100% - 25px);
+}
+
+.ti-analog-value .ti-slider ::ng-deep .mbsc-progress-track  {
   height: 4px!important;
-  top: calc(50% - 2px)!important;
+  padding: 0 1px;
+  width: calc(100% + 25px);
+  background-color: rgba(0, 0, 0, 0.26);
+  position: relative;
 }
 
-.ti-analog-value ::ng-deep .mat-slider .mat-slider-track-wrapper {
+.ti-analog-value .ti-slider ::ng-deep .mbsc-progress-bar  {
   height: 6px!important;
+  background-color: #82b0e0;
+  position: absolute;
+  top: -1px;
 }
 
-.ti-analog-value ::ng-deep .mat-slider .mat-slider-thumb-container {
-  top:calc(50% + 4px)!important;
+.ti-analog-value .ti-slider ::ng-deep .mbsc-slider-handle-cont  {
+  top: 3px;
+  margin-top: -11px;
+  margin-left: 0;
+  width: 20px;
+  height: 20px;
+  position: absolute;
 }
 
-.ti-analog-value ::ng-deep .mat-slider .mat-slider-thumb {
+.ti-analog-value .ti-slider ::ng-deep .mbsc-slider-handle  {
+  top: 0;
+  right: 0;
+  margin: 0;
+  width: 20px;
+  height: 20px;
   background-color: white;
   border: 1px #195793 solid!important;
-  width: 25px;
-  height: 25px;
-}
-
-.ti-analog-value ::ng-deep .mat-slider .mat-slider-thumb-label {
-  background-color: white;
-  border: 1px #195793 solid;
-}
-
-.ti-analog-value ::ng-deep .mat-slider .mat-slider-thumb-label-text {
-  color: #195793;
+  transform: scale(1);
 }
 </style>
 
@@ -44,11 +60,13 @@
       <span *ngIf="component._state.unit !== ''"
             class="lighterSecondaryColor ">{{component._state.presentValue | number:'1.2-2'}} {{component._state.unit ? component._state.unit : ''}}</span>
     </div>
-    <div class="marginLeft0_5 flexGrow1" style="position: relative; width: 100%">
-      <mat-slider style="width: 100%"
-        [(ngModel)]="component._state.presentValue"
+    <div class="marginLeft0_5 flexGrow1" style="width: 100%; padding: 0 10px;">
+      <mbsc-slider name="ti-slider"
+        class="ti-slider"
         [min]="component._state.min ? component._state.min: component.configuration.min"
         [max]="component._state.max ? component._state.max: component.configuration.max"
-        (change)="panel.callActorService(component, 'changeValue', {value: component._state.presentValue} )"></mat-slider>
+        live="false"
+        [(ngModel)]="component._state.presentValue"
+        (change)="panel.callActorService(component, 'changeValue', {value: component._state.presentValue} )"></mbsc-slider>
     </div>
   </div>
