@@ -26,17 +26,16 @@
 .ti-analog-value .ti-slider ::ng-deep .mbsc-progress-bar  {
   height: 6px!important;
   background-color: #82b0e0;
-  position: absolute;
   top: -1px;
 }
 
 .ti-analog-value .ti-slider ::ng-deep .mbsc-slider-handle-cont  {
+  position: absolute;
   top: 3px;
   margin-top: -11px;
   margin-left: 0;
   width: 20px;
   height: 20px;
-  position: absolute;
 }
 
 .ti-analog-value .ti-slider ::ng-deep .mbsc-slider-handle  {
@@ -48,6 +47,13 @@
   background-color: white;
   border: 1px #195793 solid!important;
   transform: scale(1);
+}
+
+.ti-analog-value .ti-slider ::ng-deep .mbsc-slider-handle::before  {
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
 }
 </style>
 
