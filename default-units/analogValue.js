@@ -353,6 +353,12 @@ AnalogValue.prototype.initParamsFromConfig = function () {
     if (_.isNil(this.config.subscribeToCOV)) {
         this.config.subscribeToCOV = true;
     }
+    var minValue = this.config.minValue;
+    this.state.min = !_.isNil(minValue) && !_.isNaN(+minValue) ?
+        minValue : 0;
+    var maxValue = this.config.maxValue;
+    this.state.max = !_.isNil(maxValue) && !_.isNaN(+maxValue) ?
+        maxValue : 100;
 };
 
 /**
@@ -547,7 +553,10 @@ AnalogValue.prototype.subscribeToProperty = function () {
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
                 .getPropertyValue(resp.layer);
-            _this.state.max = bacnetProperty.value;
+            var maxValue = bacnetProperty.value;
+            if (!_.isNil(maxValue)) {
+                _this.state.max = maxValue;
+            }
             _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
                 + ("Max value for 'Present Value' property retrieved: " + _this.state.max));
             _this.publishStateChange();
@@ -558,7 +567,10 @@ AnalogValue.prototype.subscribeToProperty = function () {
         .subscribe(function (resp) {
             var bacnetProperty = BACnet.Helpers.Layer
                 .getPropertyValue(resp.layer);
-            _this.state.min = bacnetProperty.value;
+            var minValue = bacnetProperty.value;
+            if (!_.isNil(minValue)) {
+                _this.state.min = minValue;
+            }
         _this.logger.logDebug("AnalogValueActorDevice - subscribeToProperty: "
             + ("Min value for 'Present Value' property retrieved: " + _this.state.min));
             _this.publishStateChange();
