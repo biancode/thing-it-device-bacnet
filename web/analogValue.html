@@ -69,8 +69,8 @@
     <div class="marginLeft0_5 flexGrow1" style="width: 100%; padding: 0 10px;">
       <mbsc-slider name="ti-slider"
         class="ti-slider"
-        [min]="component._state.min ? component._state.min: component.configuration.min"
-        [max]="component._state.max ? component._state.max: component.configuration.max"
+        [min]="component._state.min ? component._state.min: component.configuration.minValue"
+        [max]="component._state.max ? component._state.max: component.configuration.maxValue"
         live="false"
         [(ngModel)]="component._state.presentValue"
         (change)="panel.callActorService(component, 'changeValue', {value: component._state.presentValue} )"></mbsc-slider>
